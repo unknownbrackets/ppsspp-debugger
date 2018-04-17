@@ -1,5 +1,12 @@
-body {
+html {
+	height: 100%;
+}
+
+html, body, #root {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	font-family: sans-serif;
 	margin: 0;
 	padding: 0;
-	font-family: sans-serif;
 }

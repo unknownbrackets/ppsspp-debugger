@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Log from './Log';
 import PPSSPP from '../sdk/ppsspp.js';
 import logo from '../assets/logo.svg';
 import './App.css';
@@ -6,10 +7,13 @@ import './App.css';
 class App extends Component {
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			ppsspp: null,
 			connecting: false,
 		};
+
+		this.logRef = React.createRef();
 	}
 
 	render() {
@@ -22,7 +26,8 @@ class App extends Component {
 				<p className="App-intro">
 					To get started, edit <code>src/App.js</code> and save to reload.
 				</p>
-				<div>{this.button()}</div>
+				<div className="App-button">{this.button()}</div>
+				<Log ppsspp={this.state.ppsspp} ref={this.logRef} />
 			</div>
 		);
 	}
@@ -40,19 +45,16 @@ class App extends Component {
 		let ppsspp = new PPSSPP();
 		this.setState({ connecting: true });
 
-		ppsspp.onError = (message, level) => {
-			console.log(message);
-		};
 		ppsspp.onClose = () => {
-			console.log('Disconnected');
+			this.log('Debugger disconnected');
 			this.setState({ ppsspp: null, connecting: false });
 		};
 
 		ppsspp.autoConnect().then(() => {
-			console.log('Connected');
+			this.log('Debugger connected');
 			this.setState({ ppsspp, connecting: false });
 		}, err => {
-			console.log('Connect failed', err);
+			this.log('Debugger could not connect');
 			this.setState({ ppsspp: null, connecting: false });
 		});
 	}
@@ -60,6 +62,11 @@ class App extends Component {
 	handleDisconnect = () => {
 		// Should trigger the appropriate events automatically.
 		this.state.ppsspp.disconnect();
+	}
+
+	log = (message) => {
+		// Would rather keep Log managing its state, and pass this callback around.
+		this.logRef.current.addLogItem({ message: message + '\n' });
 	}
 }
 
