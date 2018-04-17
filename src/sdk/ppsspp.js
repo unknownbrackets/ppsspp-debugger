@@ -109,6 +109,16 @@ export default class PPSSPP {
 		}
 
 		this.listeners_[eventName].push(handler);
+
+		return {
+			remove: () => {
+				const list = this.listeners_[eventName];
+				const index = list.indexOf(handler);
+				if (index !== -1) {
+					list.splice(index, 1);
+				}
+			},
+		};
 	}
 
 	send(data) {
