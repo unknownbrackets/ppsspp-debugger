@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import CPU from './CPU';
 import Log from './Log';
 import PPSSPP from '../sdk/ppsspp.js';
 import logo from '../assets/logo.svg';
@@ -27,6 +28,7 @@ class App extends Component {
 					To get started, edit <code>src/App.js</code> and save to reload.
 				</p>
 				<div className="App-button">{this.button()}</div>
+				<CPU ppsspp={this.state.ppsspp} log={this.log} />
 				<Log ppsspp={this.state.ppsspp} ref={this.logRef} />
 			</div>
 		);

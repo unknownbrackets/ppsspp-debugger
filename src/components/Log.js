@@ -50,27 +50,32 @@ class Log extends Component {
 		});
 	}
 
-	checkConnected() {
-		if (this.props.ppsspp !== null && this.state.listener === null) {
-			const listener = this.registerListener();
-			this.setState({ listener });
-		}
-		if (this.props.ppsspp === null && this.state.listener !== null) {
+	connectionChanged() {
+		let listener = null;
+		if (this.state.listener !== null) {
+			// Remove the old listener, even if we have a new connection.
 			this.state.listener.remove();
-			this.setState({ listener: null });
 		}
+		if (this.props.ppsspp !== null) {
+			listener = this.registerListener();
+		}
+		this.setState({ listener });
 	}
 
 	componentDidMount() {
-		this.checkConnected();
+		if (this.props.ppsspp !== null) {
+			this.connectionChanged();
+		}
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		this.checkConnected();
+		if (prevProps.ppsspp !== this.props.ppsspp) {
+			this.connectionChanged();
+		}
 	}
 
 	componentWillUnmount() {
-		if (this.state.listener) {
+		if (this.state.listener !== null) {
 			this.state.listener.remove();
 		}
 	}
