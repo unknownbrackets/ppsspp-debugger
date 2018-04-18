@@ -41,6 +41,11 @@ class App extends Component {
 		return <button onClick={this.handleConnect}>Connect</button>;
 	}
 
+	componentDidMount() {
+		// Connect automatically on start.
+		this.handleConnect();
+	}
+
 	handleConnect = () => {
 		let ppsspp = new PPSSPP();
 		this.setState({ connecting: true });
