@@ -1,0 +1,39 @@
+#RegPanel {
+	font-family: Consolas, monospace;
+	text-align: start;
+	width: 22ex;
+}
+
+#RegPanel dl {
+	line-height: 1.2em;
+	max-height: calc(1.2em * 35);
+	overflow-y: auto;
+}
+
+#RegPanel dt {
+	clear: both;
+	float: left;
+	margin: 0;
+	padding: 0;
+	width: 7ex;
+}
+
+#RegPanel dt::before {
+	background: #e8efff;
+	content: "";
+	display: block;
+	float: left;
+	height: 1em;
+	margin-right: 2px;
+	width: 2ex;
+}
+
+#RegPanel dd {
+	margin: 0;
+	margin-left: 10ex;
+	padding: 0;
+}
+
+.RegPanel__changed {
+	color: red;
+}

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import RegPanel from './CPU/RegPanel';
 import listeners from '../utils/listeners.js';
 
 class CPU extends Component {
@@ -14,6 +15,7 @@ class CPU extends Component {
 	render() {
 		return (
 			<div id="CPU">
+				<RegPanel ppsspp={this.props.ppsspp} stepping={this.state.stepping} />
 				Paused: {this.state.paused ? 'y' : 'n'}, Stepping: {this.state.stepping ? 'y' : 'n'}
 			</div>
 		);
