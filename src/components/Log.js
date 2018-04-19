@@ -13,19 +13,20 @@ class Log extends Component {
 			id: 0,
 			items: [],
 		};
+
+		this.divRef = React.createRef();
 	}
 
 	render() {
 		return (
-			<div id="Log">
+			<div id="Log" ref={this.divRef}>
 				{this.state.items.map(this.renderItem.bind(this))}
 			</div>
 		);
 	}
 
 	renderItem(item) {
-		const isLatestItem = item.id === this.state.id;
-		return <LogItem key={item.id} isLatestItem={isLatestItem} item={item} />;
+		return <LogItem key={item.id} item={item} />;
 	}
 
 	addLogItem(newItem) {
@@ -47,6 +48,13 @@ class Log extends Component {
 		this.listeners_ = listeners.listen({
 			'log': this.onLogEvent.bind(this),
 		});
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.id !== this.state.id) {
+			const div = this.divRef.current;
+			div.scrollTop = div.scrollHeight - div.clientHeight;
+		}
 	}
 
 	componentWillUnmount() {

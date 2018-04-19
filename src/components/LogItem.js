@@ -3,8 +3,6 @@ import React, { Component } from 'react';
 class LogItem extends Component {
 	constructor(props) {
 		super(props);
-
-		this.spanRef = React.createRef();
 	}
 
 	render() {
@@ -17,7 +15,7 @@ class LogItem extends Component {
 
 	renderInternal() {
 		return (
-			<span className={this.makeClassName()} ref={this.spanRef}>
+			<span className={this.makeClassName()}>
 				{this.props.item.message}
 			</span>
 		);
@@ -29,7 +27,7 @@ class LogItem extends Component {
 		const timestamp = item.header.substr(0, 10);
 		const header = item.header.substr(10) + ' ';
 		return (
-			<span className={this.makeClassName()} ref={this.spanRef}>
+			<span className={this.makeClassName()}>
 				<span className="Log__message__header">
 					<span className="Log__message__timestamp">{timestamp}</span>
 					{header}
@@ -37,11 +35,6 @@ class LogItem extends Component {
 				{item.message}
 			</span>
 		);
-	}
-
-	componentDidMount() {
-		if (this.props.isLatestItem)
-			this.spanRef.current.scrollIntoView();
 	}
 
 	makeClassName() {
