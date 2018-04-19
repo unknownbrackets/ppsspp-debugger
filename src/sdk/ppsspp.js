@@ -21,7 +21,7 @@
 //  - connect(uri): Connect to a specific WebSocket URI (begins with ws://.)  Returns a promise.
 //  - disconnect(): Disconnect from PPSSPP.  No return.
 //  - listen(name, handler): Adds a listener for unsolicited events (e.g. 'log') or '*' for all.  No return.
-//      The handler takes one parameter, the data object.
+//      The handler takes two parameter, the data object, and whether any previous handler returned true.
 //  - send(object): Send an event to PPSSPP.  Returns a promise resolving to the data object.
 //      Note that not all PPSSPP events have a response.  You may receive null or it may never resolve.
 //
@@ -170,11 +170,11 @@ export default class PPSSPP {
 					this.handleError_(data.message, data.level);
 				}
 
+				let handled = false;
 				if ('ticket' in data) {
-					this.handleTicket_(data.ticket, data);
-				} else {
-					this.handleMessage_(data);
+					handled = this.handleTicket_(data.ticket, data);
 				}
+				this.handleMessage_(data, handled);
 			} catch (err) {
 				this.handleError_('Failed to parse message from PPSSPP: ' + err.message, ErrorLevels.ERROR);
 			}
@@ -204,22 +204,27 @@ export default class PPSSPP {
 			delete this.pendingTickets_[data.ticket];
 
 			handler(data);
-		} else {
-			this.handleError_('Received mismatched ticket: ' + JSON.stringify(data), ErrorLevels.ERROR);
+			return true;
 		}
+
+		this.handleError_('Received mismatched ticket: ' + JSON.stringify(data), ErrorLevels.ERROR);
+		return false;
 	}
 
-	handleMessage_(data) {
-		this.executeHandlers_('*', data);
-		this.executeHandlers_(data.event, data);
+	handleMessage_(data, handled) {
+		handled = this.executeHandlers_(data.event, data, handled);
+		this.executeHandlers_('*', data, handled);
 	}
 
-	executeHandlers_(name, data) {
+	executeHandlers_(name, data, handled) {
 		if (name in this.listeners_) {
 			for (let handler of this.listeners_[name]) {
-				handler(data);
+				if (handler(data, handled)) {
+					handled = true;
+				}
 			}
 		}
+		return handled;
 	}
 
 	handleError_(message, level) {
