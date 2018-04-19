@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import CPU from './CPU';
 import Log from './Log';
 import PPSSPP from '../sdk/ppsspp.js';
+import listeners from '../utils/listeners.js';
 import logo from '../assets/logo.svg';
 import './App.css';
 
@@ -10,11 +11,13 @@ class App extends Component {
 		super(props);
 
 		this.state = {
-			ppsspp: null,
+			connected: false,
 			connecting: false,
 		};
 
 		this.logRef = React.createRef();
+		this.ppsspp_ = new PPSSPP();
+		listeners.init(this.ppsspp_);
 	}
 
 	render() {
@@ -28,8 +31,8 @@ class App extends Component {
 					To get started, edit <code>src/App.js</code> and save to reload.
 				</p>
 				<div className="App-button">{this.button()}</div>
-				<CPU ppsspp={this.state.ppsspp} log={this.log} />
-				<Log ppsspp={this.state.ppsspp} ref={this.logRef} />
+				<CPU ppsspp={this.ppsspp_} log={this.log} />
+				<Log ppsspp={this.ppsspp_} ref={this.logRef} />
 			</div>
 		);
 	}
@@ -37,7 +40,7 @@ class App extends Component {
 	button() {
 		if (this.state.connecting) {
 			return <button disabled="disabled">Connecting...</button>;
-		} else if (this.state.ppsspp) {
+		} else if (this.state.connected) {
 			return <button onClick={this.handleDisconnect}>Disconnect</button>;
 		}
 		return <button onClick={this.handleConnect}>Connect</button>;
@@ -49,26 +52,28 @@ class App extends Component {
 	}
 
 	handleConnect = () => {
-		let ppsspp = new PPSSPP();
 		this.setState({ connecting: true });
 
-		ppsspp.onClose = () => {
+		this.ppsspp_.onClose = () => {
 			this.log('Debugger disconnected');
-			this.setState({ ppsspp: null, connecting: false });
+			listeners.change(false);
+			this.setState({ connected: false, connecting: false });
 		};
 
-		ppsspp.autoConnect().then(() => {
+		this.ppsspp_.autoConnect().then(() => {
 			this.log('Debugger connected');
-			this.setState({ ppsspp, connecting: false });
+			listeners.change(true);
+			this.setState({ connected: true, connecting: false });
 		}, err => {
 			this.log('Debugger could not connect');
-			this.setState({ ppsspp: null, connecting: false });
+			listeners.change(false);
+			this.setState({ connected: false, connecting: false });
 		});
 	}
 
 	handleDisconnect = () => {
 		// Should trigger the appropriate events automatically.
-		this.state.ppsspp.disconnect();
+		this.ppsspp_.disconnect();
 	}
 
 	log = (message) => {

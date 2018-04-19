@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import LogItem from './LogItem';
+import listeners from '../utils/listeners.js';
 import './Log.css';
 
 const MAX_LINES = 5000;
@@ -11,7 +12,6 @@ class Log extends Component {
 		this.state = {
 			id: 0,
 			items: [],
-			listener: null,
 		};
 	}
 
@@ -28,18 +28,6 @@ class Log extends Component {
 		return <LogItem key={item.id} isLatestItem={isLatestItem} item={item} />;
 	}
 
-	registerListener() {
-		this.props.ppsspp.onError = (message, level) => {
-			const newItem = { message: message + '\n', level };
-			this.addLogItem(newItem);
-		};
-
-		return this.props.ppsspp.listen('log', (data) => {
-			const newItem = { ...data };
-			this.addLogItem(newItem);
-		});
-	}
-
 	addLogItem(newItem) {
 		const id = this.state.id + 1;
 		const itemWithId = { id, ...newItem };
@@ -50,34 +38,24 @@ class Log extends Component {
 		});
 	}
 
-	connectionChanged() {
-		let listener = null;
-		if (this.state.listener !== null) {
-			// Remove the old listener, even if we have a new connection.
-			this.state.listener.remove();
-		}
-		if (this.props.ppsspp !== null) {
-			listener = this.registerListener();
-		}
-		this.setState({ listener });
-	}
-
 	componentDidMount() {
-		if (this.props.ppsspp !== null) {
-			this.connectionChanged();
-		}
-	}
+		this.props.ppsspp.onError = (message, level) => {
+			const newItem = { message: message + '\n', level };
+			this.addLogItem(newItem);
+		};
 
-	componentDidUpdate(prevProps, prevState) {
-		if (prevProps.ppsspp !== this.props.ppsspp) {
-			this.connectionChanged();
-		}
+		this.listeners_ = listeners.listen({
+			'log': this.onLogEvent.bind(this),
+		});
 	}
 
 	componentWillUnmount() {
-		if (this.state.listener !== null) {
-			this.state.listener.remove();
-		}
+		listeners.forget(this.listeners_);
+	}
+
+	onLogEvent(data) {
+		const newItem = { ...data };
+		this.addLogItem(newItem);
 	}
 }
 
