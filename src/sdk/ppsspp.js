@@ -160,6 +160,7 @@ export default class PPSSPP {
 			}
 
 			this.failAllPending_('PPSSPP disconnected');
+			this.socket_ = null;
 		};
 
 		this.socket_.onmessage = (e) => {
