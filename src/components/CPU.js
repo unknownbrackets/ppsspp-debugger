@@ -15,7 +15,7 @@ class CPU extends Component {
 	render() {
 		return (
 			<div id="CPU">
-				<RegPanel ppsspp={this.props.ppsspp} stepping={this.state.stepping} />
+				<RegPanel {...this.props} stepping={this.state.stepping} />
 				Paused: {this.state.paused ? 'y' : 'n'}, Stepping: {this.state.stepping ? 'y' : 'n'}
 			</div>
 		);
@@ -48,6 +48,8 @@ class CPU extends Component {
 		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
 			const { stepping, paused } = result;
 			this.setState({ stepping, paused });
+		}, (err) => {
+			this.setState({ stepping: false, paused: true });
 		});
 	}
 }

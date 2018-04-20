@@ -20,20 +20,20 @@ class RegPanel extends Component {
 			<div id="RegPanel">
 				{this.state.categories.map(c => c.name)}
 				<br />
-				{this.state.categories.map(c => <RegList key={c.id} contextmenu="reglist" {...c} />)}
+				{this.state.categories.map(c => <RegList key={c.id} contextmenu="reglist" onDoubleClick={this.handleChangeReg} {...c} />)}
 
 				<ContextMenu id="reglist">
-					<MenuItem data={{ action: 'memory' }} disabled={disabled} onClick={this.handleViewMemory}>
+					<MenuItem data={{ action: 'memory' }} onClick={this.handleViewMemory}>
 						Go to in Memory View
 					</MenuItem>
-					<MenuItem data={{ action: 'disasm' }} disabled={disabled} onClick={this.handleViewDisassembly}>
+					<MenuItem data={{ action: 'disasm' }} onClick={this.handleViewDisassembly}>
 						Go to in Disassembly
 					</MenuItem>
 					<MenuItem divider />
-					<MenuItem data={{ action: 'copy' }} disabled={disabled} onClick={this.handleCopyReg}>
+					<MenuItem data={{ action: 'copy' }} onClick={this.handleCopyReg}>
 						Copy Value
 					</MenuItem>
-					<MenuItem data={{ action: 'change' }} disabled={disabled} onClick={this.handleRegAction}>
+					<MenuItem data={{ action: 'change' }} disabled={disabled} onClick={this.handleChangeReg}>
 						Change...
 					</MenuItem>
 				</ContextMenu>
@@ -53,17 +53,17 @@ class RegPanel extends Component {
 		listeners.forget(this.listeners_);
 	}
 
-	handleViewMemory(ev, data) {
+	handleViewMemory = (ev, data) => {
 		// TODO
 		console.log(data);
 	}
 
-	handleViewDisassembly(ev, data) {
+	handleViewDisassembly = (ev, data) => {
 		// TODO
 		console.log(data);
 	}
 
-	handleCopyReg(ev, data, regNode) {
+	handleCopyReg = (ev, data, regNode) => {
 		const textNode = regNode.querySelector('dd').firstChild;
 		const range = document.createRange();
 		range.setStart(textNode, 0);
@@ -76,15 +76,32 @@ class RegPanel extends Component {
 		try {
 			document.execCommand('copy');
 		} catch (e) {
-			window.alert('Could not copy: ' + e);
+			this.props.log('Could not copy register: ' + e);
 		}
 
 		selection.removeAllRanges();
 	}
 
-	handleChangeReg(ev, data) {
-		// TODO
-		console.log(data);
+	handleChangeReg = (ev, data, regNode) => {
+		const prevValue = (data.cat === 0 ? '0x' : '') + data.value;
+		const registerName = this.state.categories[data.cat].registerNames[data.reg];
+
+		const newValue = window.prompt('New value for ' + registerName, prevValue);
+		if (newValue === null) {
+			return;
+		}
+
+		const packet = {
+			event: 'cpu.setReg',
+			category: data.cat,
+			register: data.reg,
+			value: newValue,
+		};
+
+		// The result is automatically listened for.
+		this.props.ppsspp.send(packet).catch((err) => {
+			window.alert(err);
+		});
 	}
 
 	updateRegs() {
@@ -97,6 +114,9 @@ class RegPanel extends Component {
 				cat.floatValuesLast = hasPrev ? this.state.categories[cat.id].floatValues : cat.floatValues;
 			}
 			this.setState({ categories });
+		}, (err) => {
+			// Leave regs alone.
+			console.error(err);
 		});
 	}
 
@@ -109,8 +129,9 @@ class RegPanel extends Component {
 			if (cat.id === result.category) {
 				return {
 					...cat,
-					uintValuesLast: cat.uintValues,
-					floatValuesLast: cat.floatValues,
+					// Keep values from last time, until next stepping.
+					uintValuesLast: cat.uintValuesLast,
+					floatValuesLast: cat.floatValuesLast,
 					uintValues: replaceCopy(cat.uintValues, result.register, result.uintValue),
 					floatValues: replaceCopy(cat.floatValues, result.register, result.floatValue),
 				};
@@ -124,6 +145,7 @@ class RegPanel extends Component {
 
 RegPanel.defaultProps = {
 	ppsspp: null,
+	log: null,
 	stepping: false,
 };
 

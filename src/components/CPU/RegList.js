@@ -14,10 +14,13 @@ class RegList extends Component {
 
 	renderReg(name, reg) {
 		const mapData = (props) => {
-			return { cat: this.props.id, reg };
+			return { cat: this.props.id, reg, value: this.format(reg) };
+		};
+		const attributes = {
+			onDoubleClick: (ev) => this.props.onDoubleClick(ev, mapData()),
 		};
 		return (
-			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} key={reg}>
+			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" attributes={attributes} collect={mapData} key={reg}>
 				<dt>{name}</dt>
 				<dd className={this.changed(reg) ? 'RegPanel__changed' : ''}>
 					{this.format(reg)}
@@ -44,6 +47,7 @@ class RegList extends Component {
 RegList.defaultProps = {
 	id: null,
 	contextmenu: null,
+	onDoubleClick: null,
 	registerNames: [],
 	uintValues: [],
 	floatValues: [],
