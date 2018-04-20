@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import { ContextMenu, MenuItem } from 'react-contextmenu';
 import RegList from './RegList';
 import listeners from '../../utils/listeners.js';
 import './RegPanel.css';
+import '../react-contextmenu.css';
 
 class RegPanel extends Component {
 	constructor(props) {
@@ -13,11 +15,28 @@ class RegPanel extends Component {
 	}
 
 	render() {
+		const disabled = !this.props.stepping;
 		return (
 			<div id="RegPanel">
 				{this.state.categories.map(c => c.name)}
 				<br />
-				{this.state.categories.map(c => <RegList key={c.id} {...c} />)}
+				{this.state.categories.map(c => <RegList key={c.id} contextmenu="reglist" {...c} />)}
+
+				<ContextMenu id="reglist">
+					<MenuItem data={{ action: 'memory' }} disabled={disabled} onClick={this.handleViewMemory}>
+						Go to in Memory View
+					</MenuItem>
+					<MenuItem data={{ action: 'disasm' }} disabled={disabled} onClick={this.handleViewDisassembly}>
+						Go to in Disassembly
+					</MenuItem>
+					<MenuItem divider />
+					<MenuItem data={{ action: 'copy' }} disabled={disabled} onClick={this.handleCopyReg}>
+						Copy Value
+					</MenuItem>
+					<MenuItem data={{ action: 'change' }} disabled={disabled} onClick={this.handleRegAction}>
+						Change...
+					</MenuItem>
+				</ContextMenu>
 			</div>
 		);
 	}
@@ -32,6 +51,40 @@ class RegPanel extends Component {
 
 	componentWillUnmount() {
 		listeners.forget(this.listeners_);
+	}
+
+	handleViewMemory(ev, data) {
+		// TODO
+		console.log(data);
+	}
+
+	handleViewDisassembly(ev, data) {
+		// TODO
+		console.log(data);
+	}
+
+	handleCopyReg(ev, data, regNode) {
+		const textNode = regNode.querySelector('dd').firstChild;
+		const range = document.createRange();
+		range.setStart(textNode, 0);
+		range.setEnd(textNode, textNode.textContent.length);
+
+		const selection = window.getSelection();
+		selection.removeAllRanges();
+		selection.addRange(range);
+
+		try {
+			document.execCommand('copy');
+		} catch (e) {
+			window.alert('Could not copy: ' + e);
+		}
+
+		selection.removeAllRanges();
+	}
+
+	handleChangeReg(ev, data) {
+		// TODO
+		console.log(data);
 	}
 
 	updateRegs() {

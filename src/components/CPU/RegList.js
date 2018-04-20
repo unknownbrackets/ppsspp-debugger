@@ -1,18 +1,28 @@
 import React, { Component } from 'react';
+import { ContextMenuTrigger } from 'react-contextmenu';
 
 class RegList extends Component {
 	render() {
 		return (
-			<dl>
+			<dl key="dl">
 				{this.props.registerNames.map((name, reg) => {
-					return [
-						<dt key={`dt-${reg}`}>{name}</dt>,
-						<dd key={`dd-${reg}`} class={this.changed(reg) ? 'RegPanel__changed' : ''}>
-							{this.format(reg)}
-						</dd>
-					];
+					return this.renderReg(name, reg);
 				})}
 			</dl>
+		);
+	}
+
+	renderReg(name, reg) {
+		const mapData = (props) => {
+			return { cat: this.props.id, reg };
+		};
+		return (
+			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} key={reg}>
+				<dt>{name}</dt>
+				<dd className={this.changed(reg) ? 'RegPanel__changed' : ''}>
+					{this.format(reg)}
+				</dd>
+			</ContextMenuTrigger>
 		);
 	}
 
@@ -33,6 +43,7 @@ class RegList extends Component {
 
 RegList.defaultProps = {
 	id: null,
+	contextmenu: null,
 	registerNames: [],
 	uintValues: [],
 	floatValues: [],

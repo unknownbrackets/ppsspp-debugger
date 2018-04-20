@@ -1,13 +1,13 @@
 #RegPanel {
-	font-family: Consolas, monospace;
-	text-align: start;
 	width: 22ex;
 }
 
 #RegPanel dl {
+	font-family: Consolas, monospace;
 	line-height: 1.2em;
 	max-height: calc(1.2em * 35);
 	overflow-y: auto;
+	text-align: start;
 }
 
 #RegPanel dt {
