@@ -22,22 +22,29 @@ class RegPanel extends Component {
 				<br />
 				{this.state.categories.map(c => <RegList key={c.id} contextmenu="reglist" onDoubleClick={this.handleChangeReg} {...c} />)}
 
-				<ContextMenu id="reglist">
-					<MenuItem data={{ action: 'memory' }} onClick={this.handleViewMemory}>
-						Go to in Memory View
-					</MenuItem>
-					<MenuItem data={{ action: 'disasm' }} onClick={this.handleViewDisassembly}>
-						Go to in Disassembly
-					</MenuItem>
-					<MenuItem divider />
-					<MenuItem data={{ action: 'copy' }} onClick={this.handleCopyReg}>
-						Copy Value
-					</MenuItem>
-					<MenuItem data={{ action: 'change' }} disabled={disabled} onClick={this.handleChangeReg}>
-						Change...
-					</MenuItem>
-				</ContextMenu>
+				{this.renderContextMenu()}
 			</div>
+		);
+	}
+
+	renderContextMenu() {
+		const disabled = !this.props.stepping;
+		return (
+			<ContextMenu id="reglist">
+				<MenuItem data={{ action: 'memory' }} onClick={this.handleViewMemory}>
+					Go to in Memory View
+					</MenuItem>
+				<MenuItem data={{ action: 'disasm' }} onClick={this.handleViewDisassembly}>
+					Go to in Disassembly
+					</MenuItem>
+				<MenuItem divider />
+				<MenuItem data={{ action: 'copy' }} onClick={this.handleCopyReg}>
+					Copy Value
+					</MenuItem>
+				<MenuItem data={{ action: 'change' }} disabled={disabled} onClick={this.handleChangeReg}>
+					Change...
+					</MenuItem>
+			</ContextMenu>
 		);
 	}
 
