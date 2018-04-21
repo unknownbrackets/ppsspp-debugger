@@ -4,19 +4,21 @@
 
 #RegPanel dl {
 	font-family: Consolas, monospace;
-	line-height: 1.2em;
+	line-height: 0.8em;
 	margin-top: 2px;
-	max-height: calc(1.2em * 35);
+	height: calc(28em + 70px);
 	overflow-y: auto;
 	text-align: start;
 }
 
 #RegPanel dt {
 	clear: both;
+	cursor: default;
 	float: left;
 	margin: 0;
+	margin-bottom: 2px;
 	padding: 0;
-	width: 7ex;
+	width: 8ex;
 }
 
 #RegPanel dt::before {
@@ -24,15 +26,19 @@
 	content: "";
 	display: block;
 	float: left;
-	height: 1em;
+	height: 10px;
+	margin-left: 1px;
 	margin-right: 2px;
-	width: 2ex;
+	width: 14px;
 }
 
 #RegPanel dd {
+	cursor: default;
 	margin: 0;
-	margin-left: 10ex;
+	margin-bottom: 2px;
+	margin-left: 16px;
 	padding: 0;
+	padding-left: 8ex;
 }
 
 .RegPanel__changed {
