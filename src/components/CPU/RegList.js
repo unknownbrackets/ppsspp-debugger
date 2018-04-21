@@ -26,7 +26,7 @@ class RegList extends Component {
 			return { cat: this.props.id, reg, value: this.format(reg) };
 		};
 		const attributes = {
-			onDoubleClick: (ev) => this.props.onDoubleClick(ev, mapData()),
+			onDoubleClick: (ev) => this.onDoubleClick(ev, mapData()),
 			onMouseDown: (ev) => this.setState({ cursor: reg }),
 		};
 		const ddClasses = {
@@ -56,6 +56,12 @@ class RegList extends Component {
 
 	changed(reg) {
 		return this.props.uintValues[reg] !== this.props.uintValuesLast[reg];
+	}
+
+	onDoubleClick = (ev, data) => {
+		if (ev.button === 0) {
+			this.props.onDoubleClick(ev, data);
+		}
 	}
 }
 
