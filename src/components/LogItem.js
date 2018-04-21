@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import classNames from 'classnames';
 
 class LogItem extends Component {
 	render() {
@@ -35,18 +36,12 @@ class LogItem extends Component {
 
 	makeClassName() {
 		const { item } = this.props;
-		let itemClass = 'Log__message';
 
-		if (item.event === 'log') {
-			itemClass += ' Log__message--channel-' + item.channel;
-		} else {
-			itemClass += ' Log__message--internal';
-		}
-
-		if (item.level !== undefined)
-			itemClass += ' Log__message--level-' + item.level;
-
-		return itemClass;
+		return classNames('Log__message', {
+			'Log__message--internal': item.event !== 'log',
+			['Log__message--channel-' + item.channel]: item.event === 'log',
+			['Log__message--level-' + item.level]: true,
+		});
 	}
 }
 

@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"license": "GPL-3.0-or-later",
 	"dependencies": {
+		"classnames": "^2.2.5",
 		"react": "^16.3.1",
 		"react-contextmenu": "^2.9.2",
 		"react-dom": "^16.3.1",

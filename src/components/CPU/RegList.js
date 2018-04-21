@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
+import classNames from 'classnames';
 
 class RegList extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			cursor: 0,
+		};
+	}
+
 	render() {
 		return (
 			<dl key="dl">
@@ -18,11 +27,17 @@ class RegList extends Component {
 		};
 		const attributes = {
 			onDoubleClick: (ev) => this.props.onDoubleClick(ev, mapData()),
+			onMouseDown: (ev) => this.setState({ cursor: reg }),
 		};
+		const ddClasses = {
+			'RegPanel__item--changed': this.changed(reg),
+			'RegPanel__item--selected': this.state.cursor === reg,
+		};
+
 		return (
 			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" attributes={attributes} collect={mapData} key={reg}>
 				<dt>{name}</dt>
-				<dd className={this.changed(reg) ? 'RegPanel__changed' : ''}>
+				<dd className={classNames(ddClasses)}>
 					{this.format(reg)}
 				</dd>
 			</ContextMenuTrigger>
