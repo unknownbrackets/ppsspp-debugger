@@ -1,12 +1,12 @@
 #RegPanel {
-	width: 22ex;
+	width: 24ex;
 }
 
 #RegPanel dl {
 	font-family: Consolas, monospace;
 	line-height: 0.8em;
 	margin-top: 1px;
-	height: calc(28em + 70px);
+	height: calc(28em + 71px);
 	overflow-y: auto;
 	text-align: start;
 }
@@ -24,10 +24,9 @@
 
 #RegPanel dt::before {
 	background: #e8efff;
-	content: "";
-	display: block;
+	content: "\00A0";
+	display: inline-block;
 	float: left;
-	height: 10px;
 	margin-left: 1px;
 	margin-right: 2px;
 	vertical-align: top;
