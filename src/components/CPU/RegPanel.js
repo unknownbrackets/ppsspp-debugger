@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { ContextMenu, MenuItem } from 'react-contextmenu';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import RegList from './RegList';
 import listeners from '../../utils/listeners.js';
 import './RegPanel.css';
-import '../react-contextmenu.css';
+import '../ext/react-contextmenu.css';
+import '../ext/react-tabs.css';
 
 class RegPanel extends Component {
 	constructor(props) {
@@ -15,15 +17,32 @@ class RegPanel extends Component {
 	}
 
 	render() {
-		const disabled = !this.props.stepping;
 		return (
 			<div id="RegPanel">
-				{this.state.categories.map(c => c.name)}
-				<br />
-				{this.state.categories.map(c => <RegList key={c.id} contextmenu="reglist" onDoubleClick={this.handleChangeReg} {...c} />)}
-
+				{this.renderTabs()}
 				{this.renderContextMenu()}
 			</div>
+		);
+	}
+
+	renderTabs() {
+		const { categories } = this.state;
+		// Seems react-tabs is buggy when tabs are initially empty.
+		if (categories.length === 0) {
+			return '';
+		}
+
+		return (
+			<Tabs>
+				<TabList>
+					{categories.map(c => <Tab key={c.id}>{c.name}</Tab>)}
+				</TabList>
+				{categories.map(c => (
+					<TabPanel key={c.id}>
+						<RegList contextmenu="reglist" onDoubleClick={this.handleChangeReg} {...c} />
+					</TabPanel>
+				))}
+			</Tabs>
 		);
 	}
 

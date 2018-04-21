@@ -5,6 +5,7 @@
 #RegPanel dl {
 	font-family: Consolas, monospace;
 	line-height: 1.2em;
+	margin-top: 2px;
 	max-height: calc(1.2em * 35);
 	overflow-y: auto;
 	text-align: start;
