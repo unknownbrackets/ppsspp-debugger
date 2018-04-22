@@ -18,6 +18,13 @@ class App extends Component {
 		this.logRef = React.createRef();
 		this.ppsspp_ = new PPSSPP();
 		listeners.init(this.ppsspp_);
+
+		this.originalTitle = document.title;
+		listeners.listen({
+			'connection.change': this.requestTitle,
+			'game.start': this.updateTitle,
+			'game.quit': this.updateTitle,
+		});
 	}
 
 	render() {
@@ -79,6 +86,22 @@ class App extends Component {
 	log = (message) => {
 		// Would rather keep Log managing its state, and pass this callback around.
 		this.logRef.current.addLogItem({ message: message + '\n' });
+	}
+
+	updateTitle = (data) => {
+		if (data.game) {
+			document.title = this.originalTitle + ' - ' + data.game.id + ': ' + data.game.title;
+		} else {
+			document.title = this.originalTitle;
+		}
+	}
+
+	requestTitle = (status) => {
+		if (status) {
+			this.ppsspp_.send({ event: 'game.status' }).then(this.updateTitle, (err) => this.updateTitle({}));
+		} else {
+			this.updateTitle({});
+		}
 	}
 }
 
