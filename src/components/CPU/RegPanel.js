@@ -102,7 +102,7 @@ class RegPanel extends Component {
 		try {
 			document.execCommand('copy');
 		} catch (e) {
-			this.props.log('Could not copy register: ' + e);
+			window.prompt('Register value (use Ctrl-C or Command-C to copy)', data.value);
 		}
 
 		selection.removeAllRanges();
