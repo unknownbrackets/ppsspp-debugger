@@ -6,6 +6,11 @@ import listeners from '../utils/listeners.js';
 import logo from '../assets/logo.svg';
 import './App.css';
 
+const versionInfo = {
+	name: process.env.REACT_APP_NAME,
+	version: process.env.REACT_APP_VERSION,
+};
+
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -21,7 +26,7 @@ class App extends Component {
 
 		this.originalTitle = document.title;
 		listeners.listen({
-			'connection.change': this.requestTitle,
+			'connection.change': this.onConnectionChange,
 			'game.start': this.updateTitle,
 			'game.quit': this.updateTitle,
 		});
@@ -96,8 +101,11 @@ class App extends Component {
 		}
 	}
 
-	requestTitle = (status) => {
+	onConnectionChange = (status) => {
 		if (status) {
+			this.ppsspp_.send({ event: 'version', ...versionInfo }).catch((err) => {
+				window.alert('PPSSPP seems to think this debugger is out of date.  Try refreshing?\n\nDetails: ' + err);
+			});
 			this.ppsspp_.send({ event: 'game.status' }).then(this.updateTitle, (err) => this.updateTitle({}));
 		} else {
 			this.updateTitle({});
