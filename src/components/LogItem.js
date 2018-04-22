@@ -20,14 +20,11 @@ class LogItem extends Component {
 
 	formatLogEvent() {
 		const { item } = this.props;
-		// TODO: Move timestamp separation to API?
-		const timestamp = item.header.substr(0, 10);
-		const header = item.header.substr(10) + ' ';
 		return (
 			<span className={this.makeClassName()}>
 				<span className="Log__message__header">
-					<span className="Log__message__timestamp">{timestamp}</span>
-					{header}
+					<span className="Log__message__timestamp">{item.timestamp}</span>
+					{' ' + item.header + ' '}
 				</span>
 				{item.message}
 			</span>
