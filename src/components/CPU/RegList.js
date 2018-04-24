@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
+import { toString08X } from '../../utils/format';
 import classNames from 'classnames';
 
 class RegList extends Component {
@@ -46,9 +47,7 @@ class RegList extends Component {
 
 	format(reg) {
 		if (this.props.id === 0) {
-			const hex = this.props.uintValues[reg].toString(16).toUpperCase();
-			// Pad to 8 characters.
-			return ('00000000' + hex).substr(-8);
+			return toString08X(this.props.uintValues[reg]);
 		} else {
 			return this.props.floatValues[reg];
 		}
