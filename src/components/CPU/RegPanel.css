@@ -54,3 +54,8 @@
 .RegPanel__item--changed {
 	color: red;
 }
+
+#RegPanel .react-contextmenu-wrapper:focus {
+	/* Already shown on selection. */
+	outline: none;
+}

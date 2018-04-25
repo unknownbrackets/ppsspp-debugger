@@ -22,6 +22,7 @@ class DisasmLine extends Component {
 		};
 		const attributes = {
 			onDoubleClick: (ev) => this.onDoubleClick(ev, mapData()),
+			tabIndex: 0,
 		};
 
 		return (
