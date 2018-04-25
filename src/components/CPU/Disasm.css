@@ -17,6 +17,11 @@
 	white-space: nowrap;
 }
 
+.DisasmLine__breakpoint-icon {
+	padding-left: 2px;
+	fill: transparent;
+}
+
 .DisasmLine--current {
 	/* This uses a linear-gradient to lighten the js-specified background-color value without affecting the text. */
 	background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
@@ -35,8 +40,24 @@
 	color: #f00;
 }
 
+.DisasmLine--breakpoint .DisasmLine__breakpoint-icon {
+	fill: #f00;
+}
+
+.DisasmLine--disabled-breakpoint .DisasmLine__breakpoint-icon {
+	fill: #999;
+}
+
 .DisasmLine--selected.DisasmLine--breakpoint {
 	text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.DisasmLine--selected.DisasmLine--breakpoint .DisasmLine__breakpoint-icon {
+	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8));
+}
+
+.DisasmLine--selected.DisasmLine--disabled-breakpoint .DisasmLine__breakpoint-icon {
+	fill: #bbb;
 }
 
 .DisasmLine__address {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import classNames from 'classnames';
+import BreakpointIcon from './BreakpointIcon';
 
 class DisasmLine extends Component {
 	render() {
@@ -26,6 +27,7 @@ class DisasmLine extends Component {
 		return (
 			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} attributes={attributes}>
 				<div className={className} style={{ backgroundColor: line.backgroundColor }}>
+					<BreakpointIcon className="DisasmLine__breakpoint-icon" />
 					{this.renderAddress(line)}
 					<code className="DisasmLine__opcode">{line.name} </code>
 					<code className="DisasmLine__params">{line.params}{this.renderConditional(line)}</code>
