@@ -27,7 +27,7 @@ class CPU extends Component {
 			<div id="CPU">
 				{/* TODO: Figure out styling.  Just placeholder. */}
 				<div style={{ minHeight: '500px', display: 'flex' }}>
-					<RegPanel {...this.props} stepping={this.state.stepping} />
+					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={pc => this.gotoDisasm(pc)} />
 					<div style={{ width: '100%', minWidth: '50%' }}>
 						<Disasm {...this.props} {...disasmProps} updateSelection={data => this.setState(data)} />
 					</div>
@@ -77,6 +77,13 @@ class CPU extends Component {
 			selectionBottom: data.pc,
 			lastTicks: this.state.ticks,
 			ticks: data.ticks,
+		});
+	}
+
+	gotoDisasm(pc) {
+		this.setState({
+			selectionTop: pc,
+			selectionBottom: pc,
 		});
 	}
 }

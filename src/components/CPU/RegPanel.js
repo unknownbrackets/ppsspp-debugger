@@ -85,8 +85,8 @@ class RegPanel extends Component {
 	}
 
 	handleViewDisassembly = (ev, data) => {
-		// TODO
-		console.log(data);
+		const uintValue = this.state.categories[data.cat].uintValues[data.reg];
+		this.props.gotoDisasm(uintValue);
 	}
 
 	handleCopyReg = (ev, data, regNode) => {
@@ -173,6 +173,7 @@ RegPanel.defaultProps = {
 	ppsspp: null,
 	log: null,
 	stepping: false,
+	gotoDisasm: null,
 };
 
 export default RegPanel;
