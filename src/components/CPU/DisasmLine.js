@@ -5,10 +5,11 @@ import classNames from 'classnames';
 
 class DisasmLine extends Component {
 	render() {
-		const { line } = this.props;
+		const { line, selected } = this.props;
 
 		const className = classNames({
 			'DisasmLine': true,
+			'DisasmLine--selected': selected,
 			'DisasmLine--breakpoint': line.breakpoint && line.breakpoint.enabled,
 			'DisasmLine--disabled-breakpoint': line.breakpoint && !line.breakpoint.enabled,
 			'DisasmLine--current': line.isCurrentPC,
@@ -17,9 +18,12 @@ class DisasmLine extends Component {
 		const mapData = (props) => {
 			return { line };
 		};
+		const attributes = {
+			onDoubleClick: (ev) => this.onDoubleClick(ev, mapData()),
+		};
 
 		return (
-			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData}>
+			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} attributes={attributes}>
 				<div className={className} style={{ backgroundColor: line.backgroundColor }}>
 					{this.renderAddress(line)}
 					<code className="DisasmLine__opcode">{line.name} </code>
@@ -51,12 +55,20 @@ class DisasmLine extends Component {
 		}
 		return '';
 	}
+
+	onDoubleClick(ev, data) {
+		if (ev.button === 0) {
+			this.props.onDoubleClick(ev, data);
+		}
+	}
 }
 
 DisasmLine.defaultProps = {
 	line: null,
+	selected: false,
 	displaySymbols: true,
 	contextmenu: null,
+	onDoubleClick: null,
 };
 
 export default DisasmLine;

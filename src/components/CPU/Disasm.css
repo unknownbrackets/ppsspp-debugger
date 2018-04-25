@@ -1,21 +1,38 @@
 .Disasm {
+	font-family: Consolas, monospace;
+	font-size: 14px;
+	height: 35.28em;
+	line-height: 1.26;
+	overflow-y: auto;
+}
+
+.Disasm__list {
 	position: relative;
 	text-align: start;
+	/* We handle selection. */
+	user-select: none;
 }
 
 .DisasmLine {
-	font-family: Consolas, monospace;
-	font-size: 14px;
 	white-space: nowrap;
+}
+
+.DisasmLine--current {
+	/* This uses a linear-gradient to lighten the js-specified background-color value without affecting the text. */
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+}
+
+.DisasmLine--selected {
+	background: linear-gradient(to bottom, #39f, #39f);
+	color: #fff;
 }
 
 .DisasmLine--breakpoint {
 	color: #f00;
 }
 
-.DisasmLine--current {
-	/* This uses a linear-gradient to lighten the js-specified background-color value without affecting the text. */
-	background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+.DisasmLine--selected.DisasmLine--breakpoint {
+	text-shadow: 0 0 rgba(255, 255, 255, 0.5);
 }
 
 .DisasmLine__address {

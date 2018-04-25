@@ -11,20 +11,25 @@ class CPU extends Component {
 			stepping: false,
 			paused: true,
 			pc: 0,
+			// Note: these are inclusive.
+			selectionTop: null,
+			selectionBottom: null,
 			lastTicks: 0,
 			ticks: 0,
 		};
 	}
 
 	render() {
-		const pc = this.state.stepping || this.state.pc !== 0 ? this.state.pc : null;
+		const { stepping, selectionTop, selectionBottom } = this.state;
+		const disasmProps = { stepping, selectionTop, selectionBottom };
+
 		return (
 			<div id="CPU">
 				{/* TODO: Figure out styling.  Just placeholder. */}
 				<div style={{ minHeight: '500px', display: 'flex' }}>
 					<RegPanel {...this.props} stepping={this.state.stepping} />
-					<div style={{ width: '100%', minWidth: '50%', height: '500px', overflowY: 'auto' }}>
-						<Disasm {...this.props} pc={pc} />
+					<div style={{ width: '100%', minWidth: '50%' }}>
+						<Disasm {...this.props} {...disasmProps} updateSelection={data => this.setState(data)} />
 					</div>
 				</div>
 				Paused: {this.state.paused ? 'y' : 'n'}, Stepping: {this.state.stepping ? 'y' : 'n'}
@@ -68,6 +73,8 @@ class CPU extends Component {
 		this.setState({
 			stepping: true,
 			pc: data.pc,
+			selectionTop: data.pc,
+			selectionBottom: data.pc,
 			lastTicks: this.state.ticks,
 			ticks: data.ticks,
 		});

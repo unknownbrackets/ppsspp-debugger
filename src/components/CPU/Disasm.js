@@ -15,27 +15,48 @@ class Disasm extends Component {
 			range: { start: 0, end: 0 },
 			lineHeight: 0,
 			displaySymbols: true,
+			selectionStart: null,
 		};
 		this.updateSequence = Promise.resolve(null);
+		this.listRef = React.createRef();
 
 		listeners.listen({
-			// TODO: Something better.
-			'connection': () => this.updateDisasm(this.props.pc - 47 * 4),
+			// TODO: Manage window start.
+			'connection': () => this.updateDisasm(this.props.selectionTop - 15 * 4),
 		});
 	}
 
 	render() {
 		const offsets = this.calcOffsets();
+		const events = {
+			onMouseDownCapture: ev => this.onMouseDown(ev),
+			onMouseUpCapture: this.state.selectionStart !== null ? (ev => this.onMouseUp(ev)) : undefined,
+			onMouseMove: this.state.selectionStart !== null ? (ev => this.onMouseMove(ev)) : undefined,
+			// TODO: Key events too.
+			// TODO: Scroll events.
+		};
+
+		return [
+			<div key="disasm" className="Disasm" {...events}>
+				<div className="Disasm__list" ref={this.listRef}>
+					{this.state.lines.map((line) => this.renderLine(line))}
+					{this.state.branchGuides.map((guide) => this.renderBranchGuide(guide, offsets))}
+				</div>
+			</div>,
+			this.renderContextMenu(),
+		];
+	}
+
+	renderLine(line) {
 		const { displaySymbols } = this.state;
+		const props = {
+			displaySymbols,
+			line,
+			selected: line.address >= this.props.selectionTop && line.address <= this.props.selectionBottom,
+			onDoubleClick: (ev, data) => console.log('breakpoint', data),
+		};
 
-		return <div className="Disasm">
-			{this.state.lines.map((line) => (
-				<DisasmLine key={line.address} contextmenu="disasm" {...{ line, displaySymbols }} />
-			))}
-
-			{this.state.branchGuides.map((guide) => this.renderBranchGuide(guide, offsets))}
-			{this.renderContextMenu()}
-		</div>;
+		return <DisasmLine key={line.address} contextmenu="disasm" {...props} />;
 	}
 
 	renderBranchGuide(guide, offsets) {
@@ -47,7 +68,7 @@ class Disasm extends Component {
 	renderContextMenu() {
 		const disabled = !this.props.stepping;
 		return (
-			<ContextMenu id="disasm">
+			<ContextMenu key="menu" id="disasm">
 				<MenuItem data={{ action: 'copy_address' }} onClick={this.handleTodo}>
 					Copy Address
 				</MenuItem>
@@ -108,8 +129,8 @@ class Disasm extends Component {
 
 	componentDidUpdate(prevProps, prevState) {
 		// TODO: Not by PC.  Something else.
-		if (prevProps.pc !== this.props.pc) {
-			this.updateDisasm(this.props.pc - 47 * 4);
+		if (prevProps.selectionTop !== this.props.selectionTop) {
+			this.updateDisasm(this.props.selectionTop - 15 * 4);
 		}
 
 		if (this.state.lineHeight === 0) {
@@ -141,12 +162,50 @@ class Disasm extends Component {
 		// TODO
 		console.log(data);
 	}
+
+	onMouseDown(ev) {
+		const line = this.mouseEventToLine(ev);
+		this.props.updateSelection({ selectionTop: line.address, selectionBottom: line.address });
+		if (ev.button === 0) {
+			this.setState({ selectionStart: line.address });
+		}
+	}
+
+	onMouseUp(ev) {
+		this.onMouseMove(ev);
+		this.setState({ selectionStart: null });
+	}
+
+	onMouseMove(ev) {
+		const line = this.mouseEventToLine(ev);
+		if (ev.shiftKey) {
+			this.props.updateSelection({
+				selectionTop: Math.min(line.address, this.state.selectionStart),
+				selectionBottom: Math.max(line.address, this.state.selectionStart),
+			});
+		} else {
+			this.props.updateSelection({
+				selectionTop: line.address,
+				selectionBottom: line.address,
+			});
+		}
+	}
+
+	mouseEventToLine(ev) {
+		// Account for page and list scrolling.
+		const y = ev.pageY - this.listRef.current.getBoundingClientRect().top - window.scrollY;
+		const index = Math.floor(y / this.state.lineHeight);
+		return this.state.lines[index];
+	}
 }
 
 Disasm.defaultProps = {
 	ppsspp: null,
 	log: null,
-	pc: null,
+	selectionTop: null,
+	selectionBottom: null,
+	stepping: false,
+	updateSelection: null,
 };
 
 export default Disasm;
