@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import classNames from 'classnames';
 
@@ -13,12 +14,18 @@ class DisasmLine extends Component {
 			'DisasmLine--current': line.isCurrentPC,
 		});
 
+		const mapData = (props) => {
+			return { line };
+		};
+
 		return (
-			<div className={className} style={{ backgroundColor: line.backgroundColor }}>
-				{this.renderAddress(line)}
-				<code className="DisasmLine__opcode">{line.name} </code>
-				<code className="DisasmLine__params">{line.params}{this.renderConditional(line)}</code>
-			</div>
+			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData}>
+				<div className={className} style={{ backgroundColor: line.backgroundColor }}>
+					{this.renderAddress(line)}
+					<code className="DisasmLine__opcode">{line.name} </code>
+					<code className="DisasmLine__params">{line.params}{this.renderConditional(line)}</code>
+				</div>
+			</ContextMenuTrigger>
 		);
 	}
 
@@ -49,6 +56,7 @@ class DisasmLine extends Component {
 DisasmLine.defaultProps = {
 	line: null,
 	displaySymbols: true,
+	contextmenu: null,
 };
 
 export default DisasmLine;

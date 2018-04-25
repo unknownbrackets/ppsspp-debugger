@@ -50,19 +50,19 @@ class RegPanel extends Component {
 		const disabled = !this.props.stepping;
 		return (
 			<ContextMenu id="reglist">
-				<MenuItem data={{ action: 'memory' }} onClick={this.handleViewMemory}>
+				<MenuItem onClick={this.handleViewMemory}>
 					Go to in Memory View
-					</MenuItem>
-				<MenuItem data={{ action: 'disasm' }} onClick={this.handleViewDisassembly}>
+				</MenuItem>
+				<MenuItem onClick={this.handleViewDisassembly}>
 					Go to in Disassembly
-					</MenuItem>
+				</MenuItem>
 				<MenuItem divider />
-				<MenuItem data={{ action: 'copy' }} onClick={this.handleCopyReg}>
+				<MenuItem onClick={this.handleCopyReg}>
 					Copy Value
-					</MenuItem>
-				<MenuItem data={{ action: 'change' }} disabled={disabled} onClick={this.handleChangeReg}>
+				</MenuItem>
+				<MenuItem disabled={disabled} onClick={this.handleChangeReg}>
 					Change...
-					</MenuItem>
+				</MenuItem>
 			</ContextMenu>
 		);
 	}
