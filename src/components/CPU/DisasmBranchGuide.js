@@ -9,8 +9,7 @@ class DisasmBranchGuide extends Component {
 		}
 		const classes = classNames({
 			'DisasmBranchGuide': true,
-			// TODO: Need cursor pos to highlight branch lines.
-			'DisasmBranchGuide--selected': false,
+			'DisasmBranchGuide--selected': this.props.selected,
 		});
 
 		return (
@@ -101,6 +100,7 @@ DisasmBranchGuide.defaultProps = {
 	offsets: {},
 	range: {},
 	lineHeight: 0,
+	selected: false,
 };
 
 export default DisasmBranchGuide;

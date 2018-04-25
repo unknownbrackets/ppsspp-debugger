@@ -65,7 +65,9 @@ class Disasm extends Component {
 	renderBranchGuide(guide, offsets) {
 		const key = String(guide.top) + String(guide.bottom) + guide.direction;
 		const { range, lineHeight } = this.state;
-		return <DisasmBranchGuide {...{key, guide, range, offsets, lineHeight}} />;
+		const selected = guide.top === this.state.cursor || guide.bottom === this.state.cursor;
+
+		return <DisasmBranchGuide {...{ key, guide, range, offsets, lineHeight, selected }} />;
 	}
 
 	renderContextMenu() {
