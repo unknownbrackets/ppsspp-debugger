@@ -30,6 +30,7 @@ class Disasm extends Component {
 	render() {
 		const offsets = this.calcOffsets();
 		const events = {
+			onDragStart: ev => ev.preventDefault(),
 			onMouseDownCapture: ev => this.onMouseDown(ev),
 			onMouseUpCapture: this.state.mouseDown ? (ev => this.onMouseUp(ev)) : undefined,
 			onMouseMove: this.state.mouseDown ? (ev => this.onMouseMove(ev)) : undefined,
@@ -201,18 +202,24 @@ class Disasm extends Component {
 	}
 
 	applySelection(ev, line) {
+		let { selectionTop, selectionBottom } = this.props;
 		if (ev.shiftKey) {
-			this.props.updateSelection({
-				selectionTop: Math.min(line.address, this.props.selectionTop),
-				selectionBottom: Math.max(line.address, this.props.selectionBottom),
-			});
+			selectionTop = Math.min(selectionTop, line.address);
+			selectionBottom = Math.max(selectionBottom, line.address);
 		} else {
+			selectionTop = line.address;
+			selectionBottom = line.address;
+		}
+
+		if (selectionTop !== this.props.selectionTop || selectionBottom !== this.props.selectionBottom) {
 			this.props.updateSelection({
-				selectionTop: line.address,
-				selectionBottom: line.address,
+				selectionTop,
+				selectionBottom,
 			});
 		}
-		this.setState({ cursor: line.address });
+		if (this.state.cursor !== line.address) {
+			this.setState({ cursor: line.address });
+		}
 	}
 
 	mouseEventToLine(ev) {
