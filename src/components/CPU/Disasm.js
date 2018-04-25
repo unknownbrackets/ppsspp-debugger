@@ -15,7 +15,8 @@ class Disasm extends Component {
 			range: { start: 0, end: 0 },
 			lineHeight: 0,
 			displaySymbols: true,
-			selectionStart: null,
+			mouseDown: false,
+			cursor: null,
 		};
 		this.updateSequence = Promise.resolve(null);
 		this.listRef = React.createRef();
@@ -30,8 +31,8 @@ class Disasm extends Component {
 		const offsets = this.calcOffsets();
 		const events = {
 			onMouseDownCapture: ev => this.onMouseDown(ev),
-			onMouseUpCapture: this.state.selectionStart !== null ? (ev => this.onMouseUp(ev)) : undefined,
-			onMouseMove: this.state.selectionStart !== null ? (ev => this.onMouseMove(ev)) : undefined,
+			onMouseUpCapture: this.state.mouseDown ? (ev => this.onMouseUp(ev)) : undefined,
+			onMouseMove: this.state.mouseDown ? (ev => this.onMouseMove(ev)) : undefined,
 			// TODO: Key events too.
 			// TODO: Scroll events.
 		};
@@ -53,6 +54,7 @@ class Disasm extends Component {
 			displaySymbols,
 			line,
 			selected: line.address >= this.props.selectionTop && line.address <= this.props.selectionBottom,
+			cursor: line.address === this.state.cursor,
 			onDoubleClick: (ev, data) => console.log('breakpoint', data),
 		};
 
@@ -128,12 +130,19 @@ class Disasm extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		// TODO: Not by PC.  Something else.
-		if (prevProps.selectionTop !== this.props.selectionTop) {
-			this.updateDisasm(this.props.selectionTop - 15 * 4);
+		const { selectionTop, selectionBottom } = this.props;
+		const { range, lineHeight, cursor } = this.state;
+
+		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
+			if (range === null || selectionTop < range.start || selectionBottom >= range.end) {
+				this.updateDisasm(selectionTop - 15 * 4);
+			}
+			if (cursor < selectionTop || cursor > selectionBottom) {
+				this.setState({ cursor: selectionTop });
+			}
 		}
 
-		if (this.state.lineHeight === 0) {
+		if (lineHeight === 0) {
 			const foundLine = document.querySelector('.DisasmLine');
 			if (foundLine) {
 				this.setState({ lineHeight: foundLine.clientHeight });
@@ -165,23 +174,37 @@ class Disasm extends Component {
 
 	onMouseDown(ev) {
 		const line = this.mouseEventToLine(ev);
-		this.props.updateSelection({ selectionTop: line.address, selectionBottom: line.address });
+		this.applySelection(ev, line);
 		if (ev.button === 0) {
-			this.setState({ selectionStart: line.address });
+			this.setState({ mouseDown: true });
 		}
 	}
 
 	onMouseUp(ev) {
-		this.onMouseMove(ev);
-		this.setState({ selectionStart: null });
+		const line = this.mouseEventToLine(ev);
+		if (line) {
+			this.applySelection(ev, line);
+		}
+		this.setState({ mouseDown: false });
 	}
 
 	onMouseMove(ev) {
+		if (ev.buttons === 0) {
+			this.setState({ mouseDown: false });
+			return;
+		}
+
 		const line = this.mouseEventToLine(ev);
+		if (line) {
+			this.applySelection(ev, line);
+		}
+	}
+
+	applySelection(ev, line) {
 		if (ev.shiftKey) {
 			this.props.updateSelection({
-				selectionTop: Math.min(line.address, this.state.selectionStart),
-				selectionBottom: Math.max(line.address, this.state.selectionStart),
+				selectionTop: Math.min(line.address, this.props.selectionTop),
+				selectionBottom: Math.max(line.address, this.props.selectionBottom),
 			});
 		} else {
 			this.props.updateSelection({
@@ -189,6 +212,7 @@ class Disasm extends Component {
 				selectionBottom: line.address,
 			});
 		}
+		this.setState({ cursor: line.address });
 	}
 
 	mouseEventToLine(ev) {

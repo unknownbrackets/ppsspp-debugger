@@ -5,11 +5,12 @@ import classNames from 'classnames';
 
 class DisasmLine extends Component {
 	render() {
-		const { line, selected } = this.props;
+		const { line, selected, cursor } = this.props;
 
 		const className = classNames({
 			'DisasmLine': true,
 			'DisasmLine--selected': selected,
+			'DisasmLine--cursor': cursor,
 			'DisasmLine--breakpoint': line.breakpoint && line.breakpoint.enabled,
 			'DisasmLine--disabled-breakpoint': line.breakpoint && !line.breakpoint.enabled,
 			'DisasmLine--current': line.isCurrentPC,
@@ -66,6 +67,7 @@ class DisasmLine extends Component {
 DisasmLine.defaultProps = {
 	line: null,
 	selected: false,
+	cursor: false,
 	displaySymbols: true,
 	contextmenu: null,
 	onDoubleClick: null,

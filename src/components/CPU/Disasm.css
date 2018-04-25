@@ -27,12 +27,16 @@
 	color: #fff;
 }
 
+.DisasmLine--cursor {
+	background: linear-gradient(to bottom, #28f, #28f);
+}
+
 .DisasmLine--breakpoint {
 	color: #f00;
 }
 
 .DisasmLine--selected.DisasmLine--breakpoint {
-	text-shadow: 0 0 rgba(255, 255, 255, 0.5);
+	text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
 .DisasmLine__address {
