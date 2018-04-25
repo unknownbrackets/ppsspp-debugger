@@ -4,6 +4,9 @@ import classNames from 'classnames';
 class DisasmBranchGuide extends Component {
 	render() {
 		const pos = this.calcPos();
+		if (pos === null) {
+			return null;
+		}
 		const classes = classNames({
 			'DisasmBranchGuide': true,
 			// TODO: Need cursor pos to highlight branch lines.
@@ -57,8 +60,7 @@ class DisasmBranchGuide extends Component {
 		const top = this.findAddressOffset(guide.top, false);
 		const bottom = this.findAddressOffset(guide.bottom, true);
 		if (top === null || bottom === null) {
-			console.error('Bad branch guide?', guide);
-			return { display: 'none' };
+			return null;
 		}
 
 		const right = (8 - guide.lane) * 8;
@@ -69,11 +71,11 @@ class DisasmBranchGuide extends Component {
 	findAddressOffset(address, down) {
 		const { offsets, range } = this.props;
 		if (address >= range.end) {
-			if (range.end - 4 in offsets && down) {
-				return offsets[range.end - 4];
+			if ((range.end - 4) in offsets && down) {
+				return offsets[range.end - 4] + this.props.lineHeight;
 			}
-			if (range.end - 8 in offsets && down) {
-				return offsets[range.end - 8];
+			if ((range.end - 8) in offsets && down) {
+				return offsets[range.end - 8] + this.props.lineHeight;
 			}
 			return null;
 		}
