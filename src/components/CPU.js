@@ -81,6 +81,7 @@ class CPU extends Component {
 	}
 
 	gotoDisasm(pc) {
+		// TODO: Need to scroll into view if already selected but not focused.
 		this.setState({
 			selectionTop: pc,
 			selectionBottom: pc,

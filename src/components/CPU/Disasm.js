@@ -6,6 +6,9 @@ import listeners from '../../utils/listeners.js';
 import { hasContextMenu } from '../../utils/dom';
 import './Disasm.css';
 
+const MIN_BUFFER = 100;
+const MAX_BUFFER = 500;
+
 class Disasm extends Component {
 	constructor(props) {
 		super(props);
@@ -19,9 +22,12 @@ class Disasm extends Component {
 			mouseDown: false,
 			cursor: null,
 		};
-		this.updateSequence = Promise.resolve(null);
+		this.updatesSequence = Promise.resolve(null);
+		this.updatesPending = 0;
+
 		this.listRef = React.createRef();
 		this.cursorRef = React.createRef();
+
 		this.needsScroll = false;
 		this.needsOffsetFix = false;
 
@@ -38,11 +44,10 @@ class Disasm extends Component {
 			onMouseUpCapture: this.state.mouseDown ? (ev => this.onMouseUp(ev)) : undefined,
 			onMouseMove: this.state.mouseDown ? (ev => this.onMouseMove(ev)) : undefined,
 			onKeyDown: ev => this.onKeyDown(ev),
-			// TODO: Scroll events.
 		};
 
 		return [
-			<div key="disasm" className="Disasm">
+			<div key="disasm" className="Disasm" onScroll={ev => this.onScroll(ev)}>
 				<div className="Disasm__list" ref={this.listRef} {...events}>
 					{this.state.lines.map((line) => this.renderLine(line))}
 					{this.state.branchGuides.map((guide) => this.renderBranchGuide(guide, offsets))}
@@ -156,7 +161,7 @@ class Disasm extends Component {
 			disasmChange = this.state.range;
 		}
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
-			if (range === null || selectionTop < range.start || selectionBottom >= range.end) {
+			if (selectionTop < range.start || selectionBottom >= range.end) {
 				disasmChange = null;
 			}
 			if (cursor < selectionTop || cursor > selectionBottom) {
@@ -189,12 +194,13 @@ class Disasm extends Component {
 
 	updateDisasm(newRange) {
 		const updateRange = {
-			address: newRange === null ? this.props.selectionTop - 47 * 4: newRange.start,
-			count: newRange === null ? 96 : undefined,
+			address: newRange === null ? this.props.selectionTop - MIN_BUFFER * 4: newRange.start,
+			count: newRange === null ? MIN_BUFFER * 2 : undefined,
 			end: newRange !== null ? newRange.end : undefined,
 		};
 
-		this.updateSequence = this.updateSequence.then(res => {
+		this.updatesPending++;
+		this.updatesSequence = this.updatesSequence.then(res => {
 			return this.props.ppsspp.send({
 				event: 'memory.disasm',
 				...updateRange,
@@ -209,6 +215,8 @@ class Disasm extends Component {
 				this.setState({ range, branchGuides, lines });
 			}, (err) => {
 				this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
+			}).finally(() => {
+				this.updatesPending--;
 			});
 		});
 	}
@@ -278,6 +286,32 @@ class Disasm extends Component {
 		}
 	}
 
+	onScroll(ev) {
+		const { scrollHeight, scrollTop, clientHeight } = ev.target;
+		const bufferTop = scrollTop / this.state.lineHeight;
+		const bufferBottom = (scrollHeight - scrollTop - clientHeight) / this.state.lineHeight;
+
+		let { start, end } = this.state.range;
+
+		if (bufferTop < MIN_BUFFER) {
+			start -= MIN_BUFFER * 4;
+		} else if (bufferTop > MAX_BUFFER) {
+			start += MIN_BUFFER * 4;
+		}
+
+		if (bufferBottom < MIN_BUFFER) {
+			end += MIN_BUFFER * 4;
+		} else if (bufferBottom > MAX_BUFFER) {
+			end -= MIN_BUFFER * 4;
+		}
+
+		if (start !== this.state.range.start || end !== this.state.range.end) {
+			if (this.updatesPending === 0) {
+				this.updateDisasm({ start, end });
+			}
+		}
+	}
+
 	applySelection(ev, line) {
 		let { selectionTop, selectionBottom } = this.props;
 		if (ev.shiftKey) {
@@ -301,19 +335,21 @@ class Disasm extends Component {
 		let { start, end } = this.state.range;
 
 		// This is here for keyboard scrolling.
-		if (selectionTop - 20 * 4 < start) {
-			start = selectionTop - 40 * 4;
-		} else if (selectionTop - 240 * 4 > start) {
-			start = selectionTop - 200 * 4;
+		if (selectionTop - MIN_BUFFER * 4 < start) {
+			start = selectionTop - MIN_BUFFER * 2 * 4;
+		} else if (selectionTop - MAX_BUFFER * 4 > start) {
+			start = selectionTop - (MAX_BUFFER - MIN_BUFFER) * 4;
 		}
-		if (selectionBottom + 20 * 4 > end) {
-			end = selectionBottom + 40 * 4;
-		} else if (selectionBottom + 240 * 4 < end) {
-			end = selectionBottom + 200 * 4;
+		if (selectionBottom + MIN_BUFFER * 4 > end) {
+			end = selectionBottom + MIN_BUFFER * 2 * 4;
+		} else if (selectionBottom + MAX_BUFFER * 4 < end) {
+			end = selectionBottom + (MAX_BUFFER - MIN_BUFFER) * 4;
 		}
 
 		if (start !== this.state.range.start || end !== this.state.range.end) {
-			this.updateDisasm({ start, end });
+			if (this.updatesPending === 0) {
+				this.updateDisasm({ start, end });
+			}
 		}
 	}
 
