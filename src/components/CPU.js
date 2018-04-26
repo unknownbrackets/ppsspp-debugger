@@ -14,14 +14,15 @@ class CPU extends Component {
 			// Note: these are inclusive.
 			selectionTop: null,
 			selectionBottom: null,
+			jumpMarker: null,
 			lastTicks: 0,
 			ticks: 0,
 		};
 	}
 
 	render() {
-		const { stepping, selectionTop, selectionBottom } = this.state;
-		const disasmProps = { stepping, selectionTop, selectionBottom };
+		const { stepping, selectionTop, selectionBottom, jumpMarker } = this.state;
+		const disasmProps = { stepping, selectionTop, selectionBottom, jumpMarker };
 
 		return (
 			<div id="CPU">
@@ -81,10 +82,11 @@ class CPU extends Component {
 	}
 
 	gotoDisasm(pc) {
-		// TODO: Need to scroll into view if already selected but not focused.
 		this.setState({
 			selectionTop: pc,
 			selectionBottom: pc,
+			// It just matters that this is a new object.
+			jumpMarker: {},
 		});
 	}
 }

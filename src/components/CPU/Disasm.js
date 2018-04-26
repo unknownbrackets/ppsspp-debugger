@@ -179,6 +179,9 @@ class Disasm extends Component {
 			}
 		}
 
+		if (this.props.jumpMarker !== prevProps.jumpMarker) {
+			this.needsScroll = 'center';
+		}
 		// Always associated with a state update.
 		if (this.needsScroll && this.cursorRef.current) {
 			this.cursorRef.current.ensureInView(this.needsScroll);
