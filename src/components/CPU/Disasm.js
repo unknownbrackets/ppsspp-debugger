@@ -279,6 +279,24 @@ class Disasm extends Component {
 		if (this.state.cursor !== line.address) {
 			this.setState({ cursor: line.address });
 		}
+
+		let { start, end } = this.state.range;
+
+		// This is here for keyboard scrolling.
+		if (selectionTop - 20 * 4 < start) {
+			start = selectionTop - 40 * 4;
+		} else if (selectionTop - 240 * 4 > start) {
+			start = selectionTop - 200 * 4;
+		}
+		if (selectionBottom + 20 * 4 > end) {
+			end = selectionBottom + 40 * 4;
+		} else if (selectionBottom + 240 * 4 < end) {
+			end = selectionBottom + 200 * 4;
+		}
+
+		if (start !== this.state.range.start || end !== this.state.range.end) {
+			this.updateDisasm({ start, end });
+		}
 	}
 
 	mouseEventToLine(ev) {
