@@ -81,7 +81,7 @@
 	display: inline-block;
 	font-weight: bold;
 	vertical-align: top;
-	width: 10ex;
+	width: 12ex;
 }
 
 .DisasmLine__opcode::before {
