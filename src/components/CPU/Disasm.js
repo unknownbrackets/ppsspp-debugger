@@ -18,6 +18,7 @@ class Disasm extends Component {
 			branchGuides: [],
 			range: { start: 0, end: 0 },
 			lineHeight: 0,
+			visibleLines: 0,
 			displaySymbols: true,
 			mouseDown: false,
 			cursor: null,
@@ -177,6 +178,11 @@ class Disasm extends Component {
 			if (foundLine) {
 				this.setState({ lineHeight: foundLine.clientHeight });
 			}
+		} else if (this.listRef.current) {
+			const visibleLines = Math.floor(this.listRef.current.parentNode.clientHeight / lineHeight);
+			if (visibleLines !== this.state.visibleLines) {
+				this.setState({ visibleLines });
+			}
 		}
 
 		if (this.props.jumpMarker !== prevProps.jumpMarker) {
@@ -196,9 +202,10 @@ class Disasm extends Component {
 	}
 
 	updateDisasm(newRange) {
+		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
 		const updateRange = {
-			address: newRange === null ? this.props.selectionTop - MIN_BUFFER * 4: newRange.start,
-			count: newRange === null ? MIN_BUFFER * 2 : undefined,
+			address: newRange === null ? this.props.selectionTop - minBuffer * 4: newRange.start,
+			count: newRange === null ? minBuffer * 2 : undefined,
 			end: newRange !== null ? newRange.end : undefined,
 		};
 
@@ -274,17 +281,21 @@ class Disasm extends Component {
 		if (hasContextMenu()) {
 			return;
 		}
-		if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+		if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown' || ev.key === 'PageUp' || ev.key === 'PageDown') {
 			const lineIndex = this.findCursorLineIndex();
 
-			if (ev.key === 'ArrowUp' && lineIndex > 0) {
-				this.needsScroll = 'nearest';
-				this.applySelection(ev, this.state.lines[lineIndex - 1]);
-				ev.preventDefault();
+			let dist = 1;
+			if (ev.key === 'PageUp' || ev.key === 'PageDown') {
+				dist = this.state.visibleLines;
 			}
-			if (ev.key === 'ArrowDown' && lineIndex < this.state.lines.length - 1) {
+			if (ev.key === 'ArrowUp' || ev.key === 'PageUp') {
+				dist = -dist;
+			}
+
+			const newIndex = Math.min(this.state.lines.length - 1, Math.max(0, lineIndex + dist));
+			if (lineIndex !== newIndex) {
 				this.needsScroll = 'nearest';
-				this.applySelection(ev, this.state.lines[lineIndex + 1]);
+				this.applySelection(ev, this.state.lines[newIndex]);
 				ev.preventDefault();
 			}
 		}
@@ -301,17 +312,19 @@ class Disasm extends Component {
 		const bufferBottom = (scrollHeight - scrollTop - clientHeight) / this.state.lineHeight;
 
 		let { start, end } = this.state.range;
+		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
+		const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
 
-		if (bufferTop < MIN_BUFFER) {
-			start -= MIN_BUFFER * 4;
-		} else if (bufferTop > MAX_BUFFER) {
-			start += MIN_BUFFER * 4;
+		if (bufferTop < minBuffer) {
+			start -= minBuffer * 4;
+		} else if (bufferTop > maxBuffer) {
+			start += minBuffer * 4;
 		}
 
-		if (bufferBottom < MIN_BUFFER) {
-			end += MIN_BUFFER * 4;
-		} else if (bufferBottom > MAX_BUFFER) {
-			end -= MIN_BUFFER * 4;
+		if (bufferBottom < minBuffer) {
+			end += minBuffer * 4;
+		} else if (bufferBottom > maxBuffer) {
+			end -= minBuffer * 4;
 		}
 
 		if (start !== this.state.range.start || end !== this.state.range.end) {
@@ -342,17 +355,19 @@ class Disasm extends Component {
 		}
 
 		let { start, end } = this.state.range;
+		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
+		const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
 
 		// This is here for keyboard scrolling.
-		if (selectionTop - MIN_BUFFER * 4 < start) {
-			start = selectionTop - MIN_BUFFER * 2 * 4;
-		} else if (selectionTop - MAX_BUFFER * 4 > start) {
-			start = selectionTop - (MAX_BUFFER - MIN_BUFFER) * 4;
+		if (line.address - minBuffer * 4 < start) {
+			start = line.address - minBuffer * 2 * 4;
+		} else if (line.address - maxBuffer * 4 > start) {
+			start = line.address - (maxBuffer - minBuffer) * 4;
 		}
-		if (selectionBottom + MIN_BUFFER * 4 > end) {
-			end = selectionBottom + MIN_BUFFER * 2 * 4;
-		} else if (selectionBottom + MAX_BUFFER * 4 < end) {
-			end = selectionBottom + (MAX_BUFFER - MIN_BUFFER) * 4;
+		if (line.address + minBuffer * 4 > end) {
+			end = line.address + minBuffer * 2 * 4;
+		} else if (line.address + maxBuffer * 4 < end) {
+			end = line.address + (maxBuffer - minBuffer) * 4;
 		}
 
 		if (start !== this.state.range.start || end !== this.state.range.end) {
