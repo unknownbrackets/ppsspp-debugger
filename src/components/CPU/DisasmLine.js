@@ -1,10 +1,21 @@
 import React, { Component } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
+import { ensureInView } from '../../utils/dom';
 import classNames from 'classnames';
 import BreakpointIcon from './BreakpointIcon';
 
 class DisasmLine extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			needsScroll: false,
+		};
+
+		this.ref = React.createRef();
+	}
+
 	render() {
 		const { line, selected, cursor } = this.props;
 
@@ -27,7 +38,7 @@ class DisasmLine extends Component {
 
 		return (
 			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} attributes={attributes}>
-				<div className={className} style={{ backgroundColor: line.backgroundColor }}>
+				<div className={className} style={{ backgroundColor: line.backgroundColor }} ref={this.ref}>
 					<BreakpointIcon className="DisasmLine__breakpoint-icon" />
 					{this.renderAddress(line)}
 					<code className="DisasmLine__opcode">{line.name} </code>
@@ -60,10 +71,23 @@ class DisasmLine extends Component {
 		return '';
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if (this.state.needsScroll) {
+			const triggerNode = this.ref.current.parentNode;
+			ensureInView(triggerNode, { block: 'nearest' });
+			triggerNode.focus();
+			this.setState({ needsScroll: false });
+		}
+	}
+
 	onDoubleClick(ev, data) {
 		if (ev.button === 0) {
 			this.props.onDoubleClick(ev, data);
 		}
+	}
+
+	ensureInView() {
+		this.setState({ needsScroll: true });
 	}
 }
 

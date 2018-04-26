@@ -13,6 +13,11 @@
 	user-select: none;
 }
 
+.Disasm .react-contextmenu-wrapper:focus {
+	/* Already shown on selection. */
+	outline: none;
+}
+
 .DisasmLine {
 	white-space: nowrap;
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
-import { ensureInView } from '../../utils/dom';
+import { ensureInView, hasContextMenu } from '../../utils/dom';
 import classNames from 'classnames';
 
 class RegList extends Component {
@@ -66,7 +66,9 @@ class RegList extends Component {
 	componentDidUpdate(prevProps, prevState) {
 		// Always associated with a state update.
 		if (this.needsScroll && this.cursorRef.current) {
-			ensureInView(this.cursorRef.current, { block: 'nearest' });
+			const triggerNode = this.cursorRef.current.parentNode;
+			ensureInView(triggerNode, { block: 'nearest' });
+			triggerNode.focus();
 			this.needsScroll = false;
 		}
 	}
@@ -78,6 +80,9 @@ class RegList extends Component {
 	}
 
 	onKeyDown(ev) {
+		if (hasContextMenu()) {
+			return;
+		}
 		if (ev.key === 'ArrowUp' && this.state.cursor > 0) {
 			this.needsScroll = true;
 			this.setState({ cursor: this.state.cursor - 1 });

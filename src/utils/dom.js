@@ -10,3 +10,16 @@ export function ensureInView(node, options) {
 	}
 	return false;
 }
+
+let contextMenuStatus = false;
+
+window.addEventListener('REACT_CONTEXTMENU_SHOW', (ev) => {
+	contextMenuStatus = true;
+});
+window.addEventListener('REACT_CONTEXTMENU_HIDE', (ev) => {
+	contextMenuStatus = false;
+});
+
+export function hasContextMenu() {
+	return contextMenuStatus;
+}

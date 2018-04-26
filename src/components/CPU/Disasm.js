@@ -3,6 +3,7 @@ import { ContextMenu, MenuItem } from 'react-contextmenu';
 import DisasmBranchGuide from './DisasmBranchGuide';
 import DisasmLine from './DisasmLine';
 import listeners from '../../utils/listeners.js';
+import { hasContextMenu } from '../../utils/dom';
 import './Disasm.css';
 
 class Disasm extends Component {
@@ -20,6 +21,8 @@ class Disasm extends Component {
 		};
 		this.updateSequence = Promise.resolve(null);
 		this.listRef = React.createRef();
+		this.cursorRef = React.createRef();
+		this.needsScroll = false;
 
 		listeners.listen({
 			// TODO: Manage window start.
@@ -34,7 +37,7 @@ class Disasm extends Component {
 			onMouseDownCapture: ev => this.onMouseDown(ev),
 			onMouseUpCapture: this.state.mouseDown ? (ev => this.onMouseUp(ev)) : undefined,
 			onMouseMove: this.state.mouseDown ? (ev => this.onMouseMove(ev)) : undefined,
-			// TODO: Key events too.
+			onKeyDown: ev => this.onKeyDown(ev),
 			// TODO: Scroll events.
 		};
 
@@ -57,6 +60,7 @@ class Disasm extends Component {
 			selected: line.address >= this.props.selectionTop && line.address <= this.props.selectionBottom,
 			cursor: line.address === this.state.cursor,
 			onDoubleClick: (ev, data) => console.log('breakpoint', data),
+			ref: line.address === this.state.cursor ? this.cursorRef : undefined,
 		};
 
 		return <DisasmLine key={line.address} contextmenu="disasm" {...props} />;
@@ -151,6 +155,12 @@ class Disasm extends Component {
 				this.setState({ lineHeight: foundLine.clientHeight });
 			}
 		}
+
+		// Always associated with a state update.
+		if (this.needsScroll && this.cursorRef.current) {
+			this.cursorRef.current.ensureInView();
+			this.needsScroll = false;
+		}
 	}
 
 	updateDisasm(addr) {
@@ -188,11 +198,14 @@ class Disasm extends Component {
 		if (line) {
 			this.applySelection(ev, line);
 		}
+		// For focus.
+		this.needsScroll = true;
 		this.setState({ mouseDown: false });
 	}
 
 	onMouseMove(ev) {
 		if (ev.buttons === 0) {
+			this.needsScroll = true;
 			this.setState({ mouseDown: false });
 			return;
 		}
@@ -200,6 +213,27 @@ class Disasm extends Component {
 		const line = this.mouseEventToLine(ev);
 		if (line) {
 			this.applySelection(ev, line);
+		}
+	}
+
+	onKeyDown(ev) {
+		if (hasContextMenu()) {
+			return;
+		}
+		if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+			const lineIndex = this.findCursorLineIndex();
+
+			// TODO: Handle scroll outside viewport.
+			if (ev.key === 'ArrowUp' && lineIndex > 0) {
+				this.needsScroll = true;
+				this.applySelection(ev, this.state.lines[lineIndex - 1]);
+				ev.preventDefault();
+			}
+			if (ev.key === 'ArrowDown' && lineIndex < this.state.lines.length - 1) {
+				this.needsScroll = true;
+				this.applySelection(ev, this.state.lines[lineIndex + 1]);
+				ev.preventDefault();
+			}
 		}
 	}
 
@@ -229,6 +263,17 @@ class Disasm extends Component {
 		const y = ev.pageY - this.listRef.current.getBoundingClientRect().top - window.scrollY;
 		const index = Math.floor(y / this.state.lineHeight);
 		return this.state.lines[index];
+	}
+
+	findCursorLineIndex() {
+		const addr = this.state.cursor ? this.state.cursor : this.props.selectionTop;
+		for (let i = 0; i < this.state.lines.length; ++i) {
+			if (this.state.lines[i].address === addr) {
+				return i;
+			}
+		}
+
+		return undefined;
 	}
 }
 
