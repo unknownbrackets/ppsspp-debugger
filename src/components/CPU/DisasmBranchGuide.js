@@ -62,7 +62,7 @@ class DisasmBranchGuide extends Component {
 			return null;
 		}
 
-		const right = (8 - guide.lane) * 8;
+		const right = (16 - guide.lane) * 8;
 		const height = bottom - top;
 		return { top, right, height };
 	}
