@@ -48,6 +48,11 @@ class CPU extends Component {
 			'game.quit': () => this.setState({ stepping: false, paused: true, pc: 0 }),
 			'game.pause': () => this.setState({ paused: true }),
 			'game.resume': () => this.setState({ paused: false }),
+			'cpu.setReg': (result) => {
+				if (result.category === 0 && result.register === 32) {
+					this.setState({ pc: result.uintValue });
+				}
+			},
 		});
 	}
 

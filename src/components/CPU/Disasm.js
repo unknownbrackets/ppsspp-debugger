@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { ContextMenu, MenuItem } from 'react-contextmenu';
 import DisasmBranchGuide from './DisasmBranchGuide';
+import DisasmContextMenu from './DisasmContextMenu';
 import DisasmLine from './DisasmLine';
 import listeners from '../../utils/listeners.js';
 import { hasContextMenu } from '../../utils/dom';
@@ -34,6 +34,12 @@ class Disasm extends Component {
 
 		listeners.listen({
 			'connection': () => this.updateDisasm(null),
+			'cpu.setReg': (result) => {
+				// Need to re-render if pc is changed.
+				if (result.category === 0 && result.register === 32) {
+					this.updateDisasm(null);
+				}
+			},
 		});
 	}
 
@@ -81,54 +87,7 @@ class Disasm extends Component {
 	}
 
 	renderContextMenu() {
-		const disabled = !this.props.stepping;
-		return (
-			<ContextMenu key="menu" id="disasm">
-				<MenuItem data={{ action: 'copy_address' }} onClick={this.handleTodo}>
-					Copy Address
-				</MenuItem>
-				<MenuItem data={{ action: 'copy_hex' }} onClick={this.handleTodo}>
-					Copy Instruction (Hex)
-				</MenuItem>
-				<MenuItem data={{ action: 'copy_disasm' }} onClick={this.handleTodo}>
-					Copy Instruction (Disasm)
-				</MenuItem>
-				<MenuItem divider />
-				<MenuItem data={{ action: 'assemble' }} disabled={disabled} onClick={this.handleTodo}>
-					Assemble Opcode...
-				</MenuItem>
-				<MenuItem divider />
-				<MenuItem data={{ action: 'step_until' }} disabled={disabled} onClick={this.handleTodo}>
-					Run to Cursor
-				</MenuItem>
-				<MenuItem data={{ action: 'change_pc' }} disabled={disabled} onClick={this.handleTodo}>
-					Jump to Cursor
-				</MenuItem>
-				<MenuItem data={{ action: 'toggle_breakpoint' }} onClick={this.handleTodo}>
-					Toggle Breakpoint
-				</MenuItem>
-				<MenuItem divider />
-				<MenuItem data={{ action: 'follow_branch' }} onClick={this.handleTodo}>
-					Follow Branch
-				</MenuItem>
-				<MenuItem data={{ action: 'goto_memory' }} onClick={this.handleTodo}>
-					Go to in Memory View
-				</MenuItem>
-				<MenuItem data={{ action: 'goto_jit' }} onClick={this.handleTodo}>
-					Go to in Jit Compare
-				</MenuItem>
-				<MenuItem divider />
-				<MenuItem data={{ action: 'func_rename' }} onClick={this.handleTodo}>
-					Rename Function...
-				</MenuItem>
-				<MenuItem data={{ action: 'func_remove' }} onClick={this.handleTodo}>
-					Remove Function
-				</MenuItem>
-				<MenuItem data={{ action: 'func_add' }} onClick={this.handleTodo}>
-					Add Function Here
-				</MenuItem>
-			</ContextMenu>
-		);
+		return <DisasmContextMenu key="menu" stepping={this.props.stepping} />;
 	}
 
 	calcOffsets() {
