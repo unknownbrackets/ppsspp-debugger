@@ -232,7 +232,13 @@ class Disasm extends Component {
 
 	onMouseDown(ev) {
 		const line = this.mouseEventToLine(ev);
-		this.applySelection(ev, line);
+		// Don't change selection if right clicking within the selection.
+		if (ev.button !== 2 || line.address < this.props.selectionTop || line.address > this.props.selectionBottom) {
+			this.applySelection(ev, line);
+		} else if (this.state.cursor !== line.address) {
+			// But do change the cursor.
+			this.setState({ cursor: line.address });
+		}
 		if (ev.button === 0) {
 			this.setState({ mouseDown: true });
 		}
