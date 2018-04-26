@@ -41,8 +41,8 @@ class Disasm extends Component {
 		};
 
 		return [
-			<div key="disasm" className="Disasm" {...events}>
-				<div className="Disasm__list" ref={this.listRef}>
+			<div key="disasm" className="Disasm">
+				<div className="Disasm__list" ref={this.listRef} {...events}>
 					{this.state.lines.map((line) => this.renderLine(line))}
 					{this.state.branchGuides.map((guide) => this.renderBranchGuide(guide, offsets))}
 				</div>
