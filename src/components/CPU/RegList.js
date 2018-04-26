@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import { ensureInView, hasContextMenu } from '../../utils/dom';
 import classNames from 'classnames';
 
-class RegList extends Component {
+class RegList extends PureComponent {
 	constructor(props) {
 		super(props);
 

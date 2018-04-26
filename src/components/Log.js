@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import LogItem from './LogItem';
 import listeners from '../utils/listeners.js';
 import './Log.css';
 
 const MAX_LINES = 5000;
 
-class Log extends Component {
+class Log extends PureComponent {
 	constructor(props) {
 		super(props);
 

@@ -59,7 +59,7 @@ class Disasm extends Component {
 			line,
 			selected: line.address >= this.props.selectionTop && line.address <= this.props.selectionBottom,
 			cursor: line.address === this.state.cursor,
-			onDoubleClick: (ev, data) => console.log('breakpoint', data),
+			onDoubleClick: this.onDoubleClick,
 			ref: line.address === this.state.cursor ? this.cursorRef : undefined,
 		};
 
@@ -183,6 +183,10 @@ class Disasm extends Component {
 	handleTodo = (ev, data) => {
 		// TODO
 		console.log(data);
+	}
+
+	onDoubleClick = (ev, data) => {
+		console.log('breakpoint', data);
 	}
 
 	onMouseDown(ev) {

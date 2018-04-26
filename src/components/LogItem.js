@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import classNames from 'classnames';
 
-class LogItem extends Component {
+class LogItem extends PureComponent {
 	render() {
 		if (this.props.item.event === 'log') {
 			return this.formatLogEvent();

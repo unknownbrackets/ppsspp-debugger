@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import { ensureInView } from '../../utils/dom';
 import classNames from 'classnames';
 import BreakpointIcon from './BreakpointIcon';
 
-class DisasmLine extends Component {
+class DisasmLine extends PureComponent {
 	constructor(props) {
 		super(props);
 
