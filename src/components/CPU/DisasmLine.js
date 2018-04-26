@@ -89,6 +89,14 @@ class DisasmLine extends PureComponent {
 	ensureInView(needsScroll) {
 		this.setState({ needsScroll });
 	}
+
+	boundingTop() {
+		if (this.ref.current) {
+			const triggerNode = this.ref.current.parentNode;
+			return triggerNode.getBoundingClientRect().top;
+		}
+		return null;
+	}
 }
 
 DisasmLine.defaultProps = {

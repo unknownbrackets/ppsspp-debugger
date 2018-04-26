@@ -23,6 +23,7 @@ class Disasm extends Component {
 		this.listRef = React.createRef();
 		this.cursorRef = React.createRef();
 		this.needsScroll = false;
+		this.needsOffsetFix = false;
 
 		listeners.listen({
 			'connection': () => this.updateDisasm(null),
@@ -135,7 +136,17 @@ class Disasm extends Component {
 		return offsets;
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	getSnapshotBeforeUpdate(prevProps, prevState) {
+		if (this.needsOffsetFix && this.cursorRef.current) {
+			const top = this.cursorRef.current.boundingTop();
+			if (top) {
+				return { top };
+			}
+		}
+		return null;
+	}
+
+	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { selectionTop, selectionBottom } = this.props;
 		const { range, lineHeight, cursor } = this.state;
 
@@ -168,6 +179,12 @@ class Disasm extends Component {
 			this.cursorRef.current.ensureInView(this.needsScroll);
 			this.needsScroll = false;
 		}
+
+		if (snapshot && this.cursorRef.current) {
+			const top = this.cursorRef.current.boundingTop();
+			this.listRef.current.parentNode.scrollTop -= snapshot.top - top;
+			this.needsOffsetFix = false;
+		}
 	}
 
 	updateDisasm(newRange) {
@@ -186,6 +203,8 @@ class Disasm extends Component {
 				const { range, branchGuides, lines } = data;
 				if (newRange === null) {
 					this.needsScroll = 'center';
+				} else {
+					this.needsOffsetFix = true;
 				}
 				this.setState({ range, branchGuides, lines });
 			}, (err) => {
@@ -241,7 +260,6 @@ class Disasm extends Component {
 		if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
 			const lineIndex = this.findCursorLineIndex();
 
-			// TODO: Handle scroll outside viewport.
 			if (ev.key === 'ArrowUp' && lineIndex > 0) {
 				this.needsScroll = 'nearest';
 				this.applySelection(ev, this.state.lines[lineIndex - 1]);
