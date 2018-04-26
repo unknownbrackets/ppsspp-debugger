@@ -25,8 +25,7 @@ class Disasm extends Component {
 		this.needsScroll = false;
 
 		listeners.listen({
-			// TODO: Manage window start.
-			'connection': () => this.updateDisasm(this.props.selectionTop - 15 * 4),
+			'connection': () => this.updateDisasm(null),
 		});
 	}
 
@@ -140,13 +139,21 @@ class Disasm extends Component {
 		const { selectionTop, selectionBottom } = this.props;
 		const { range, lineHeight, cursor } = this.state;
 
+		let disasmChange = false;
+		if (this.state.displaySymbols !== prevState.displaySymbols) {
+			// Keep the existing range, just update.
+			disasmChange = this.state.range;
+		}
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
 			if (range === null || selectionTop < range.start || selectionBottom >= range.end) {
-				this.updateDisasm(selectionTop - 15 * 4);
+				disasmChange = null;
 			}
 			if (cursor < selectionTop || cursor > selectionBottom) {
 				this.setState({ cursor: selectionTop });
 			}
+		}
+		if (disasmChange !== false) {
+			this.updateDisasm(disasmChange);
 		}
 
 		if (lineHeight === 0) {
@@ -158,21 +165,28 @@ class Disasm extends Component {
 
 		// Always associated with a state update.
 		if (this.needsScroll && this.cursorRef.current) {
-			this.cursorRef.current.ensureInView();
+			this.cursorRef.current.ensureInView(this.needsScroll);
 			this.needsScroll = false;
 		}
 	}
 
-	updateDisasm(addr) {
+	updateDisasm(newRange) {
+		const updateRange = {
+			address: newRange === null ? this.props.selectionTop - 47 * 4: newRange.start,
+			count: newRange === null ? 96 : undefined,
+			end: newRange !== null ? newRange.end : undefined,
+		};
+
 		this.updateSequence = this.updateSequence.then(res => {
 			return this.props.ppsspp.send({
 				event: 'memory.disasm',
-				address: addr,
-				// TODO: Calculate properly.
-				count: 96,
+				...updateRange,
 				displaySymbols: this.state.displaySymbols,
 			}).then((data) => {
 				const { range, branchGuides, lines } = data;
+				if (newRange === null) {
+					this.needsScroll = 'center';
+				}
 				this.setState({ range, branchGuides, lines });
 			}, (err) => {
 				this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
@@ -203,13 +217,13 @@ class Disasm extends Component {
 			this.applySelection(ev, line);
 		}
 		// For focus.
-		this.needsScroll = true;
+		this.needsScroll = 'nearest';
 		this.setState({ mouseDown: false });
 	}
 
 	onMouseMove(ev) {
 		if (ev.buttons === 0) {
-			this.needsScroll = true;
+			this.needsScroll = 'nearest';
 			this.setState({ mouseDown: false });
 			return;
 		}
@@ -229,15 +243,20 @@ class Disasm extends Component {
 
 			// TODO: Handle scroll outside viewport.
 			if (ev.key === 'ArrowUp' && lineIndex > 0) {
-				this.needsScroll = true;
+				this.needsScroll = 'nearest';
 				this.applySelection(ev, this.state.lines[lineIndex - 1]);
 				ev.preventDefault();
 			}
 			if (ev.key === 'ArrowDown' && lineIndex < this.state.lines.length - 1) {
-				this.needsScroll = true;
+				this.needsScroll = 'nearest';
 				this.applySelection(ev, this.state.lines[lineIndex + 1]);
 				ev.preventDefault();
 			}
+		}
+
+		if (ev.key === 'Tab') {
+			this.setState({ displaySymbols: !this.state.displaySymbols });
+			ev.preventDefault();
 		}
 	}
 

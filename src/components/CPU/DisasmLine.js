@@ -74,7 +74,7 @@ class DisasmLine extends PureComponent {
 	componentDidUpdate(prevProps, prevState) {
 		if (this.state.needsScroll) {
 			const triggerNode = this.ref.current.parentNode;
-			ensureInView(triggerNode, { block: 'nearest' });
+			ensureInView(triggerNode, { block: this.state.needsScroll });
 			triggerNode.focus();
 			this.setState({ needsScroll: false });
 		}
@@ -86,8 +86,8 @@ class DisasmLine extends PureComponent {
 		}
 	}
 
-	ensureInView() {
-		this.setState({ needsScroll: true });
+	ensureInView(needsScroll) {
+		this.setState({ needsScroll });
 	}
 }
 
