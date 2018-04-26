@@ -3,6 +3,7 @@ import { ContextMenu, MenuItem } from 'react-contextmenu';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import RegList from './RegList';
 import listeners from '../../utils/listeners.js';
+import { copyText } from '../../utils/clipboard';
 import './RegPanel.css';
 import '../ext/react-contextmenu.css';
 import '../ext/react-tabs.css';
@@ -90,22 +91,7 @@ class RegPanel extends Component {
 	}
 
 	handleCopyReg = (ev, data, regNode) => {
-		const textNode = regNode.querySelector('dd').firstChild;
-		const range = document.createRange();
-		range.setStart(textNode, 0);
-		range.setEnd(textNode, textNode.textContent.length);
-
-		const selection = window.getSelection();
-		selection.removeAllRanges();
-		selection.addRange(range);
-
-		try {
-			document.execCommand('copy');
-		} catch (e) {
-			window.prompt('Register value (use Ctrl-C or Command-C to copy)', data.value);
-		}
-
-		selection.removeAllRanges();
+		copyText(data.value);
 	}
 
 	handleChangeReg = (ev, data, regNode) => {
