@@ -20,7 +20,7 @@ class DisasmContextMenu extends PureComponent {
 				<MenuItem onClick={this.handleCopyHex}>
 					Copy Instruction (Hex)
 				</MenuItem>
-				<MenuItem data={{ action: 'copy_disasm' }} onClick={this.handleTodo}>
+				<MenuItem onClick={this.handleCopyDisasm}>
 					Copy Instruction (Disasm)
 				</MenuItem>
 				<MenuItem divider />
@@ -63,16 +63,29 @@ class DisasmContextMenu extends PureComponent {
 
 	handleCopyAddress = (ev, data) => {
 		copyText(toString08X(data.line.address));
+		data.node.focus();
 	}
 
 	handleCopyHex = (ev, data) => {
-		const hexLines = this.props.getSelectedLines().map(line => toString08X(line.encoding));
+		const hexLines = this.props.getSelectedLines().map(line => {
+			// Include each opcode of a macro if it's a macro.
+			return line.macroEncoding ? line.macroEncoding.map(toString08X).join("\n") : toString08X(line.encoding);
+		});
 		copyText(hexLines.join("\n"));
+		data.node.focus();
 	}
+
+	handleCopyDisasm = (ev, data) => {
+		const lines = this.props.getSelectedDisasm();
+		copyText(lines);
+		data.node.focus();
+	}
+
 
 	handleTodo = (ev, data) => {
 		// TODO
 		console.log(data);
+		data.node.focus();
 	}
 };
 
@@ -87,6 +100,7 @@ DisasmContextMenu.propTypes = {
 	}),
 	stepping: PropTypes.bool.isRequired,
 	getSelectedLines: PropTypes.func.isRequired,
+	getSelectedDisasm: PropTypes.func.isRequired,
 };
 
 export default connectMenu('disasm')(DisasmContextMenu);

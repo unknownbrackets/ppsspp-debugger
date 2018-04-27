@@ -4,7 +4,7 @@ import classNames from 'classnames';
 class DisasmBranchGuide extends PureComponent {
 	render() {
 		const pos = this.calcPos();
-		if (pos === null) {
+		if (pos === null || this.props.lineHeight === 0) {
 			return null;
 		}
 		const classes = classNames({

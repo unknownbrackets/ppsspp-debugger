@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import DisasmContextMenu from './DisasmContextMenu';
 import DisasmList from './DisasmList';
+import { toString08X } from '../../utils/format';
 import listeners from '../../utils/listeners.js';
 import './Disasm.css';
 
@@ -67,6 +68,7 @@ class Disasm extends PureComponent {
 		return <DisasmContextMenu key="menu"
 			stepping={this.props.stepping}
 			getSelectedLines={this.getSelectedLines}
+			getSelectedDisasm={this.getSelectedDisasm}
 		/>;
 	}
 
@@ -103,6 +105,42 @@ class Disasm extends PureComponent {
 		const { selectionTop, selectionBottom } = this.props;
 		const isSelected = line => line.address >= selectionTop && line.address <= selectionBottom;
 		return this.state.lines.filter(isSelected);
+	}
+
+	getSelectedDisasm = () => {
+		const lines = this.getSelectedLines();
+
+		// Gather all branch targets without labels.
+		let branchAddresses = {};
+		const unlabeledBranches = lines.map(l => l.branch).filter(b => b && !b.symbol && b.targetAddress);
+		for (const b of unlabeledBranches) {
+			branchAddresses[b.targetAddress] = 'pos_' + toString08X(b.targetAddress);
+		}
+
+		let result = '';
+		let firstLine = true;
+		for (const l of lines) {
+			const label = l.symbol || branchAddresses[l.address];
+			if (label) {
+				if (!firstLine) {
+					result += '\n';
+				}
+				result += label + ':\n\n';
+			}
+
+			result += '\t' + l.name + ' ';
+			if (l.branch && l.branch.targetAddress && !l.branch.symbol) {
+				// Use the generated label.
+				result += l.params.replace(/0x[0-9A-f]+/, branchAddresses[l.branch.targetAddress]);
+			} else {
+				result += l.params;
+			}
+			result += '\n';
+
+			firstLine = false;
+		}
+
+		return result;
 	}
 
 	updateDisplaySymbols = (flag) => {

@@ -25,7 +25,7 @@ class DisasmLine extends PureComponent {
 		});
 
 		const mapData = (props) => {
-			return { line };
+			return { line, node: this.ref.current.parentNode };
 		};
 		const attributes = {
 			onDoubleClick: (ev) => this.onDoubleClick(ev, mapData()),
