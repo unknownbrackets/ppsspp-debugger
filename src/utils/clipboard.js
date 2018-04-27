@@ -8,6 +8,7 @@ function createScratchpad() {
 	div.style.top = 0;
 	div.style.left = 0;
 	div.style.pointerEvents = 'none';
+	div.style.whiteSpace = 'pre';
 	document.body.appendChild(div);
 
 	return div;

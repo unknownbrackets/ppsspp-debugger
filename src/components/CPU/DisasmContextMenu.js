@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import { ContextMenu, MenuItem, connectMenu } from 'react-contextmenu';
 import { copyText } from '../../utils/clipboard';
 import { toString08X } from '../../utils/format';
@@ -7,7 +8,7 @@ class DisasmContextMenu extends PureComponent {
 	render() {
 		const { id, trigger } = this.props;
 		const disabled = !this.props.stepping;
-		const line = trigger && trigger.line;;
+		const line = trigger && trigger.line;
 
 		const followBranch = line && (line.branch !== null || line.relevantData !== null || line.type === 'data');
 
@@ -16,7 +17,7 @@ class DisasmContextMenu extends PureComponent {
 				<MenuItem onClick={this.handleCopyAddress}>
 					Copy Address
 				</MenuItem>
-				<MenuItem data={{ action: 'copy_hex' }} onClick={this.handleTodo}>
+				<MenuItem onClick={this.handleCopyHex}>
 					Copy Instruction (Hex)
 				</MenuItem>
 				<MenuItem data={{ action: 'copy_disasm' }} onClick={this.handleTodo}>
@@ -64,10 +65,28 @@ class DisasmContextMenu extends PureComponent {
 		copyText(toString08X(data.line.address));
 	}
 
+	handleCopyHex = (ev, data) => {
+		const hexLines = this.props.getSelectedLines().map(line => toString08X(line.encoding));
+		copyText(hexLines.join("\n"));
+	}
+
 	handleTodo = (ev, data) => {
 		// TODO
 		console.log(data);
 	}
+};
+
+DisasmContextMenu.propTypes = {
+	id: PropTypes.string.isRequired,
+	trigger: PropTypes.shape({
+		line: PropTypes.shape({
+			type: PropTypes.string,
+			branch: PropTypes.object,
+			relevantData: PropTypes.object,
+		}),
+	}),
+	stepping: PropTypes.bool.isRequired,
+	getSelectedLines: PropTypes.func.isRequired,
 };
 
 export default connectMenu('disasm')(DisasmContextMenu);

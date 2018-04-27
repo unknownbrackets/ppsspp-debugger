@@ -64,7 +64,10 @@ class Disasm extends PureComponent {
 	}
 
 	renderContextMenu() {
-		return <DisasmContextMenu key="menu" stepping={this.props.stepping} />;
+		return <DisasmContextMenu key="menu"
+			stepping={this.props.stepping}
+			getSelectedLines={this.getSelectedLines}
+		/>;
 	}
 
 	updateCursor = (cursor) => {
@@ -94,6 +97,12 @@ class Disasm extends PureComponent {
 				}
 			}
 		}
+	}
+
+	getSelectedLines = () => {
+		const { selectionTop, selectionBottom } = this.props;
+		const isSelected = line => line.address >= selectionTop && line.address <= selectionBottom;
+		return this.state.lines.filter(isSelected);
 	}
 
 	updateDisplaySymbols = (flag) => {
