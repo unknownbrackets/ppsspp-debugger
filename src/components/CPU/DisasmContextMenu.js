@@ -31,7 +31,7 @@ class DisasmContextMenu extends PureComponent {
 				<MenuItem data={{ action: 'step_until' }} disabled={disabled} onClick={this.handleTodo}>
 					Run to Cursor
 				</MenuItem>
-				<MenuItem data={{ action: 'change_pc' }} disabled={disabled} onClick={this.handleTodo}>
+				<MenuItem disabled={disabled} onClick={this.handleJumpPC}>
 					Jump to Cursor
 				</MenuItem>
 				<MenuItem data={{ action: 'toggle_breakpoint' }} onClick={this.handleTodo}>
@@ -81,6 +81,11 @@ class DisasmContextMenu extends PureComponent {
 		data.node.focus();
 	}
 
+	handleJumpPC = (ev, data) => {
+		this.props.ppsspp.send({ event: 'cpu.setReg', name: 'pc', value: data.line.address }).catch((err) => {
+			this.props.log('Failed to update PC: ' + err);
+		});
+	}
 
 	handleTodo = (ev, data) => {
 		// TODO
@@ -98,6 +103,7 @@ DisasmContextMenu.propTypes = {
 			relevantData: PropTypes.object,
 		}),
 	}),
+	ppsspp: PropTypes.object.isRequired,
 	stepping: PropTypes.bool.isRequired,
 	getSelectedLines: PropTypes.func.isRequired,
 	getSelectedDisasm: PropTypes.func.isRequired,

@@ -67,6 +67,8 @@ class Disasm extends PureComponent {
 
 	renderContextMenu() {
 		return <DisasmContextMenu key="menu"
+			ppsspp={this.props.ppsspp}
+			log={this.props.log}
 			stepping={this.props.stepping}
 			getSelectedLines={this.getSelectedLines}
 			getSelectedDisasm={this.getSelectedDisasm}
