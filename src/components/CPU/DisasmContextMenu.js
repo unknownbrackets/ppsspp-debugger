@@ -6,14 +6,10 @@ import { toString08X } from '../../utils/format';
 class DisasmContextMenu extends PureComponent {
 	render() {
 		const { id, trigger } = this.props;
-		if (!trigger) {
-			return <ContextMenu id={id}><MenuItem divider /></ContextMenu>;
-		}
-
 		const disabled = !this.props.stepping;
-		const { line } = trigger;
+		const line = trigger && trigger.line;;
 
-		const followBranch = line.branch !== null || line.relevantData !== null || line.type === 'data';
+		const followBranch = line && (line.branch !== null || line.relevantData !== null || line.type === 'data');
 
 		return (
 			<ContextMenu id={id}>
