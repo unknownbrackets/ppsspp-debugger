@@ -7,6 +7,8 @@ import { hasContextMenu } from '../../utils/dom';
 class DisasmList extends PureComponent {
 	state = {
 		mouseDown: false,
+		lineOffsets: {},
+		lineOffsetLines: null,
 	};
 	ref;
 	cursorRef;
@@ -26,24 +28,12 @@ class DisasmList extends PureComponent {
 			onKeyDown: ev => this.onKeyDown(ev),
 		};
 
-		const offsets = this.calcOffsets();
 		return (
 			<div className="Disasm__list" ref={this.ref} {...events}>
 				{this.props.lines.map((line) => this.renderLine(line))}
-				{this.props.branchGuides.map((guide) => this.renderBranchGuide(guide, offsets))}
+				{this.props.branchGuides.map((guide) => this.renderBranchGuide(guide))}
 			</div>
 		);
-	}
-
-	calcOffsets() {
-		// TODO: Cache this and update when lines update.
-		let pos = 0;
-		let offsets = {};
-		this.props.lines.forEach((line) => {
-			offsets[line.address] = pos;
-			pos += this.props.lineHeight;
-		});
-		return offsets;
 	}
 
 	renderLine(line) {
@@ -60,13 +50,13 @@ class DisasmList extends PureComponent {
 		return <DisasmLine key={line.address} contextmenu="disasm" {...props} />;
 	}
 
-	renderBranchGuide(guide, offsets) {
+	renderBranchGuide(guide) {
 		const key = String(guide.top) + String(guide.bottom) + guide.direction;
 		const { range, lineHeight, cursor } = this.props;
 		const props = {
 			key,
 			guide,
-			offsets,
+			offsets: this.state.lineOffsets,
 			range,
 			lineHeight,
 			selected: guide.top === cursor || guide.bottom === cursor,
@@ -88,6 +78,24 @@ class DisasmList extends PureComponent {
 		if (this.cursorRef.current) {
 			this.cursorRef.current.ensureInView(options);
 		}
+	}
+
+	static calcOffsets(lines, lineHeight) {
+		let pos = 0;
+		let offsets = {};
+		lines.forEach((line) => {
+			offsets[line.address] = pos;
+			pos += lineHeight;
+		});
+		return offsets;
+	}
+
+	static getDerivedStateFromProps(nextProps, prevState) {
+		if (nextProps.lines !== prevState.lineOffsetLines) {
+			const lineOffsets = DisasmList.calcOffsets(nextProps.lines, nextProps.lineHeight);
+			return { lineOffsets, lineOffsetLines: nextProps.lines };
+		}
+		return null;
 	}
 
 	onMouseDown(ev) {

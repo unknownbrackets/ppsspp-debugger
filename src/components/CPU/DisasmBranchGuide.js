@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import classNames from 'classnames';
 
-class DisasmBranchGuide extends Component {
+class DisasmBranchGuide extends PureComponent {
 	render() {
 		const pos = this.calcPos();
 		if (pos === null) {
