@@ -209,10 +209,11 @@ class Disasm extends PureComponent {
 
 	updateDisasm(newRange) {
 		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
+		const defaultBuffer = Math.floor(minBuffer * 1.5);
 		const displaySymbols = this.state.wantDisplaySymbols;
 		const updateRange = {
-			address: newRange === null ? this.props.selectionTop - minBuffer * 4: newRange.start,
-			count: newRange === null ? minBuffer * 2 : undefined,
+			address: newRange === null ? this.props.selectionTop - defaultBuffer * 4 : newRange.start,
+			count: newRange === null ? defaultBuffer * 2 : undefined,
 			end: newRange !== null ? newRange.end : undefined,
 		};
 
@@ -243,13 +244,10 @@ class Disasm extends PureComponent {
 	}
 
 	onScroll(ev) {
-		const { scrollHeight, scrollTop, clientHeight } = ev.target;
-		const bufferTop = scrollTop / this.state.lineHeight;
-		const bufferBottom = (scrollHeight - scrollTop - clientHeight) / this.state.lineHeight;
-
-		let { start, end } = this.state.range;
+		const { bufferTop, bufferBottom } = this.bufferRange();
 		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
 		const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
+		let { start, end } = this.state.range;
 
 		if (bufferTop < minBuffer) {
 			start -= minBuffer * 4;
@@ -268,6 +266,18 @@ class Disasm extends PureComponent {
 				this.updateDisasm({ start, end });
 			}
 		}
+	}
+
+	bufferRange() {
+		const { scrollHeight, scrollTop, clientHeight } = this.ref.current;
+		const bufferTop = scrollTop / this.state.lineHeight;
+		const bufferBottom = (scrollHeight - scrollTop - clientHeight) / this.state.lineHeight;
+		const visibleEachDirection = Math.floor((this.state.visibleLines - 1) / 2);
+
+		return {
+			bufferTop: bufferTop + visibleEachDirection,
+			bufferBottom: bufferBottom + visibleEachDirection,
+		};
 	}
 }
 
