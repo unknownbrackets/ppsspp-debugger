@@ -58,6 +58,7 @@ class Disasm extends PureComponent {
 					updateDisplaySymbols={this.updateDisplaySymbols}
 					selectionTop={this.props.selectionTop}
 					selectionBottom={this.props.selectionBottom}
+					getSelectedDisasm={this.getSelectedDisasm}
 				/>
 			</div>,
 			this.renderContextMenu(),

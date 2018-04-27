@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import DisasmBranchGuide from './DisasmBranchGuide';
 import DisasmLine from './DisasmLine';
 import { hasContextMenu } from '../../utils/dom';
+import { listenCopy, forgetCopy } from '../../utils/clipboard';
 
 class DisasmList extends PureComponent {
 	state = {
@@ -96,6 +97,18 @@ class DisasmList extends PureComponent {
 			return { lineOffsets, lineOffsetLines: nextProps.lines };
 		}
 		return null;
+	}
+
+	componentDidMount() {
+		listenCopy('.Disasm__list', this.onCopy);
+	}
+
+	componentWillUnmount() {
+		forgetCopy('.Disasm__list', this.onCopy);
+	}
+
+	onCopy = (ev) => {
+		return this.props.getSelectedDisasm();
 	}
 
 	onMouseDown(ev) {
@@ -211,6 +224,7 @@ DisasmList.propTypes = {
 	updateCursor: PropTypes.func.isRequired,
 	updateSelection: PropTypes.func.isRequired,
 	updateDisplaySymbols: PropTypes.func.isRequired,
+	getSelectedDisasm: PropTypes.func.isRequired,
 
 	range: PropTypes.shape({
 		start: PropTypes.number.isRequired,
