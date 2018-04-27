@@ -9,10 +9,6 @@ class DisasmLine extends PureComponent {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			needsScroll: false,
-		};
-
 		this.ref = React.createRef();
 	}
 
@@ -71,15 +67,6 @@ class DisasmLine extends PureComponent {
 		return '';
 	}
 
-	componentDidUpdate(prevProps, prevState) {
-		if (this.state.needsScroll) {
-			const triggerNode = this.ref.current.parentNode;
-			ensureInView(triggerNode, { block: this.state.needsScroll });
-			triggerNode.focus();
-			this.setState({ needsScroll: false });
-		}
-	}
-
 	onDoubleClick(ev, data) {
 		if (ev.button === 0) {
 			this.props.onDoubleClick(ev, data);
@@ -87,7 +74,9 @@ class DisasmLine extends PureComponent {
 	}
 
 	ensureInView(needsScroll) {
-		this.setState({ needsScroll });
+		const triggerNode = this.ref.current.parentNode;
+		ensureInView(triggerNode, { block: needsScroll });
+		triggerNode.focus();
 	}
 
 	boundingTop() {
