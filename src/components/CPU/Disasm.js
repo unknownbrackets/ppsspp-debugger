@@ -32,16 +32,6 @@ class Disasm extends PureComponent {
 
 		this.ref = React.createRef();
 		this.listRef = React.createRef();
-
-		listeners.listen({
-			'connection': () => this.updateDisasm(null),
-			'cpu.setReg': (result) => {
-				// Need to re-render if pc is changed.
-				if (result.category === 0 && result.register === 32) {
-					this.updateDisasm(null);
-				}
-			},
-		});
 	}
 
 	render() {
@@ -190,6 +180,18 @@ class Disasm extends PureComponent {
 			}
 		}
 		return null;
+	}
+
+	componentDidMount() {
+		listeners.listen({
+			'connection': () => this.updateDisasm(null),
+			'cpu.setReg': (result) => {
+				// Need to re-render if pc is changed.
+				if (result.category === 0 && result.register === 32) {
+					this.updateDisasm(null);
+				}
+			},
+		});
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {

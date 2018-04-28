@@ -257,8 +257,8 @@ export default class PPSSPP {
 		this.pendingTickets_ = {};
 	}
 
-	onError: null;
-	onClose: null;
+	onError = null;
+	onClose = null;
 
 	socket_ = null;
 	pendingTickets_ = {};
