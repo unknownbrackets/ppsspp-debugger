@@ -8,9 +8,11 @@ import { listenCopy, forgetCopy } from '../../utils/clipboard';
 class DisasmList extends PureComponent {
 	state = {
 		mouseDown: false,
+		focused: false,
 		lineOffsets: {},
 		lineOffsetLines: null,
 	};
+	focusTimeout = null;
 	ref;
 	cursorRef;
 
@@ -27,6 +29,8 @@ class DisasmList extends PureComponent {
 			onMouseUpCapture: this.state.mouseDown ? (ev => this.onMouseUp(ev)) : undefined,
 			onMouseMove: this.state.mouseDown ? (ev => this.onMouseMove(ev)) : undefined,
 			onKeyDown: ev => this.onKeyDown(ev),
+			onBlur: ev => this.onFocusChange(ev, false),
+			onFocus: ev => this.onFocusChange(ev, true),
 		};
 
 		return (
@@ -39,7 +43,7 @@ class DisasmList extends PureComponent {
 
 	renderLine(line) {
 		const { selectionTop, selectionBottom, displaySymbols, cursor } = this.props;
-		const props = {
+		let props = {
 			displaySymbols,
 			line,
 			selected: line.address >= selectionTop && line.address <= selectionBottom,
@@ -47,6 +51,7 @@ class DisasmList extends PureComponent {
 			onDoubleClick: this.props.onDoubleClick,
 			ref: line.address === cursor ? this.cursorRef : undefined,
 		};
+		props.focused = props.selected && this.state.focused;
 
 		return <DisasmLine key={line.address} contextmenu="disasm" {...props} />;
 	}
@@ -107,6 +112,26 @@ class DisasmList extends PureComponent {
 
 	onCopy = (ev) => {
 		return this.props.getSelectedDisasm();
+	}
+
+	onFocusChange(ev, focused) {
+		const update = () => {
+			if (focused !== this.state.focused) {
+				this.setState({ focused });
+			}
+		};
+
+		if (this.focusTimeout) {
+			clearTimeout(this.focusTimeout);
+			this.focusTimeout = null;
+		}
+
+		if (!focused) {
+			// Arbitrary short delay because a click will temporarily blur.
+			this.focusTimeout = setTimeout(update, 20);
+		} else {
+			update();
+		}
 	}
 
 	onMouseDown(ev) {

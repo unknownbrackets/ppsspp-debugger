@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import { ensureInView } from '../../utils/dom';
@@ -13,11 +14,12 @@ class DisasmLine extends PureComponent {
 	}
 
 	render() {
-		const { line, selected, cursor } = this.props;
+		const { line, selected, focused, cursor } = this.props;
 
 		const className = classNames({
 			'DisasmLine': true,
-			'DisasmLine--selected': selected,
+			'DisasmLine--selected': selected && !focused,
+			'DisasmLine--focused': focused,
 			'DisasmLine--cursor': cursor,
 			'DisasmLine--breakpoint': line.breakpoint && line.breakpoint.enabled,
 			'DisasmLine--disabled-breakpoint': line.breakpoint && !line.breakpoint.enabled,
@@ -89,13 +91,16 @@ class DisasmLine extends PureComponent {
 	}
 }
 
-DisasmLine.defaultProps = {
-	line: null,
-	selected: false,
-	cursor: false,
-	displaySymbols: true,
-	contextmenu: null,
-	onDoubleClick: null,
+DisasmLine.propTypes = {
+	line: PropTypes.shape({
+		address: PropTypes.number.isRequired,
+	}).isRequired,
+	selected: PropTypes.bool,
+	focused: PropTypes.bool,
+	cursor: PropTypes.bool,
+	displaySymbols: PropTypes.bool,
+	contextmenu: PropTypes.string.isRequired,
+	onDoubleClick: PropTypes.func.isRequired,
 };
 
 export default DisasmLine;

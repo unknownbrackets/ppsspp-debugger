@@ -34,11 +34,15 @@
 }
 
 .DisasmLine--selected {
+	background: linear-gradient(to bottom, #bcd, #bcd);
+}
+
+.DisasmLine--focused {
 	background: linear-gradient(to bottom, #39f, #39f);
 	color: #fff;
 }
 
-.DisasmLine--cursor {
+.DisasmLine--focused.DisasmLine--cursor {
 	background: linear-gradient(to bottom, #28f, #28f);
 }
 
@@ -54,15 +58,15 @@
 	fill: #999;
 }
 
-.DisasmLine--selected.DisasmLine--breakpoint {
+.DisasmLine--focused.DisasmLine--breakpoint {
 	text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
-.DisasmLine--selected.DisasmLine--breakpoint .DisasmLine__breakpoint-icon {
+.DisasmLine--focused.DisasmLine--breakpoint .DisasmLine__breakpoint-icon {
 	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8));
 }
 
-.DisasmLine--selected.DisasmLine--disabled-breakpoint .DisasmLine__breakpoint-icon {
+.DisasmLine--focused.DisasmLine--disabled-breakpoint .DisasmLine__breakpoint-icon {
 	fill: #bbb;
 }
 
