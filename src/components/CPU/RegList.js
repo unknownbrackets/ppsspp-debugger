@@ -20,7 +20,7 @@ class RegList extends PureComponent {
 
 	render() {
 		return (
-			<dl key="dl">
+			<dl>
 				{this.props.registerNames.map((name, reg) => {
 					return this.renderReg(name, reg);
 				})}

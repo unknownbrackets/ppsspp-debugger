@@ -50,8 +50,8 @@ class Disasm extends PureComponent {
 			onDragStart: ev => ev.preventDefault(),
 		};
 
-		return [
-			<div key="disasm" ref={this.ref} className="Disasm" {...events}>
+		return <React.Fragment>
+			<div ref={this.ref} className="Disasm" {...events}>
 				<DisasmList ref={this.listRef} {...this.state}
 					onDoubleClick={this.onDoubleClick}
 					updateSelection={this.props.updateSelection}
@@ -62,13 +62,13 @@ class Disasm extends PureComponent {
 					getSelectedDisasm={this.getSelectedDisasm}
 					followBranch={this.followBranch}
 				/>
-			</div>,
-			this.renderContextMenu(),
-		];
+			</div>
+			{this.renderContextMenu()}
+		</React.Fragment>;
 	}
 
 	renderContextMenu() {
-		return <DisasmContextMenu key="menu"
+		return <DisasmContextMenu
 			ppsspp={this.props.ppsspp}
 			log={this.props.log}
 			stepping={this.props.stepping}
