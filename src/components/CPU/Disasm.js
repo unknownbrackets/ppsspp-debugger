@@ -24,7 +24,6 @@ class Disasm extends PureComponent {
 			cursor: null,
 		};
 		this.updatesSequence = Promise.resolve(null);
-		this.updatesPending = 0;
 
 		this.ref = React.createRef();
 		this.listRef = React.createRef();
@@ -80,27 +79,27 @@ class Disasm extends PureComponent {
 			this.needsScroll = 'nearest';
 			this.setState({ cursor });
 
-			let { start, end } = this.state.range;
-			const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
-			const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
+			this.updatesSequence = this.updatesSequence.then(() => {
+				let { start, end } = this.state.range;
+				const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
+				const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
 
-			// This is here for keyboard scrolling, mainly.
-			if (cursor - minBuffer * 4 < start) {
-				start = cursor - minBuffer * 2 * 4;
-			} else if (cursor - maxBuffer * 4 > start) {
-				start = cursor - (maxBuffer - minBuffer) * 4;
-			}
-			if (cursor + minBuffer * 4 > end) {
-				end = cursor + minBuffer * 2 * 4;
-			} else if (cursor + maxBuffer * 4 < end) {
-				end = cursor + (maxBuffer - minBuffer) * 4;
-			}
-
-			if (start !== this.state.range.start || end !== this.state.range.end) {
-				if (this.updatesPending === 0) {
-					this.updateDisasm({ start, end });
+				// This is here for keyboard scrolling, mainly.
+				if (cursor - minBuffer * 4 < start) {
+					start = cursor - minBuffer * 2 * 4;
+				} else if (cursor - maxBuffer * 4 > start) {
+					start = cursor - (maxBuffer - minBuffer) * 4;
 				}
-			}
+				if (cursor + minBuffer * 4 > end) {
+					end = cursor + minBuffer * 2 * 4;
+				} else if (cursor + maxBuffer * 4 < end) {
+					end = cursor + (maxBuffer - minBuffer) * 4;
+				}
+
+				if (start !== this.state.range.start || end !== this.state.range.end) {
+					return this.updateDisasmNow({ start, end });
+				}
+			});
 		}
 	}
 
@@ -152,9 +151,11 @@ class Disasm extends PureComponent {
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
 		if (this.needsOffsetFix && this.listRef.current) {
-			const top = this.listRef.current.cursorBoundingTop();
+			const { lines } = this.state;
+			const centerAddress = lines[Math.floor(lines.length / 2)].address;
+			const top = this.listRef.current.addressBoundingTop(centerAddress);
 			if (top) {
-				return { top };
+				return { top, centerAddress };
 			}
 		}
 		return null;
@@ -203,13 +204,19 @@ class Disasm extends PureComponent {
 		}
 
 		if (snapshot && this.listRef.current) {
-			const top = this.listRef.current.cursorBoundingTop();
+			const top = this.listRef.current.addressBoundingTop(snapshot.centerAddress);
 			this.ref.current.scrollTop -= snapshot.top - top;
 			this.needsOffsetFix = false;
 		}
 	}
 
 	updateDisasm(newRange) {
+		this.updatesSequence = this.updatesSequence.then(() => {
+			return this.updateDisasmNow(newRange);
+		});
+	}
+
+	updateDisasmNow(newRange) {
 		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
 		const defaultBuffer = Math.floor(minBuffer * 1.5);
 		const displaySymbols = this.state.wantDisplaySymbols;
@@ -219,8 +226,7 @@ class Disasm extends PureComponent {
 			end: newRange !== null ? newRange.end : undefined,
 		};
 
-		this.updatesPending++;
-		this.updatesSequence = this.updatesSequence.then(res => {
+		return Promise.resolve(null).then(() => {
 			return this.props.ppsspp.send({
 				event: 'memory.disasm',
 				...updateRange,
@@ -235,8 +241,6 @@ class Disasm extends PureComponent {
 				this.setState({ range, branchGuides, lines, displaySymbols });
 			}, (err) => {
 				this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
-			}).finally(() => {
-				this.updatesPending--;
 			});
 		});
 	}
@@ -246,28 +250,28 @@ class Disasm extends PureComponent {
 	}
 
 	onScroll(ev) {
-		const { bufferTop, bufferBottom } = this.bufferRange();
-		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
-		const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
-		let { start, end } = this.state.range;
+		this.updatesSequence = this.updatesSequence.then(() => {
+			const { bufferTop, bufferBottom } = this.bufferRange();
+			const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
+			const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
+			let { start, end } = this.state.range;
 
-		if (bufferTop < minBuffer) {
-			start -= minBuffer * 4;
-		} else if (bufferTop > maxBuffer) {
-			start += minBuffer * 4;
-		}
-
-		if (bufferBottom < minBuffer) {
-			end += minBuffer * 4;
-		} else if (bufferBottom > maxBuffer) {
-			end -= minBuffer * 4;
-		}
-
-		if (start !== this.state.range.start || end !== this.state.range.end) {
-			if (this.updatesPending === 0) {
-				this.updateDisasm({ start, end });
+			if (bufferTop < minBuffer) {
+				start -= minBuffer * 4;
+			} else if (bufferTop > maxBuffer) {
+				start += minBuffer * 4;
 			}
-		}
+
+			if (bufferBottom < minBuffer) {
+				end += minBuffer * 4;
+			} else if (bufferBottom > maxBuffer) {
+				end -= minBuffer * 4;
+			}
+
+			if (start !== this.state.range.start || end !== this.state.range.end) {
+				return this.updateDisasmNow({ start, end });
+			}
+		});
 	}
 
 	bufferRange() {

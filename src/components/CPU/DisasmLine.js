@@ -34,7 +34,7 @@ class DisasmLine extends PureComponent {
 
 		return (
 			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} attributes={attributes}>
-				<div className={className} style={{ backgroundColor: line.backgroundColor }} ref={this.ref}>
+				<div className={className} style={{ backgroundColor: line.backgroundColor }} ref={this.ref} data-address={line.address}>
 					<BreakpointIcon className="DisasmLine__breakpoint-icon" />
 					{this.renderAddress(line)}
 					<code className="DisasmLine__opcode">{line.name} </code>
@@ -79,9 +79,10 @@ class DisasmLine extends PureComponent {
 		triggerNode.focus();
 	}
 
-	boundingTop() {
-		if (this.ref.current) {
-			const triggerNode = this.ref.current.parentNode;
+	static addressBoundingTop(parentNode, address) {
+		const lineNode = parentNode.querySelector('.DisasmLine[data-address="' + address + '"]');
+		if (lineNode) {
+			const triggerNode = lineNode.parentNode;
 			return triggerNode.getBoundingClientRect().top;
 		}
 		return null;

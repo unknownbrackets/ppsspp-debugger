@@ -67,11 +67,9 @@ class DisasmList extends PureComponent {
 	}
 
 	// Exposed to parent.
-	cursorBoundingTop() {
-		if (this.cursorRef.current) {
-			return this.cursorRef.current.boundingTop();
-		}
-		return null;
+	addressBoundingTop(address) {
+		// It seems like pointless complexity to use a ref for this.
+		return DisasmLine.addressBoundingTop(this.ref.current, address);
 	}
 
 	// Exposed to parent.
