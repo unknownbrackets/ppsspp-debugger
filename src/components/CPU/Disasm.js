@@ -10,6 +10,8 @@ const MIN_BUFFER = 100;
 const MAX_BUFFER = 500;
 
 class Disasm extends PureComponent {
+	jumpStack = [];
+
 	constructor(props) {
 		super(props);
 
@@ -58,6 +60,7 @@ class Disasm extends PureComponent {
 					selectionTop={this.props.selectionTop}
 					selectionBottom={this.props.selectionBottom}
 					getSelectedDisasm={this.getSelectedDisasm}
+					followBranch={this.followBranch}
 				/>
 			</div>,
 			this.renderContextMenu(),
@@ -71,6 +74,7 @@ class Disasm extends PureComponent {
 			stepping={this.props.stepping}
 			getSelectedLines={this.getSelectedLines}
 			getSelectedDisasm={this.getSelectedDisasm}
+			followBranch={this.followBranch}
 		/>;
 	}
 
@@ -147,6 +151,33 @@ class Disasm extends PureComponent {
 
 	updateDisplaySymbols = (flag) => {
 		this.setState({ wantDisplaySymbols: flag });
+	}
+
+	followBranch = (direction, line) => {
+		const go = (pc) => {
+			this.needsScroll = 'center';
+			this.props.updateSelection({
+				selectionTop: pc,
+				selectionBottom: pc,
+			});
+		};
+
+		if (direction) {
+			let target = line.branch && line.branch.targetAddress;
+			if (target === null) {
+				target = line.relevantData && line.relevantData.address;
+			}
+			if (target !== null) {
+				this.jumpStack.push(this.state.cursor);
+				go(target);
+			}
+		} else {
+			if (this.jumpStack.length !== 0) {
+				go(this.jumpStack.pop());
+			} else {
+				go(this.props.pc);
+			}
+		}
 	}
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
@@ -294,6 +325,7 @@ Disasm.propTypes = {
 	selectionTop: PropTypes.number,
 	selectionBottom: PropTypes.number,
 	stepping: PropTypes.bool.isRequired,
+	pc: PropTypes.number,
 };
 
 export default Disasm;

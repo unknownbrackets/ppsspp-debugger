@@ -22,8 +22,8 @@ class CPU extends Component {
 	}
 
 	render() {
-		const { stepping, selectionTop, selectionBottom, jumpMarker } = this.state;
-		const disasmProps = { stepping, selectionTop, selectionBottom, jumpMarker };
+		const { stepping, selectionTop, selectionBottom, jumpMarker, pc } = this.state;
+		const disasmProps = { stepping, selectionTop, selectionBottom, jumpMarker, pc };
 
 		return (
 			<div id="CPU">
