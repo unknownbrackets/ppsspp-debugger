@@ -189,7 +189,7 @@ export default class PPSSPP {
 			}
 
 			const endpoint = 'ws://' + listing[0].ip + ':' + listing[0].p + PPSSPP_DEFAULT_PATH;
-			this.connect(endpoint).then(resolve, err => {
+			return this.connect(endpoint).then(resolve, err => {
 				if (listing.length > 1) {
 					resolve(this.tryNextEndpoint_(listing.slice(1)));
 				} else {
@@ -263,6 +263,6 @@ export default class PPSSPP {
 	socket_ = null;
 	pendingTickets_ = {};
 	listeners_ = {};
-};
+}
 
 export { ErrorLevels };

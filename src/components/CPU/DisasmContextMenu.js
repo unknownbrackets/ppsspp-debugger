@@ -96,7 +96,7 @@ class DisasmContextMenu extends PureComponent {
 		console.log(data);
 		data.node.focus();
 	}
-};
+}
 
 DisasmContextMenu.propTypes = {
 	id: PropTypes.string.isRequired,

@@ -53,8 +53,9 @@ class DisasmLine extends PureComponent {
 		const addressHex = toString08X(address);
 
 		if (this.props.displaySymbols) {
-			if (symbol !== null)
+			if (symbol !== null) {
 				return <code className="DisasmLine__address DisasmLine__address--symbol">{symbol}:</code>;
+			}
 			return <code className="DisasmLine__address DisasmLine__address--nosymbol">{addressHex}</code>;
 		}
 		return (

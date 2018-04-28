@@ -93,6 +93,7 @@ class Disasm extends PureComponent {
 				if (start !== this.state.range.start || end !== this.state.range.end) {
 					return this.updateDisasmNow({ start, end });
 				}
+				return null;
 			});
 		}
 	}
@@ -304,6 +305,7 @@ class Disasm extends PureComponent {
 			if (start !== this.state.range.start || end !== this.state.range.end) {
 				return this.updateDisasmNow({ start, end });
 			}
+			return null;
 		});
 	}
 
