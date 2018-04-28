@@ -2,8 +2,8 @@
 	background: black;
 	border-radius: 1ex;
 	color: #ccc;
+	flex: 1 1;
 	font: 12px Consolas, monospace;
-	height: 16em;
 	max-width: 100%;
 	min-height: 2em;
 	overflow: auto;

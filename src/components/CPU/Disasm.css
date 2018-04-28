@@ -1,7 +1,8 @@
 .Disasm {
 	font-family: Consolas, monospace;
 	font-size: 14px;
-	height: 35.28em;
+	min-height: 10em;
+	max-height: 100%;
 	line-height: 1.26;
 	overflow-y: auto;
 }

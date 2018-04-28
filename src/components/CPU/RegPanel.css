@@ -1,10 +1,14 @@
 #RegPanel {
-	width: 24ex;
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: column;
+	width: 22ex;
 }
 
 #RegPanel dl {
 	font-family: Consolas, monospace;
 	line-height: 0.8em;
+	margin: 0;
 	margin-top: 1px;
 	height: calc(28em + 71px);
 	overflow-y: auto;
@@ -58,4 +62,15 @@
 #RegPanel .react-contextmenu-wrapper:focus {
 	/* Already shown on selection. */
 	outline: none;
+}
+
+#RegPanel .react-tabs {
+	display: flex;
+	flex-direction: column;
+}
+
+#RegPanel .react-tabs__tab-panel {
+	display: flex;
+	flex: 1 1;
+	flex-direction: column;
 }

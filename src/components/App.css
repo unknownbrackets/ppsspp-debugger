@@ -3,34 +3,32 @@
 	flex-direction: column;
 	flex-grow: 1;
 	height: 100%;
-	text-align: center;
 }
 
 .App-logo {
-	animation: App-logo-spin infinite 20s linear;
-	height: 80px;
+	display: inline-block;
+	height: 24px;
+	margin-right: 5px;
+	vertical-align: top;
 }
 
 .App-header {
-	background-color: #222;
-	height: 150px;
-	padding: 20px;
+	background: linear-gradient(135deg, #0d2d3b 0%,#163951 25%,#1c4261 53%,#27517c 89%,#27517c 89%,#234b72 100%);
+	border-bottom: 2px solid #3999bd;
 	color: white;
+	height: 24px;
+	padding: 8px;
+	text-align: right;
 }
 
 .App-title {
-	font-size: 1.5em;
-}
-
-.App-intro {
-	font-size: large;
+	display: inline-block;
+	font-family: Roboto, sans-serif;
+	font-size: 20px;
+	font-weight: normal;
+	margin: 0;
 }
 
 .App-button {
-	flex: 1;
-}
-
-@keyframes App-logo-spin {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
+	flex: 0;
 }

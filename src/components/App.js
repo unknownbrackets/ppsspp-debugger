@@ -37,11 +37,8 @@ class App extends Component {
 			<div className="App">
 				<header className="App-header">
 					<img src={logo} className="App-logo" alt="logo" />
-					<h1 className="App-title">Welcome to React</h1>
+					<h1 className="App-title">Debugger</h1>
 				</header>
-				<p className="App-intro">
-					To get started, edit <code>src/App.js</code> and save to reload.
-				</p>
 				<div className="App-button">{this.button()}</div>
 				<CPU ppsspp={this.ppsspp_} log={this.log} />
 				<Log ppsspp={this.ppsspp_} ref={this.logRef} />

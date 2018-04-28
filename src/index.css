@@ -1,12 +1,16 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
 html {
-	height: 100%;
+	background: #fff;
+	color: #000;
+	min-height: 100%;
 }
 
 html, body, #root {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	font-family: sans-serif;
+	font-family: Roboto, sans-serif;
 	font-size: 13px;
 	margin: 0;
 	padding: 0;

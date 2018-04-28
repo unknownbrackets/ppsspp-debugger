@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Disasm from './CPU/Disasm';
 import RegPanel from './CPU/RegPanel';
 import listeners from '../utils/listeners.js';
+import './CPU.css';
 
 class CPU extends Component {
 	constructor(props) {
@@ -27,13 +28,12 @@ class CPU extends Component {
 		return (
 			<div id="CPU">
 				{/* TODO: Figure out styling.  Just placeholder. */}
-				<div style={{ minHeight: '500px', display: 'flex' }}>
+				<div style={{ display: 'flex', flex: 1 }}>
 					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={pc => this.gotoDisasm(pc)} />
 					<div style={{ width: '100%', minWidth: '50%' }}>
 						<Disasm {...this.props} {...disasmProps} updateSelection={data => this.setState(data)} />
 					</div>
 				</div>
-				Paused: {this.state.paused ? 'y' : 'n'}, Stepping: {this.state.stepping ? 'y' : 'n'}
 			</div>
 		);
 	}
