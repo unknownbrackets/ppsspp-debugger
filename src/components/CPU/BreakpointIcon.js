@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function BreakpointIcon(props) {
 	return (
@@ -7,3 +8,7 @@ export default function BreakpointIcon(props) {
 		</svg>
 	);
 }
+
+BreakpointIcon.propTypes = {
+	className: PropTypes.string.isRequired,
+};

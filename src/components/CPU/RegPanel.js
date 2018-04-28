@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ContextMenu, MenuItem } from 'react-contextmenu';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import RegList from './RegList';
@@ -9,13 +10,9 @@ import '../ext/react-contextmenu.css';
 import '../ext/react-tabs.css';
 
 class RegPanel extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			categories: [],
-		};
-	}
+	state = {
+		categories: [],
+	};
 
 	render() {
 		return (
@@ -155,11 +152,11 @@ class RegPanel extends Component {
 	}
 }
 
-RegPanel.defaultProps = {
-	ppsspp: null,
-	log: null,
-	stepping: false,
-	gotoDisasm: null,
+RegPanel.propTypes = {
+	ppsspp: PropTypes.object.isRequired,
+	log: PropTypes.func.isRequired,
+	stepping: PropTypes.bool,
+	gotoDisasm: PropTypes.func.isRequired,
 };
 
 export default RegPanel;

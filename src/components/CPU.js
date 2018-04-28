@@ -1,25 +1,22 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Disasm from './CPU/Disasm';
 import RegPanel from './CPU/RegPanel';
 import listeners from '../utils/listeners.js';
 import './CPU.css';
 
 class CPU extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			stepping: false,
-			paused: true,
-			pc: 0,
-			// Note: these are inclusive.
-			selectionTop: null,
-			selectionBottom: null,
-			jumpMarker: null,
-			lastTicks: 0,
-			ticks: 0,
-		};
-	}
+	state = {
+		stepping: false,
+		paused: true,
+		pc: 0,
+		// Note: these are inclusive.
+		selectionTop: null,
+		selectionBottom: null,
+		jumpMarker: null,
+		lastTicks: 0,
+		ticks: 0,
+	};
 
 	render() {
 		const { stepping, selectionTop, selectionBottom, jumpMarker, pc } = this.state;
@@ -96,9 +93,9 @@ class CPU extends Component {
 	}
 }
 
-CPU.defaultProps = {
-	ppsspp: null,
-	log: null,
+CPU.propTypes = {
+	ppsspp: PropTypes.object.isRequired,
+	log: PropTypes.func.isRequired,
 };
 
 export default CPU;

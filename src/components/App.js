@@ -12,19 +12,22 @@ const versionInfo = {
 };
 
 class App extends Component {
+	state = {
+		connected: false,
+		connecting: false,
+	};
+	logRef;
+	ppsspp;
+	originalTitle;
+
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			connected: false,
-			connecting: false,
-		};
-
 		this.logRef = React.createRef();
-		this.ppsspp_ = new PPSSPP();
-		listeners.init(this.ppsspp_);
-
+		this.ppsspp = new PPSSPP();
 		this.originalTitle = document.title;
+
+		listeners.init(this.ppsspp);
 		listeners.listen({
 			'connection.change': this.onConnectionChange,
 			'game.start': this.updateTitle,
@@ -36,12 +39,12 @@ class App extends Component {
 		return (
 			<div className="App">
 				<header className="App-header">
-					<img src={logo} className="App-logo" alt="logo" />
+					<img src={logo} className="App-logo" alt="PPSSPP" />
 					<h1 className="App-title">Debugger</h1>
 				</header>
 				<div className="App-button">{this.button()}</div>
-				<CPU ppsspp={this.ppsspp_} log={this.log} />
-				<Log ppsspp={this.ppsspp_} ref={this.logRef} />
+				<CPU ppsspp={this.ppsspp} log={this.log} />
+				<Log ppsspp={this.ppsspp} ref={this.logRef} />
 			</div>
 		);
 	}
@@ -63,13 +66,13 @@ class App extends Component {
 	handleConnect = () => {
 		this.setState({ connecting: true });
 
-		this.ppsspp_.onClose = () => {
+		this.ppsspp.onClose = () => {
 			this.log('Debugger disconnected');
 			listeners.change(false);
 			this.setState({ connected: false, connecting: false });
 		};
 
-		this.ppsspp_.autoConnect().then(() => {
+		this.ppsspp.autoConnect().then(() => {
 			this.log('Debugger connected');
 			listeners.change(true);
 			this.setState({ connected: true, connecting: false });
@@ -82,7 +85,7 @@ class App extends Component {
 
 	handleDisconnect = () => {
 		// Should trigger the appropriate events automatically.
-		this.ppsspp_.disconnect();
+		this.ppsspp.disconnect();
 	}
 
 	log = (message) => {
@@ -100,10 +103,10 @@ class App extends Component {
 
 	onConnectionChange = (status) => {
 		if (status) {
-			this.ppsspp_.send({ event: 'version', ...versionInfo }).catch((err) => {
+			this.ppsspp.send({ event: 'version', ...versionInfo }).catch((err) => {
 				window.alert('PPSSPP seems to think this debugger is out of date.  Try refreshing?\n\nDetails: ' + err);
 			});
-			this.ppsspp_.send({ event: 'game.status' }).then(this.updateTitle, (err) => this.updateTitle({}));
+			this.ppsspp.send({ event: 'game.status' }).then(this.updateTitle, (err) => this.updateTitle({}));
 		} else {
 			this.updateTitle({});
 		}

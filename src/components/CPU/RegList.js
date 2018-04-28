@@ -1,18 +1,21 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import { ensureInView, hasContextMenu } from '../../utils/dom';
 import classNames from 'classnames';
 
 class RegList extends PureComponent {
+	state = {
+		cursor: 0,
+	};
+	cursorRef;
+	needsScroll = false;
+
 	constructor(props) {
 		super(props);
 
 		this.cursorRef = React.createRef();
-		this.state = {
-			cursor: 0,
-		};
-		this.needsScroll = false;
 	}
 
 	render() {
@@ -96,15 +99,15 @@ class RegList extends PureComponent {
 	}
 }
 
-RegList.defaultProps = {
-	id: null,
-	contextmenu: null,
-	onDoubleClick: null,
-	registerNames: [],
-	uintValues: [],
-	floatValues: [],
-	uintValuesLast: [],
-	floatValuesLast: [],
+RegList.propTypes = {
+	id: PropTypes.number.isRequired,
+	contextmenu: PropTypes.string.isRequired,
+	onDoubleClick: PropTypes.func.isRequired,
+	registerNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+	uintValues: PropTypes.arrayOf(PropTypes.number).isRequired,
+	floatValues: PropTypes.arrayOf(PropTypes.string).isRequired,
+	uintValuesLast: PropTypes.arrayOf(PropTypes.number).isRequired,
+	floatValuesLast: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default RegList;

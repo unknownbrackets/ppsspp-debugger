@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 class LogItem extends PureComponent {
@@ -41,5 +42,16 @@ class LogItem extends PureComponent {
 		});
 	}
 }
+
+LogItem.propTypes = {
+	item: PropTypes.shape({
+		event: PropTypes.string,
+		channel: PropTypes.string,
+		level: PropTypes.number,
+		timestamp: PropTypes.string,
+		header: PropTypes.string,
+		message: PropTypes.string.isRequired,
+	}).isRequired,
+};
 
 export default LogItem;

@@ -7,6 +7,8 @@ import classNames from 'classnames';
 import BreakpointIcon from './BreakpointIcon';
 
 class DisasmLine extends PureComponent {
+	ref;
+
 	constructor(props) {
 		super(props);
 

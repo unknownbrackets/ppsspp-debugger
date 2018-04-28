@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 class DisasmBranchGuide extends PureComponent {
@@ -95,12 +96,20 @@ class DisasmBranchGuide extends PureComponent {
 	}
 }
 
-DisasmBranchGuide.defaultProps = {
-	guide: null,
-	offsets: {},
-	range: {},
-	lineHeight: 0,
-	selected: false,
+DisasmBranchGuide.propTypes = {
+	guide: PropTypes.shape({
+		direction: PropTypes.oneOf(['up', 'down']).isRequired,
+		top: PropTypes.number.isRequired,
+		bottom: PropTypes.number.isRequired,
+		lane: PropTypes.number.isRequired,
+	}).isRequired,
+	offsets: PropTypes.object.isRequired,
+	range: PropTypes.shape({
+		start: PropTypes.number.isRequired,
+		end: PropTypes.number.isRequired,
+	}).isRequired,
+	lineHeight: PropTypes.number.isRequired,
+	selected: PropTypes.bool,
 };
 
 export default DisasmBranchGuide;

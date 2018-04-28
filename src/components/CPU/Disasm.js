@@ -10,28 +10,28 @@ const MIN_BUFFER = 100;
 const MAX_BUFFER = 500;
 
 class Disasm extends PureComponent {
+	state = {
+		lines: [],
+		branchGuides: [],
+		range: { start: 0, end: 0 },
+		lineHeight: 0,
+		visibleLines: 0,
+		displaySymbols: true,
+		wantDisplaySymbols: true,
+		cursor: null,
+	};
 	jumpStack = [];
+	needsScroll = false;
+	needsOffsetFix = false;
+	updatesSequence = Promise.resolve(null);
+	ref;
+	listRef;
 
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			lines: [],
-			branchGuides: [],
-			range: { start: 0, end: 0 },
-			lineHeight: 0,
-			visibleLines: 0,
-			displaySymbols: true,
-			wantDisplaySymbols: true,
-			cursor: null,
-		};
-		this.updatesSequence = Promise.resolve(null);
-
 		this.ref = React.createRef();
 		this.listRef = React.createRef();
-
-		this.needsScroll = false;
-		this.needsOffsetFix = false;
 
 		listeners.listen({
 			'connection': () => this.updateDisasm(null),

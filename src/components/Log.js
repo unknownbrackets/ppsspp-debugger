@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import LogItem from './LogItem';
 import listeners from '../utils/listeners.js';
 import './Log.css';
@@ -6,13 +7,14 @@ import './Log.css';
 const MAX_LINES = 5000;
 
 class Log extends PureComponent {
+	state = {
+		id: 0,
+		items: [],
+	};
+	divRef;
+
 	constructor(props) {
 		super(props);
-
-		this.state = {
-			id: 0,
-			items: [],
-		};
 
 		this.divRef = React.createRef();
 	}
@@ -67,8 +69,8 @@ class Log extends PureComponent {
 	}
 }
 
-Log.defaultProps = {
-	ppsspp: null,
+Log.propTypes = {
+	ppsspp: PropTypes.object.isRequired,
 };
 
 export default Log;
