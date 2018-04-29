@@ -32,7 +32,7 @@ class CPU extends Component {
 					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
-					<DisasmButtons ppsspp={this.props.ppsspp} />
+					<DisasmButtons ppsspp={this.props.ppsspp} started={this.state.started} stepping={this.state.stepping} />
 					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} />
 				</div>
 			</div>

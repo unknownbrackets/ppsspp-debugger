@@ -1,0 +1,49 @@
+.ReactModal__FitOverlay {
+	align-items: center;
+	background: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	opacity: 0;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	transition: 0.10s opacity;
+}
+
+.ReactModal__FitContent {
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	max-height: 90vh;
+	max-width: 90vw;
+	opacity: 0;
+	outline: none;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	padding: 16px;
+	position: static;
+	transform: translateY(-10px) perspective(600px) rotateX(12deg) scale(0.95);
+	transition: 0.15s transform, 0.10s opacity;
+}
+
+.ReactModal__Overlay--after-open {
+	opacity: 1;
+	transition: 0.15s opacity;
+}
+
+.ReactModal__Overlay--before-close {
+	opacity: 0;
+}
+
+.ReactModal__Content--after-open {
+	opacity: 1;
+	transform: translateY(0) perspective(600px) rotateX(0) scale(1);
+	transition: 0.15s transform, 0.15s opacity;
+}
+
+.ReactModal__Content--before-close {
+	opacity: 0;
+	transform: translateY(10px) perspective(600px) rotateX(0) scale(1);
+}
