@@ -16,13 +16,16 @@
 .GotoBox__button {
 	background: transparent;
 	border: 0;
-	cursor: pointer;
 	font-size: inherit;
 	padding: 0 3px;
 }
 
-.GotoBox__button:active,
-.GotoBox__button:hover,
-.GotoBox__button:focus {
+.GotoBox__button:enabled {
+	cursor: pointer;
+}
+
+.GotoBox__button:enabled:active,
+.GotoBox__button:enabled:hover,
+.GotoBox__button:enabled:focus {
 	color: #279;
 }

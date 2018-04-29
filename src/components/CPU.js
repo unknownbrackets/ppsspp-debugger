@@ -11,6 +11,7 @@ class CPU extends Component {
 	state = {
 		stepping: false,
 		paused: true,
+		started: false,
 		pc: 0,
 		// Note: these are inclusive.
 		selectionTop: null,
@@ -21,18 +22,18 @@ class CPU extends Component {
 	};
 
 	render() {
-		const { stepping, selectionTop, selectionBottom, jumpMarker, pc } = this.state;
-		const disasmProps = { stepping, selectionTop, selectionBottom, jumpMarker, pc };
+		const { stepping, started, selectionTop, selectionBottom, jumpMarker, pc } = this.state;
+		const disasmProps = { stepping, started, selectionTop, selectionBottom, jumpMarker, pc };
 
 		return (
 			<div id="CPU">
 				<div className="CPU__pane">
-					<GotoBox gotoDisasm={pc => this.gotoDisasm(pc)} />
-					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={pc => this.gotoDisasm(pc)} />
+					<GotoBox ppsspp={this.props.ppsspp} started={this.state.started} gotoDisasm={this.gotoDisasm} />
+					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
 					<DisasmButtons ppsspp={this.props.ppsspp} />
-					<Disasm {...this.props} {...disasmProps} updateSelection={data => this.setState(data)} />
+					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} />
 				</div>
 			</div>
 		);
@@ -44,8 +45,8 @@ class CPU extends Component {
 			'connection.change': () => this.onConnectionChange(),
 			'cpu.stepping': (data) => this.onStepping(data),
 			'cpu.resume': () => this.setState({ stepping: false }),
-			'game.start': () => this.setState({ paused: false }),
-			'game.quit': () => this.setState({ stepping: false, paused: true, pc: 0 }),
+			'game.start': () => this.setState({ started: true, paused: false }),
+			'game.quit': () => this.setState({ started: false, stepping: false, paused: true, pc: 0 }),
 			'game.pause': () => this.setState({ paused: true }),
 			'game.resume': () => this.setState({ paused: false }),
 			'cpu.setReg': (result) => {
@@ -62,14 +63,15 @@ class CPU extends Component {
 
 	onConnectionChange() {
 		// On any reconnect, assume paused until proven otherwise.
-		this.setState({ stepping: false, paused: true });
+		this.setState({ started: false, stepping: false, paused: true });
 	}
 
 	onConnection() {
 		// Update the status of this connection immediately too.
 		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
 			const { stepping, paused, pc, ticks } = result;
-			this.setState({ stepping, paused, pc, ticks, lastTicks: ticks });
+			const started = pc !== 0 || stepping;
+			this.setState({ started, stepping, paused, pc, ticks, lastTicks: ticks });
 		}, (err) => {
 			this.setState({ stepping: false, paused: true });
 		});
@@ -86,7 +88,11 @@ class CPU extends Component {
 		});
 	}
 
-	gotoDisasm(pc) {
+	updateSelection = (data) => {
+		this.setState(data)
+	}
+
+	gotoDisasm = (pc) => {
 		this.setState({
 			selectionTop: pc,
 			selectionBottom: pc,

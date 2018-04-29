@@ -187,7 +187,11 @@ class Disasm extends PureComponent {
 
 	componentDidMount() {
 		listeners.listen({
-			'connection': () => this.updateDisasm(null),
+			'connection': () => {
+				if (this.props.started) {
+					this.updateDisasm(null);
+				}
+			},
 			'cpu.setReg': (result) => {
 				// Need to re-render if pc is changed.
 				if (result.category === 0 && result.register === 32) {
@@ -199,7 +203,7 @@ class Disasm extends PureComponent {
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { selectionTop, selectionBottom } = this.props;
-		const { range, lineHeight, cursor } = this.state;
+		const { range, lineHeight } = this.state;
 
 		let disasmChange = false;
 		if (this.state.wantDisplaySymbols !== prevState.displaySymbols) {
@@ -209,9 +213,6 @@ class Disasm extends PureComponent {
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
 			if (selectionTop < range.start || selectionBottom >= range.end) {
 				disasmChange = null;
-			}
-			if (cursor < selectionTop || cursor > selectionBottom) {
-				this.setState({ cursor: selectionTop });
 			}
 		}
 		if (disasmChange !== false) {
@@ -322,6 +323,13 @@ class Disasm extends PureComponent {
 			bufferBottom: bufferBottom + visibleEachDirection,
 		};
 	}
+
+	static getDerivedStateFromProps(nextProps, prevState) {
+		if (prevState.cursor < nextProps.selectionTop || prevState.cursor > nextProps.selectionBottom) {
+			return { cursor: nextProps.selectionTop };
+		}
+		return null;
+	}
 }
 
 Disasm.propTypes = {
@@ -331,6 +339,7 @@ Disasm.propTypes = {
 	selectionTop: PropTypes.number,
 	selectionBottom: PropTypes.number,
 	stepping: PropTypes.bool.isRequired,
+	started: PropTypes.bool.isRequired,
 	pc: PropTypes.number,
 };
 
