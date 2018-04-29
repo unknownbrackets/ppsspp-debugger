@@ -1,0 +1,13 @@
+.DisasmButtons {
+	/* Matches with the Diasm max-height. */
+	height: 25px;
+}
+
+.DisasmButtons__spacer {
+	display: inline-block;
+	width: 12px;
+}
+
+.DisasmButtons button {
+	margin-right: 3px;
+}

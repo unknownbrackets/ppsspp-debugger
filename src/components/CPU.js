@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Disasm from './CPU/Disasm';
+import DisasmButtons from './CPU/DisasmButtons';
+import GotoBox from './CPU/GotoBox';
 import RegPanel from './CPU/RegPanel';
 import listeners from '../utils/listeners.js';
 import './CPU.css';
@@ -24,12 +26,13 @@ class CPU extends Component {
 
 		return (
 			<div id="CPU">
-				{/* TODO: Figure out styling.  Just placeholder. */}
-				<div style={{ display: 'flex', flex: 1 }}>
+				<div className="CPU__pane">
+					<GotoBox gotoDisasm={pc => this.gotoDisasm(pc)} />
 					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={pc => this.gotoDisasm(pc)} />
-					<div style={{ width: '100%', minWidth: '50%' }}>
-						<Disasm {...this.props} {...disasmProps} updateSelection={data => this.setState(data)} />
-					</div>
+				</div>
+				<div className="Disasm__container">
+					<DisasmButtons ppsspp={this.props.ppsspp} />
+					<Disasm {...this.props} {...disasmProps} updateSelection={data => this.setState(data)} />
 				</div>
 			</div>
 		);

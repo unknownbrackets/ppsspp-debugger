@@ -1,0 +1,28 @@
+.GotoBox {
+	padding: 5px;
+	padding-top: 2px;
+}
+
+.GotoBox__label {
+	display: block;
+	padding-bottom: 3px;
+}
+
+#GotoBox__address {
+	width: 11ex;
+	margin-right: 4px;
+}
+
+.GotoBox__button {
+	background: transparent;
+	border: 0;
+	cursor: pointer;
+	font-size: inherit;
+	padding: 0 3px;
+}
+
+.GotoBox__button:active,
+.GotoBox__button:hover,
+.GotoBox__button:focus {
+	color: #279;
+}

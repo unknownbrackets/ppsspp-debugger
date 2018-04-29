@@ -13,11 +13,13 @@
 }
 
 .App-header {
-	background: linear-gradient(135deg, #0d2d3b 0%,#163951 25%,#1c4261 53%,#27517c 89%,#27517c 89%,#234b72 100%);
+	/* Roughly from PPSSPP's background, maybe replace with something better. */
+	background: linear-gradient(135deg, #0d2d3b, #163951 25%, #1c4261 53%, #27517c 89%, #234b72);
 	border-bottom: 2px solid #3999bd;
 	color: white;
 	height: 24px;
 	padding: 8px;
+	margin-bottom: 3px;
 	text-align: right;
 }
 
@@ -30,5 +32,8 @@
 }
 
 .App-button {
-	flex: 0;
+	align-items: center;
+	display: flex;
+	float: left;
+	height: 100%;
 }

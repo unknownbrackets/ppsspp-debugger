@@ -2,9 +2,13 @@
 	font-family: Consolas, monospace;
 	font-size: 14px;
 	min-height: 10em;
-	max-height: 100%;
+	max-height: calc(100% - 25px);
 	line-height: 1.26;
 	overflow-y: auto;
+}
+
+.Disasm__container {
+	width: 100%;
 }
 
 .Disasm__list {

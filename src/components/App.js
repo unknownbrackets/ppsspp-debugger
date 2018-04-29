@@ -39,10 +39,10 @@ class App extends Component {
 		return (
 			<div className="App">
 				<header className="App-header">
+					<div className="App-button">{this.button()}</div>
 					<img src={logo} className="App-logo" alt="PPSSPP" />
 					<h1 className="App-title">Debugger</h1>
 				</header>
-				<div className="App-button">{this.button()}</div>
 				<CPU ppsspp={this.ppsspp} log={this.log} />
 				<Log ppsspp={this.ppsspp} ref={this.logRef} />
 			</div>

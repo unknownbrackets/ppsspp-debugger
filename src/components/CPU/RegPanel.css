@@ -1,6 +1,6 @@
 #RegPanel {
 	display: flex;
-	flex: 0 0 auto;
+	flex: 1 1 auto;
 	flex-direction: column;
 	width: 22ex;
 }
@@ -29,11 +29,10 @@
 #RegPanel dt::before {
 	background: #e8efff;
 	content: "\00A0";
-	display: inline-block;
+	display: block;
 	float: left;
 	margin-left: 1px;
 	margin-right: 2px;
-	vertical-align: top;
 	width: 14px;
 }
 
