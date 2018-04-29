@@ -295,13 +295,13 @@ class Disasm extends PureComponent {
 			if (bufferTop < minBuffer) {
 				start -= minBuffer * 4;
 			} else if (bufferTop > maxBuffer) {
-				start += minBuffer * 4;
+				start += Math.max(minBuffer, bufferTop - maxBuffer) * 4;
 			}
 
 			if (bufferBottom < minBuffer) {
 				end += minBuffer * 4;
 			} else if (bufferBottom > maxBuffer) {
-				end -= minBuffer * 4;
+				end -= Math.max(minBuffer, bufferBottom - maxBuffer) * 4;
 			}
 
 			if (start !== this.state.range.start || end !== this.state.range.end) {
