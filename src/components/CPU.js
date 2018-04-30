@@ -20,6 +20,7 @@ class CPU extends Component {
 		lastTicks: 0,
 		ticks: 0,
 	};
+	listeners_;
 
 	render() {
 		const { stepping, started, selectionTop, selectionBottom, jumpMarker, pc } = this.state;

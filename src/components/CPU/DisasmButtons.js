@@ -1,20 +1,23 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
+import listeners from '../../utils/listeners.js';
 import './DisasmButtons.css';
 import '../ext/react-modal.css';
 
 class DisasmButtons extends PureComponent {
 	state = {
 		breakpointModalOpen: false,
+		connected: false,
 	};
+	listeners_;
 
 	render() {
 		const disabled = !this.props.started || !this.props.stepping;
 
 		return (
 			<div className="DisasmButtons">
-				<button type="button" disabled={!this.props.started}>
+				<button type="button" disabled={!this.props.started} onClick={this.handleGoStop}>
 					{this.props.stepping || !this.props.started ? 'Go' : 'Stop'}
 				</button>
 				<span className="DisasmButtons__spacer"></span>
@@ -24,7 +27,7 @@ class DisasmButtons extends PureComponent {
 				<span className="DisasmButtons__spacer"></span>
 				<button type="button" disabled={disabled}>Next HLE</button>
 				<span className="DisasmButtons__spacer"></span>
-				<button type="button" onClick={this.handleBreakpointOpen}>Breakpoint</button>
+				<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.state.connected}>Breakpoint</button>
 				<span className="DisasmButtons__spacer"></span>
 				<span className="DisasmButtons__thread">
 					Thread: TODO
@@ -44,12 +47,37 @@ class DisasmButtons extends PureComponent {
 		);
 	}
 
+	componentDidMount() {
+		this.listeners_ = listeners.listen({
+			'connection.change': (connected) => this.setState({ connected }),
+		});
+	}
+
+	componentWillUnmount() {
+		listeners.forget(this.listeners_);
+	}
+
+	handleGoStop = () => {
+		this.props.ppsspp.send({
+			event: this.props.stepping ? 'cpu.resume' : 'cpu.stepping',
+		}).catch(() => {
+			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
+		});
+	}
+
 	handleBreakpointOpen = () => {
 		this.setState({ breakpointModalOpen: true });
 	}
 
 	handleBreakpointClose = () => {
 		this.setState({ breakpointModalOpen: false });
+	}
+
+	static getDerivedStateFromProps(nextProps, prevState) {
+		if (nextProps.stepping || nextProps.started) {
+			return { connected: true };
+		}
+		return null;
 	}
 }
 
