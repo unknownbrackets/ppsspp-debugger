@@ -48,7 +48,7 @@ const ErrorLevels = {
 	VERBOSE: 6,
 };
 
-const PPSSPP_MATCH_API = 'http://report.ppsspp.org/match/list';
+const PPSSPP_MATCH_API = '//report.ppsspp.org/match/list';
 const PPSSPP_SUB_PROTOCOL = 'debugger.ppsspp.org';
 const PPSSPP_DEFAULT_PATH = '/debugger';
 
