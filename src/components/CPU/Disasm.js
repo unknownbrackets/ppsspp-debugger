@@ -174,7 +174,7 @@ class Disasm extends PureComponent {
 	}
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
-		if (this.needsOffsetFix && this.listRef.current) {
+		if (this.needsOffsetFix && this.listRef.current && this.state.lines.length !== 0) {
 			const { lines } = this.state;
 			const centerAddress = lines[Math.floor(lines.length / 2)].address;
 			const top = this.listRef.current.addressBoundingTop(centerAddress);
@@ -191,6 +191,10 @@ class Disasm extends PureComponent {
 				if (this.props.started) {
 					this.updateDisasm(null);
 				}
+			},
+			'cpu.stepping': () => {
+				this.needsScroll = 'nearest';
+				this.updateDisasm(this.state.range);
 			},
 			'cpu.setReg': (result) => {
 				// Need to re-render if pc is changed.
@@ -275,11 +279,21 @@ class Disasm extends PureComponent {
 				} else {
 					this.needsOffsetFix = true;
 				}
-				this.setState({ range, branchGuides, lines, displaySymbols });
+				this.setState({ range, branchGuides: this.cleanupBranchGuides(branchGuides), lines, displaySymbols });
 			}, (err) => {
 				this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
 			});
 		});
+	}
+
+	cleanupBranchGuides(branchGuides) {
+		// TODO: Temporary (?) workaround for a bug with duplicate branch guides.
+		const unique = new Map();
+		branchGuides.forEach((guide) => {
+			const key = String(guide.top) + String(guide.bottom) + guide.direction;
+			unique.set(key, guide);
+		});
+		return [...unique.values()];
 	}
 
 	onDoubleClick = (ev, data) => {
