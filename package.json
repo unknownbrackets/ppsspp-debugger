@@ -1,6 +1,7 @@
 {
 	"name": "ppsspp-debugger",
 	"version": "0.1.0",
+	"homepage": "https://unknownbrackets.github.io/ppsspp-debugger",
 	"license": "GPL-3.0-or-later",
 	"dependencies": {
 		"classnames": "^2.2.5",
