@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import Modal from 'react-modal';
+import BreakpointModal from './BreakpointModal';
 import listeners from '../../utils/listeners.js';
 import './DisasmButtons.css';
-import '../ext/react-modal.css';
 
 class DisasmButtons extends PureComponent {
 	state = {
@@ -33,16 +32,7 @@ class DisasmButtons extends PureComponent {
 					Thread: TODO
 				</span>
 
-				{/* TODO: Separate component. */}
-				<Modal
-					isOpen={this.state.breakpointModalOpen}
-					onRequestClose={this.handleBreakpointClose}
-					contentLabel="Breakpoint settings"
-					className="ReactModal__FitContent" overlayClassName="ReactModal__FitOverlay"
-					closeTimeoutMS={150}
-				>
-					Fit to content
-				</Modal>
+				<BreakpointModal isOpen={this.state.breakpointModalOpen} onClose={this.handleBreakpointClose} />
 			</div>
 		);
 	}

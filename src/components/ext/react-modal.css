@@ -1,9 +1,10 @@
 .ReactModal__FitOverlay {
-	align-items: center;
+	align-items: flex-start;
 	background: rgba(0, 0, 0, 0.6);
 	display: flex;
 	justify-content: center;
 	opacity: 0;
+	padding-top: 50px;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -46,4 +47,9 @@
 .ReactModal__Content--before-close {
 	opacity: 0;
 	transform: translateY(10px) perspective(600px) rotateX(0) scale(1);
+}
+
+.ReactModal__FitContent > :first-child,
+.ReactModal__FitContent > :first-child > :first-child {
+	margin-top: 0;
 }

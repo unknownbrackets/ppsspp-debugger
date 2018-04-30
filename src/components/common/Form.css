@@ -1,0 +1,32 @@
+.Form {
+	margin: 0;
+}
+
+.Form__buttons {
+	margin-top: 1ex;
+	text-align: end;
+}
+
+.Form__buttons button {
+	margin-left: 1ex;
+}
+
+.Field {
+	margin-bottom: 1ex;
+}
+
+.Field input[type="checkbox"],
+.Field input[type="radio"] {
+	vertical-align: -1px;
+}
+
+.Field input[type="text"] {
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.Field__label {
+	color: #333;
+	display: block;
+	font-weight: bold;
+}
