@@ -16,7 +16,7 @@ class GotoBox extends PureComponent {
 				<input
 					type="text" id="GotoBox__address"
 					value={this.state.address} onChange={this.handleChange}
-					pattern="(0x)?[0-9A-Fa-f]+" title="Hexadecimal address, enter to submit"
+					title="Hexadecimal address, enter to submit"
 					autoComplete="off"
 				/>
 				<button type="button" className="GotoBox__button" onClick={this.handlePC} disabled={disabled}>PC</button>
@@ -42,7 +42,14 @@ class GotoBox extends PureComponent {
 
 	handleSubmit = (ev) => {
 		if (this.props.started) {
-			this.props.gotoDisasm(parseInt(this.state.address, 16));
+			this.props.ppsspp.send({
+				event: 'cpu.evaluate',
+				expression: this.state.address,
+			}).then(({ uintValue }) => {
+				if (this.props.started) {
+					this.props.gotoDisasm(uintValue);
+				}
+			});
 		}
 		ev.preventDefault();
 	}
