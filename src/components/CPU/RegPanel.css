@@ -66,10 +66,11 @@
 #RegPanel .react-tabs {
 	display: flex;
 	flex-direction: column;
+	flex-grow: 1;
 }
 
-#RegPanel .react-tabs__tab-panel {
+#RegPanel .react-tabs__tab-panel--selected {
 	display: flex;
-	flex: 1 1;
+	flex: 1 1 auto;
 	flex-direction: column;
 }

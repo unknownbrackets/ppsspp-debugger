@@ -223,7 +223,7 @@ class DisasmList extends PureComponent {
 
 	mouseEventToLine(ev) {
 		// Account for page and list scrolling.
-		const y = ev.pageY - this.ref.current.getBoundingClientRect().top - window.scrollY;
+		const y = ev.pageY - this.ref.current.getBoundingClientRect().top - window.pageYOffset;
 		const index = Math.floor(y / this.props.lineHeight);
 		return this.props.lines[index];
 	}

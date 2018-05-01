@@ -226,7 +226,7 @@ class Disasm extends PureComponent {
 		if (lineHeight === 0) {
 			const foundLine = document.querySelector('.DisasmLine');
 			if (foundLine) {
-				this.setState({ lineHeight: foundLine.clientHeight });
+				this.setState({ lineHeight: foundLine.getBoundingClientRect().height });
 			}
 		} else if (this.ref.current) {
 			const visibleLines = Math.floor(this.ref.current.clientHeight / lineHeight);
