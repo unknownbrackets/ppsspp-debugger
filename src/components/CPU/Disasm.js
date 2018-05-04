@@ -24,6 +24,7 @@ class Disasm extends PureComponent {
 	needsScroll = false;
 	needsOffsetFix = false;
 	updatesSequence = Promise.resolve(null);
+	lastSearch = null;
 	ref;
 	listRef;
 
@@ -55,6 +56,8 @@ class Disasm extends PureComponent {
 						assembleInstruction={this.assembleInstruction}
 						toggleBreakpoint={this.toggleBreakpoint}
 						applyScroll={this.applyScroll}
+						gotoPromptAddress={this.gotoPromptAddress}
+						searchDisasm={this.searchDisasm}
 					/>
 				</div>
 				{this.renderContextMenu()}
@@ -152,14 +155,6 @@ class Disasm extends PureComponent {
 	}
 
 	followBranch = (direction, line) => {
-		const go = (pc) => {
-			this.needsScroll = 'center';
-			this.props.updateSelection({
-				selectionTop: pc,
-				selectionBottom: pc,
-			});
-		};
-
 		if (direction) {
 			let target = line.branch && line.branch.targetAddress;
 			if (target === null) {
@@ -167,13 +162,13 @@ class Disasm extends PureComponent {
 			}
 			if (target !== null) {
 				this.jumpStack.push(this.state.cursor);
-				go(target);
+				this.gotoAddress(target);
 			}
 		} else {
 			if (this.jumpStack.length !== 0) {
-				go(this.jumpStack.pop());
+				this.gotoAddress(this.jumpStack.pop());
 			} else {
-				go(this.props.pc);
+				this.gotoAddress(this.props.pc);
 			}
 		}
 	}
@@ -196,11 +191,7 @@ class Disasm extends PureComponent {
 					const lineIndex = this.state.lines.indexOf(line);
 					if (lineIndex < this.state.lines.length - 1) {
 						const nextAddress = this.state.lines[lineIndex + 1].address;
-						this.needsScroll = 'nearest';
-						this.props.updateSelection({
-							selectionTop: nextAddress,
-							selectionBottom: nextAddress,
-						});
+						this.gotoAddress(nextAddress, 'nearest');
 					}
 				}
 
@@ -256,6 +247,70 @@ class Disasm extends PureComponent {
 		}
 
 		this.updateDisasm(this.state.range);
+	}
+
+	gotoAddress = (addr, snap = 'center') => {
+		this.needsScroll = snap;
+		this.props.updateSelection({
+			selectionTop: addr,
+			selectionBottom: addr,
+		});
+	}
+
+	gotoPromptAddress = () => {
+		const expression = window.prompt('Go to', '');
+		if (expression !== null) {
+			this.props.ppsspp.send({
+				event: 'cpu.evaluate',
+				expression,
+			}).then(({ uintValue }) => {
+				this.gotoAddress(uintValue);
+			});
+		}
+	}
+
+	searchDisasm = (cont) => {
+		if (this.lastSearch && this.lastSearch.progress) {
+			// Don't have cancel support right now, so ignore mashing.
+			return;
+		}
+
+		const { cursor } = this.state;
+		if (!cont || this.lastSearch === null) {
+			const match = window.prompt('Search text', this.lastSearch === null ? '' : this.lastSearch.match);
+			if (match === null) {
+				return;
+			}
+
+			this.lastSearch = {
+				match,
+				end: cursor,
+				last: null,
+				progress: false,
+			};
+		}
+
+		const { match, end, last } = this.lastSearch;
+		this.lastSearch.progress = true;
+
+		this.props.ppsspp.send({
+			event: 'memory.searchDisasm',
+			address: cursor === last ? cursor + 4 : cursor,
+			end,
+			match,
+		}).then(({ address }) => {
+			this.lastSearch.progress = false;
+			this.lastSearch.last = address;
+
+			if (address !== null) {
+				this.gotoAddress(address);
+			} else if (cursor !== end) {
+				window.alert('Reached the starting point of the search');
+				this.gotoAddress(end);
+			} else {
+				window.alert('The specified text was not found:\n\n' + match);
+			}
+		});
 	}
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
