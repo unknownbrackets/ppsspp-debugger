@@ -54,6 +54,7 @@ class Disasm extends PureComponent {
 						followBranch={this.followBranch}
 						assembleInstruction={this.assembleInstruction}
 						toggleBreakpoint={this.toggleBreakpoint}
+						applyScroll={this.applyScroll}
 					/>
 				</div>
 				{this.renderContextMenu()}
@@ -382,6 +383,10 @@ class Disasm extends PureComponent {
 
 	onDoubleClick = (ev, data) => {
 		this.toggleBreakpoint(data.line);
+	}
+
+	applyScroll = (dist) => {
+		this.ref.current.scrollTop += dist * this.state.lineHeight;
 	}
 
 	onScroll(ev) {

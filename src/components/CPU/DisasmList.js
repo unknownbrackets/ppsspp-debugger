@@ -175,9 +175,7 @@ class DisasmList extends PureComponent {
 
 		const modifiers = (ev.ctrlKey ? 'c' : '') + (ev.metaKey ? 'm' : '') + (ev.altKey ? 'a' : '') + (ev.shiftKey ? 's' : '');
 
-		if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(ev.key) && modifiers === '') {
-			const lineIndex = this.findCursorLineIndex();
-
+		if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(ev.key)) {
 			let dist = 1;
 			if (ev.key === 'PageUp' || ev.key === 'PageDown') {
 				dist = this.props.visibleLines;
@@ -186,9 +184,15 @@ class DisasmList extends PureComponent {
 				dist = -dist;
 			}
 
-			const newIndex = Math.min(this.props.lines.length - 1, Math.max(0, lineIndex + dist));
-			if (lineIndex !== newIndex) {
-				this.applySelection(ev, this.props.lines[newIndex]);
+			if (modifiers === '') {
+				const lineIndex = this.findCursorLineIndex();
+				const newIndex = Math.min(this.props.lines.length - 1, Math.max(0, lineIndex + dist));
+				if (lineIndex !== newIndex) {
+					this.applySelection(ev, this.props.lines[newIndex]);
+					ev.preventDefault();
+				}
+			} else if (ev.ctrlKey) {
+				this.props.applyScroll(dist);
 				ev.preventDefault();
 			}
 		}
@@ -274,6 +278,7 @@ DisasmList.propTypes = {
 	followBranch: PropTypes.func.isRequired,
 	assembleInstruction: PropTypes.func.isRequired,
 	toggleBreakpoint: PropTypes.func.isRequired,
+	applyScroll: PropTypes.func.isRequired,
 
 	range: PropTypes.shape({
 		start: PropTypes.number.isRequired,
