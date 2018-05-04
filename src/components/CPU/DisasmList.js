@@ -191,13 +191,17 @@ class DisasmList extends PureComponent {
 		}
 
 		if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') {
-			const lineIndex = this.findCursorLineIndex();
-			this.props.followBranch(ev.key === 'ArrowRight', this.props.lines[lineIndex]);
+			this.props.followBranch(ev.key === 'ArrowRight', this.findCursorLine());
 			ev.preventDefault();
 		}
 
 		if (ev.key === 'Tab') {
 			this.props.updateDisplaySymbols(!this.props.displaySymbols);
+			ev.preventDefault();
+		}
+
+		if (ev.key === 'a' && ev.ctrlKey) {
+			this.props.assembleInstruction(this.findCursorLine(), '');
 			ev.preventDefault();
 		}
 	}
@@ -239,6 +243,11 @@ class DisasmList extends PureComponent {
 
 		return undefined;
 	}
+
+	findCursorLine() {
+		const lineIndex = this.findCursorLineIndex();
+		return this.props.lines[lineIndex];
+	}
 }
 
 DisasmList.propTypes = {
@@ -255,6 +264,7 @@ DisasmList.propTypes = {
 	updateDisplaySymbols: PropTypes.func.isRequired,
 	getSelectedDisasm: PropTypes.func.isRequired,
 	followBranch: PropTypes.func.isRequired,
+	assembleInstruction: PropTypes.func.isRequired,
 
 	range: PropTypes.shape({
 		start: PropTypes.number.isRequired,

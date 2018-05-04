@@ -52,6 +52,7 @@ class Disasm extends PureComponent {
 						selectionBottom={this.props.selectionBottom}
 						getSelectedDisasm={this.getSelectedDisasm}
 						followBranch={this.followBranch}
+						assembleInstruction={this.assembleInstruction}
 					/>
 				</div>
 				{this.renderContextMenu()}
@@ -67,6 +68,7 @@ class Disasm extends PureComponent {
 			getSelectedLines={this.getSelectedLines}
 			getSelectedDisasm={this.getSelectedDisasm}
 			followBranch={this.followBranch}
+			assembleInstruction={this.assembleInstruction}
 		/>;
 	}
 
@@ -170,6 +172,57 @@ class Disasm extends PureComponent {
 			} else {
 				go(this.props.pc);
 			}
+		}
+	}
+
+	assembleInstruction = (line, startCode) => {
+		const { address } = line;
+		const code = prompt('Assemble instruction', startCode);
+		if (!code) {
+			return Promise.resolve(null);
+		}
+
+		const writeInstruction = () => {
+			return this.props.ppsspp.send({
+				event: 'memory.assemble',
+				address: address,
+				code,
+			}).then(() => {
+				if (address === this.state.cursor) {
+					// Okay, move one down so we can fire 'em off.
+					const lineIndex = this.state.lines.indexOf(line);
+					if (lineIndex < this.state.lines.length - 1) {
+						const nextAddress = this.state.lines[lineIndex + 1].address;
+						this.needsScroll = 'nearest';
+						this.props.updateSelection({
+							selectionTop: nextAddress,
+							selectionBottom: nextAddress,
+						});
+					}
+				}
+
+				// Now, whether we moved or not, also update disasm.
+				this.updateDisasm(this.state.range);
+			});
+		};
+
+		// Check if this is actually a register assignment.
+		const assignment = code.split(/\s*=\s*(.+)$/, 2);
+		if (assignment.length >= 2) {
+			return this.props.ppsspp.send({
+				event: 'cpu.evaluate',
+				expression: assignment[1],
+			}).then((result) => {
+				return this.props.ppsspp.send({
+					event: 'cpu.setReg',
+					name: assignment[0],
+					value: result.uintValue,
+				});
+			}).then(({ uintValue }) => {
+				this.props.log('Updated ' + assignment[0] + ' to ' + toString08X(uintValue));
+			}, writeInstruction);
+		} else {
+			return writeInstruction();
 		}
 	}
 
