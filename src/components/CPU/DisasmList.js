@@ -172,7 +172,10 @@ class DisasmList extends PureComponent {
 		if (hasContextMenu()) {
 			return;
 		}
-		if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown' || ev.key === 'PageUp' || ev.key === 'PageDown') {
+
+		const modifiers = (ev.ctrlKey ? 'c' : '') + (ev.metaKey ? 'm' : '') + (ev.altKey ? 'a' : '') + (ev.shiftKey ? 's' : '');
+
+		if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(ev.key) && modifiers === '') {
 			const lineIndex = this.findCursorLineIndex();
 
 			let dist = 1;
@@ -190,18 +193,23 @@ class DisasmList extends PureComponent {
 			}
 		}
 
-		if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') {
+		if ((ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && modifiers === '') {
 			this.props.followBranch(ev.key === 'ArrowRight', this.findCursorLine());
 			ev.preventDefault();
 		}
 
-		if (ev.key === 'Tab') {
+		if (ev.key === 'Tab' && modifiers === '') {
 			this.props.updateDisplaySymbols(!this.props.displaySymbols);
 			ev.preventDefault();
 		}
 
-		if (ev.key === 'a' && ev.ctrlKey) {
+		if (ev.key === 'a' && modifiers === 'c') {
 			this.props.assembleInstruction(this.findCursorLine(), '');
+			ev.preventDefault();
+		}
+
+		if ((ev.key === ' ' || ev.key === 'Spacebar') && modifiers === '') {
+			this.props.toggleBreakpoint(this.findCursorLine());
 			ev.preventDefault();
 		}
 	}
@@ -265,6 +273,7 @@ DisasmList.propTypes = {
 	getSelectedDisasm: PropTypes.func.isRequired,
 	followBranch: PropTypes.func.isRequired,
 	assembleInstruction: PropTypes.func.isRequired,
+	toggleBreakpoint: PropTypes.func.isRequired,
 
 	range: PropTypes.shape({
 		start: PropTypes.number.isRequired,

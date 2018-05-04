@@ -34,7 +34,7 @@ class DisasmContextMenu extends PureComponent {
 				<MenuItem disabled={disabled} onClick={this.handleJumpPC}>
 					Jump to Cursor
 				</MenuItem>
-				<MenuItem data={{ action: 'toggle_breakpoint' }} onClick={this.handleTodo}>
+				<MenuItem onClick={this.handleToggleBreakpoint}>
 					Toggle Breakpoint
 				</MenuItem>
 				<MenuItem divider />
@@ -106,6 +106,10 @@ class DisasmContextMenu extends PureComponent {
 		});
 	}
 
+	handleToggleBreakpoint = (ev, data) => {
+		this.props.toggleBreakpoint(data.line);
+	}
+
 	handleFollowBranch = (ev, data) => {
 		this.props.followBranch(true, data.line);
 	}
@@ -133,6 +137,7 @@ DisasmContextMenu.propTypes = {
 	getSelectedDisasm: PropTypes.func.isRequired,
 	followBranch: PropTypes.func.isRequired,
 	assembleInstruction: PropTypes.func.isRequired,
+	toggleBreakpoint: PropTypes.func.isRequired,
 };
 
 export default connectMenu('disasm')(DisasmContextMenu);

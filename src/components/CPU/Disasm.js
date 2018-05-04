@@ -53,6 +53,7 @@ class Disasm extends PureComponent {
 						getSelectedDisasm={this.getSelectedDisasm}
 						followBranch={this.followBranch}
 						assembleInstruction={this.assembleInstruction}
+						toggleBreakpoint={this.toggleBreakpoint}
 					/>
 				</div>
 				{this.renderContextMenu()}
@@ -69,6 +70,7 @@ class Disasm extends PureComponent {
 			getSelectedDisasm={this.getSelectedDisasm}
 			followBranch={this.followBranch}
 			assembleInstruction={this.assembleInstruction}
+			toggleBreakpoint={this.toggleBreakpoint}
 		/>;
 	}
 
@@ -226,6 +228,35 @@ class Disasm extends PureComponent {
 		}
 	}
 
+	toggleBreakpoint = (line) => {
+		if (line.breakpoint === null) {
+			this.props.ppsspp.send({
+				event: 'cpu.breakpoint.add',
+				address: line.address,
+				enabled: true,
+			});
+		} else if (!line.breakpoint.enabled) {
+			this.props.ppsspp.send({
+				event: 'cpu.breakpoint.update',
+				address: line.address,
+				enabled: true,
+			});
+		} else {
+			if (line.breakpoint.condition !== null) {
+				if (!window.confirm('This breakpoint has has a condition.\n\nAre you sure you want to remove it?')) {
+					return;
+				}
+			}
+
+			this.props.ppsspp.send({
+				event: 'cpu.breakpoint.remove',
+				address: line.address,
+			});
+		}
+
+		this.updateDisasm(this.state.range);
+	}
+
 	getSnapshotBeforeUpdate(prevProps, prevState) {
 		if (this.needsOffsetFix && this.listRef.current && this.state.lines.length !== 0) {
 			const { lines } = this.state;
@@ -350,7 +381,7 @@ class Disasm extends PureComponent {
 	}
 
 	onDoubleClick = (ev, data) => {
-		console.log('breakpoint', data);
+		this.toggleBreakpoint(data.line);
 	}
 
 	onScroll(ev) {
