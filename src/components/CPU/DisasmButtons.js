@@ -32,7 +32,11 @@ class DisasmButtons extends PureComponent {
 					Thread: TODO
 				</span>
 
-				<BreakpointModal isOpen={this.state.breakpointModalOpen} onClose={this.handleBreakpointClose} />
+				<BreakpointModal
+					ppsspp={this.props.ppsspp}
+					isOpen={this.state.breakpointModalOpen}
+					onClose={this.handleBreakpointClose}
+				/>
 			</div>
 		);
 	}

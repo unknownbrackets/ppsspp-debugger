@@ -18,7 +18,7 @@ const operationOptions = [
 ];
 
 const actionOptions = [
-	{ label: 'Break', value: 'break' },
+	{ label: 'Break', value: 'enabled' },
 	{ label: 'Log', value: 'log' },
 ];
 
@@ -33,7 +33,7 @@ class BreakpointModal extends PureComponent {
 		read: true,
 		write: true,
 		change: false,
-		break: true,
+		enabled: true,
 		log: true,
 	};
 
@@ -91,8 +91,21 @@ class BreakpointModal extends PureComponent {
 	}
 
 	onSave = () => {
-		// TODO
-		this.onClose();
+		if (this.state.type === 'execute') {
+			this.props.ppsspp.send({
+				event: 'cpu.breakpoint.add',
+				...this.state,
+			}).then(this.onClose, err => {
+				window.alert(err.message);
+			});
+		} else if (this.state.type === 'memory') {
+			this.props.ppsspp.send({
+				event: 'memory.breakpoint.add',
+				...this.state,
+			}).then(this.onClose, err => {
+				window.alert(err.message);
+			});
+		}
 	}
 
 	onClose = () => {
@@ -102,6 +115,7 @@ class BreakpointModal extends PureComponent {
 }
 
 BreakpointModal.propTypes = {
+	ppsspp: PropTypes.object.isRequired,
 	isOpen: PropTypes.bool.isRequired,
 	onClose: PropTypes.func.isRequired,
 };

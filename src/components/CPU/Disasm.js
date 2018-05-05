@@ -101,7 +101,7 @@ class Disasm extends PureComponent {
 				}
 
 				if (start !== this.state.range.start || end !== this.state.range.end) {
-					return this.updateDisasmNow({ start, end });
+					return this.updateDisasmNow(true, { start, end });
 				}
 				return null;
 			});
@@ -196,7 +196,7 @@ class Disasm extends PureComponent {
 				}
 
 				// Now, whether we moved or not, also update disasm.
-				this.updateDisasm(this.state.range);
+				this.updateDisasm();
 			});
 		};
 
@@ -245,8 +245,6 @@ class Disasm extends PureComponent {
 				address: line.address,
 			});
 		}
-
-		this.updateDisasm(this.state.range);
 	}
 
 	gotoAddress = (addr, snap = 'center') => {
@@ -329,18 +327,27 @@ class Disasm extends PureComponent {
 		listeners.listen({
 			'connection': () => {
 				if (this.props.started) {
-					this.updateDisasm(null);
+					this.updateDisasm(true);
 				}
 			},
 			'cpu.stepping': () => {
 				this.needsScroll = 'nearest';
-				this.updateDisasm(this.state.range);
+				this.updateDisasm();
 			},
 			'cpu.setReg': (result) => {
 				// Need to re-render if pc is changed.
 				if (result.category === 0 && result.register === 32) {
-					this.updateDisasm(null);
+					this.updateDisasm(true);
 				}
+			},
+			'cpu.breakpoint.add': () => {
+				this.updateDisasm();
+			},
+			'cpu.breakpoint.update': () => {
+				this.updateDisasm();
+			},
+			'cpu.breakpoint.remove': () => {
+				this.updateDisasm();
 			},
 		});
 	}
@@ -349,17 +356,17 @@ class Disasm extends PureComponent {
 		const { selectionTop, selectionBottom } = this.props;
 		const { range, lineHeight } = this.state;
 
-		let disasmChange = false;
+		let disasmChange = null;
 		if (this.state.wantDisplaySymbols !== prevState.displaySymbols) {
 			// Keep the existing range, just update.
-			disasmChange = this.state.range;
+			disasmChange = false;
 		}
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
 			if (selectionTop < range.start || selectionBottom >= range.end) {
-				disasmChange = null;
+				disasmChange = true;
 			}
 		}
-		if (disasmChange !== false) {
+		if (disasmChange !== null) {
 			this.updateDisasm(disasmChange);
 		}
 
@@ -391,21 +398,29 @@ class Disasm extends PureComponent {
 		}
 	}
 
-	updateDisasm(newRange) {
+	updateDisasm(reset, newRange) {
 		this.updatesSequence = this.updatesSequence.then(() => {
-			return this.updateDisasmNow(newRange);
+			return this.updateDisasmNow(reset, newRange);
 		});
 	}
 
-	updateDisasmNow(newRange) {
-		const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
-		const defaultBuffer = Math.floor(minBuffer * 1.5);
-		const displaySymbols = this.state.wantDisplaySymbols;
-		const updateRange = {
-			address: newRange === null ? this.props.selectionTop - defaultBuffer * 4 : newRange.start,
-			count: newRange === null ? defaultBuffer * 2 : undefined,
-			end: newRange !== null ? newRange.end : undefined,
-		};
+	updateDisasmNow(reset, newRange = null) {
+		const { range, visibleLines, wantDisplaySymbols: displaySymbols } = this.state;
+		let updateRange;
+		if (reset || (range.start === 0 && range.end === 0)) {
+			const minBuffer = Math.max(MIN_BUFFER, visibleLines);
+			const defaultBuffer = Math.floor(minBuffer * 1.5);
+			updateRange = {
+				address: newRange === null ? this.props.selectionTop - defaultBuffer * 4 : newRange.start,
+				count: newRange === null ? defaultBuffer * 2 : undefined,
+				end: newRange !== null ? newRange.end : undefined,
+			};
+		} else {
+			updateRange = {
+				address: range.start,
+				end: range.end,
+			};
+		}
 
 		return Promise.resolve(null).then(() => {
 			return this.props.ppsspp.send({
@@ -414,7 +429,7 @@ class Disasm extends PureComponent {
 				displaySymbols,
 			}).then((data) => {
 				const { range, branchGuides, lines } = data;
-				if (newRange === null) {
+				if (reset) {
 					this.needsScroll = 'center';
 				} else {
 					this.needsOffsetFix = true;
@@ -464,7 +479,7 @@ class Disasm extends PureComponent {
 			}
 
 			if (start !== this.state.range.start || end !== this.state.range.end) {
-				return this.updateDisasmNow({ start, end });
+				return this.updateDisasmNow(true, { start, end });
 			}
 			return null;
 		});
