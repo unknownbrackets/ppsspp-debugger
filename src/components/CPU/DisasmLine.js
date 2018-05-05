@@ -41,8 +41,8 @@ class DisasmLine extends PureComponent {
 				<div className={className} style={{ backgroundColor: line.backgroundColor }} ref={this.ref} data-address={line.address}>
 					<BreakpointIcon className="DisasmLine__breakpoint-icon" />
 					{this.renderAddress(line)}
-					<code className="DisasmLine__opcode">{line.name} </code>
-					<code className="DisasmLine__params">{line.params}{this.renderConditional(line)}</code>
+					<code className="DisasmLine__opcode">{this.highlight(line.name)} </code>
+					<code className="DisasmLine__params">{this.highlightParams(line.params)}{this.renderConditional(line)}</code>
 				</div>
 			</ContextMenuTrigger>
 		);
@@ -54,13 +54,13 @@ class DisasmLine extends PureComponent {
 
 		if (this.props.displaySymbols) {
 			if (symbol !== null) {
-				return <code className="DisasmLine__address DisasmLine__address--symbol">{symbol}:</code>;
+				return <code className="DisasmLine__address DisasmLine__address--symbol">{this.highlight(symbol + ':')}</code>;
 			}
-			return <code className="DisasmLine__address DisasmLine__address--nosymbol">{addressHex}</code>;
+			return <code className="DisasmLine__address DisasmLine__address--nosymbol">{this.highlight(addressHex)}</code>;
 		}
 		return (
 			<code className="DisasmLine__address DisasmLine__address--hexonly">
-				{addressHex} {toString08X(encoding)}
+				{this.highlight(addressHex)} {toString08X(encoding)}
 			</code>
 		);
 	}
@@ -70,6 +70,37 @@ class DisasmLine extends PureComponent {
 			return line.conditionMet ? ' ; true' : ' ; false';
 		}
 		return '';
+	}
+
+	highlight(text) {
+		const { highlight } = this.props;
+		if (highlight !== null) {
+			const pos = text.toLowerCase().indexOf(highlight);
+			if (pos !== -1) {
+				return (
+					<React.Fragment>
+						{text.substr(0, pos)}
+						<span className="DisasmLine__highlight">{text.substr(pos, highlight.length)}</span>
+						{text.substr(pos + highlight.length)}
+					</React.Fragment>
+				);
+			}
+		}
+		return text;
+	}
+
+	highlightParams(text) {
+		const { highlight, highlightParams } = this.props;
+		if (highlight === null && highlightParams !== null) {
+			const params = text.split(/([,()])/);
+			return params.map((param, key) => {
+				if (highlightParams.includes(param)) {
+					return <span className="DisasmLine__highlight-param" key={key}>{param}</span>;
+				}
+				return param;
+			});
+		}
+		return this.highlight(text);
 	}
 
 	onDoubleClick(ev, data) {
@@ -102,6 +133,8 @@ DisasmLine.propTypes = {
 	focused: PropTypes.bool,
 	cursor: PropTypes.bool,
 	displaySymbols: PropTypes.bool,
+	highlight: PropTypes.string,
+	highlightParams: PropTypes.arrayOf(PropTypes.string),
 	contextmenu: PropTypes.string.isRequired,
 	onDoubleClick: PropTypes.func.isRequired,
 };

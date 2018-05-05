@@ -4,13 +4,17 @@ import DisasmBranchGuide from './DisasmBranchGuide';
 import DisasmLine from './DisasmLine';
 import { hasContextMenu } from '../../utils/dom';
 import { listenCopy, forgetCopy } from '../../utils/clipboard';
+import { toString08X } from '../../utils/format';
 
 class DisasmList extends PureComponent {
 	state = {
 		mouseDown: false,
 		focused: false,
 		lineOffsets: {},
-		lineOffsetLines: null,
+		selectedLineParams: [],
+		prevLines: null,
+		prevSelectionTop: null,
+		prevSelectionBottom: null,
 	};
 	focusTimeout = null;
 	ref;
@@ -50,6 +54,9 @@ class DisasmList extends PureComponent {
 			cursor: line.address === cursor,
 			onDoubleClick: this.props.onDoubleClick,
 			ref: line.address === cursor ? this.cursorRef : undefined,
+			// Avoid re-rendering lines unnecessarily.
+			highlight: this.shouldHighlight(line, this.props.highlightText) ? this.props.highlightText : null,
+			highlightParams: this.shouldHighlightParams(line) ? this.state.selectedLineParams : null,
 		};
 		props.focused = props.selected && this.state.focused;
 
@@ -69,6 +76,26 @@ class DisasmList extends PureComponent {
 		};
 
 		return <DisasmBranchGuide {...props} />;
+	}
+
+	shouldHighlight(line, match) {
+		let parts = [];
+		parts.push(toString08X(line.address));
+		if (line.symbol !== null) {
+			parts.push(line.symbol + ':');
+		}
+		parts.push(line.name);
+		parts.push(line.params);
+
+		return parts.some(part => part.toLowerCase().indexOf(match) !== -1);
+	}
+
+	shouldHighlightParams(line, match) {
+		const { selectionTop, selectionBottom } = this.props;
+		if (line.address >= selectionTop && line.address <= selectionBottom) {
+			return false;
+		}
+		return this.state.selectedLineParams.some(param => line.params.indexOf(param) !== -1);
 	}
 
 	// Exposed to parent.
@@ -94,10 +121,41 @@ class DisasmList extends PureComponent {
 		return offsets;
 	}
 
+	static getSelectedLineParams({ lines, selectionTop, selectionBottom }) {
+		const selectedLines = lines.filter(line => line.address >= selectionTop && line.address <= selectionBottom);
+
+		let params = {};
+		for (let line of selectedLines) {
+			for (let param of line.params.split(/[,()]/)) {
+				params[param] = param;
+			}
+		}
+		delete params[''];
+
+		return Object.values(params);
+	}
+
 	static getDerivedStateFromProps(nextProps, prevState) {
-		if (nextProps.lines !== prevState.lineOffsetLines) {
+		const linesChanged = nextProps.lines !== prevState.prevLines;
+		const selectionChanged = nextProps.selectionTop !== prevState.prevSelectionTop || nextProps.selectionBottom !== prevState.prevSelectionBottom;
+
+		let offsetsUpdate = null;
+		if (linesChanged) {
 			const lineOffsets = DisasmList.calcOffsets(nextProps.lines, nextProps.lineHeight);
-			return { lineOffsets, lineOffsetLines: nextProps.lines };
+			offsetsUpdate = { lineOffsets, prevLines: nextProps.lines };
+		}
+
+		let selectedUpdate = null;
+		if (linesChanged || selectionChanged) {
+			selectedUpdate = {
+				selectedLineParams: DisasmList.getSelectedLineParams(nextProps),
+				prevSelectionTop: nextProps.selectionTop,
+				prevSelectionBottom: nextProps.selectionBottom,
+			};
+		}
+
+		if (offsetsUpdate !== null || selectedUpdate !== null) {
+			return { ...offsetsUpdate, ...selectedUpdate };
 		}
 		return null;
 	}
@@ -284,6 +342,7 @@ DisasmList.propTypes = {
 	cursor: PropTypes.number,
 	selectionTop: PropTypes.number,
 	selectionBottom: PropTypes.number,
+	highlightText: PropTypes.string,
 
 	onDoubleClick: PropTypes.func.isRequired,
 	updateCursor: PropTypes.func.isRequired,

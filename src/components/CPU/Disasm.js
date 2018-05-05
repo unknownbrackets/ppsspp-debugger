@@ -19,6 +19,7 @@ class Disasm extends PureComponent {
 		displaySymbols: true,
 		wantDisplaySymbols: true,
 		cursor: null,
+		highlightText: null,
 	};
 	jumpStack = [];
 	needsScroll = false;
@@ -308,6 +309,8 @@ class Disasm extends PureComponent {
 			} else {
 				window.alert('The specified text was not found:\n\n' + match);
 			}
+
+			this.setState({ highlightText: match.toLowerCase() });
 		});
 	}
 
