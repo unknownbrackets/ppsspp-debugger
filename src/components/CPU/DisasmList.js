@@ -5,18 +5,21 @@ import DisasmLine from './DisasmLine';
 import { hasContextMenu } from '../../utils/dom';
 import { listenCopy, forgetCopy } from '../../utils/clipboard';
 import { toString08X } from '../../utils/format';
+import { Timeout } from '../../utils/timeouts';
 
 class DisasmList extends PureComponent {
 	state = {
 		mouseDown: false,
 		focused: false,
 		lineOffsets: {},
+		pendingLineParams: [],
 		selectedLineParams: [],
 		prevLines: null,
 		prevSelectionTop: null,
 		prevSelectionBottom: null,
 	};
-	focusTimeout = null;
+	focusTimeout;
+	paramsTimeout;
 	ref;
 	cursorRef;
 
@@ -25,6 +28,10 @@ class DisasmList extends PureComponent {
 
 		this.ref = React.createRef();
 		this.cursorRef = React.createRef();
+		this.focusTimeout = new Timeout(() => null, 20);
+		this.paramsTimeout = new Timeout(() => {
+			this.setState({ selectedLineParams: this.state.pendingLineParams });
+		}, 20);
 	}
 
 	render() {
@@ -155,7 +162,7 @@ class DisasmList extends PureComponent {
 		let selectedUpdate = null;
 		if (linesChanged || selectionChanged) {
 			selectedUpdate = {
-				selectedLineParams: DisasmList.getSelectedLineParams(nextProps),
+				pendingLineParams: DisasmList.getSelectedLineParams(nextProps),
 				prevSelectionTop: nextProps.selectionTop,
 				prevSelectionBottom: nextProps.selectionBottom,
 			};
@@ -175,6 +182,13 @@ class DisasmList extends PureComponent {
 		forgetCopy('.Disasm__list', this.onCopy);
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if (this.state.pendingLineParams !== prevState.pendingLineParams) {
+			// Apply the line params soon after selection change - not immediately for quicker scrolling.
+			this.paramsTimeout.start();
+		}
+	}
+
 	onCopy = (ev) => {
 		return this.props.getSelectedDisasm();
 	}
@@ -186,14 +200,12 @@ class DisasmList extends PureComponent {
 			}
 		};
 
-		if (this.focusTimeout) {
-			clearTimeout(this.focusTimeout);
-			this.focusTimeout = null;
-		}
+		this.focusTimeout.cancel();
 
 		if (!focused) {
-			// Arbitrary short delay because a click will temporarily blur.
-			this.focusTimeout = setTimeout(update, 20);
+			// We use an arbitrary short delay because a click will temporarily blur.
+			this.focusTimeout.reset(update);
+			this.focusTimeout.start();
 		} else {
 			update();
 		}

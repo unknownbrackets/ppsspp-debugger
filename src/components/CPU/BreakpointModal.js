@@ -5,7 +5,7 @@ import Field from '../common/Field';
 import Form from '../common/Form';
 import '../ext/react-modal.css';
 import './BreakpointModal.css';
-import { clearTimeout } from 'timers';
+import { Timeout } from '../../utils/timeouts';
 
 const typeOptions = [
 	{ label: 'Memory', value: 'memory' },
@@ -37,11 +37,15 @@ class BreakpointModal extends PureComponent {
 		enabled: true,
 		log: true,
 	};
-	cleanTimeout = null;
+	cleanTimeout;
 
 	constructor(props) {
 		super(props);
 		Object.assign(this.state, this.cleanState);
+
+		this.cleanTimeout = new Timeout(() => {
+			this.setState(this.cleanState);
+		}, 200);
 	}
 
 	render() {
@@ -94,10 +98,7 @@ class BreakpointModal extends PureComponent {
 
 	componentDidUpdate(prevProps, prevState) {
 		if (this.props.isOpen && this.cleanTimeout != null) {
-			clearTimeout(this.cleanTimeout);
-
-			this.setState(this.cleanState);
-			this.cleanTimeout = null;
+			this.cleanTimeout.runEarly();
 		}
 	}
 
@@ -126,10 +127,7 @@ class BreakpointModal extends PureComponent {
 	}
 
 	onClose = () => {
-		this.cleanTimeout = setTimeout(() => {
-			this.setState(this.cleanState);
-			this.cleanTimeout = null;
-		}, 200);
+		this.cleanTimeout.start();
 		this.props.onClose();
 	}
 }

@@ -91,13 +91,15 @@ class DisasmLine extends PureComponent {
 
 	highlightParams(text) {
 		const { highlight, highlightParams } = this.props;
-		if (highlight === null && highlightParams !== null) {
+		if (highlight === null) {
 			const params = text.split(/([,()])/);
+			const toHighlight = highlightParams || [];
 			return params.map((param, key) => {
-				if (highlightParams.includes(param)) {
-					return <span className="DisasmLine__highlight-param" key={key}>{param}</span>;
+				let className = 'DisasmLine__param';
+				if (toHighlight.includes(param)) {
+					className += ' DisasmLine__param--highlighted';
 				}
-				return param;
+				return <span className={className} key={key}>{param}</span>;
 			});
 		}
 		return this.highlight(text);

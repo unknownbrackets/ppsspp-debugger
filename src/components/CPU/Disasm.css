@@ -119,7 +119,7 @@
 	vertical-align: top;
 }
 
-.DisasmLine__highlight-param {
+.DisasmLine__param--highlighted {
 	color: #0ba;
 }
 
