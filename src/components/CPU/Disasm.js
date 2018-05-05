@@ -123,7 +123,7 @@ class Disasm extends PureComponent {
 
 	getSelectedLines = () => {
 		const { selectionTop, selectionBottom } = this.props;
-		const isSelected = line => line.address >= selectionTop && line.address <= selectionBottom;
+		const isSelected = line => line.address + line.addressSize > selectionTop && line.address <= selectionBottom;
 		return this.state.lines.filter(isSelected);
 	}
 
@@ -535,8 +535,15 @@ class Disasm extends PureComponent {
 	}
 
 	static getDerivedStateFromProps(nextProps, prevState) {
-		if (prevState.cursor < nextProps.selectionTop || prevState.cursor > nextProps.selectionBottom) {
-			return { cursor: nextProps.selectionTop };
+		const { selectionTop, selectionBottom } = nextProps;
+		if (prevState.cursor < selectionTop || prevState.cursor > selectionBottom) {
+			let cursor = selectionTop;
+			if (prevState.lines.length) {
+				// Snap to in case we goto an address in the middle
+				const line = prevState.lines.find(l => l.address <= selectionTop && l.address + l.addressSize > selectionTop);
+				cursor = line ? line.address : cursor;
+			}
+			return { cursor };
 		}
 		return null;
 	}

@@ -46,11 +46,11 @@ class DisasmList extends PureComponent {
 	}
 
 	renderLine(line) {
-		const { selectionTop, selectionBottom, displaySymbols, cursor } = this.props;
+		const { displaySymbols, cursor } = this.props;
 		let props = {
 			displaySymbols,
 			line,
-			selected: line.address >= selectionTop && line.address <= selectionBottom,
+			selected: this.isLineSelected(line),
 			cursor: line.address === cursor,
 			onDoubleClick: this.props.onDoubleClick,
 			ref: line.address === cursor ? this.cursorRef : undefined,
@@ -91,8 +91,7 @@ class DisasmList extends PureComponent {
 	}
 
 	shouldHighlightParams(line, match) {
-		const { selectionTop, selectionBottom } = this.props;
-		if (line.address >= selectionTop && line.address <= selectionBottom) {
+		if (this.isLineSelected(line)) {
 			return false;
 		}
 		return this.state.selectedLineParams.some(param => line.params.indexOf(param) !== -1);
@@ -111,6 +110,14 @@ class DisasmList extends PureComponent {
 		}
 	}
 
+	isLineSelected(line) {
+		return DisasmList.isLineSelected(this.props, line);
+	}
+
+	static isLineSelected({ selectionTop, selectionBottom }, line) {
+		return line.address + line.addressSize > selectionTop && line.address <= selectionBottom;
+	}
+
 	static calcOffsets(lines, lineHeight) {
 		let pos = 0;
 		let offsets = {};
@@ -122,7 +129,7 @@ class DisasmList extends PureComponent {
 	}
 
 	static getSelectedLineParams({ lines, selectionTop, selectionBottom }) {
-		const selectedLines = lines.filter(line => line.address >= selectionTop && line.address <= selectionBottom);
+		const selectedLines = lines.filter(DisasmList.isLineSelected.bind(null, { selectionTop, selectionBottom }));
 
 		let params = {};
 		for (let line of selectedLines) {
@@ -195,7 +202,7 @@ class DisasmList extends PureComponent {
 	onMouseDown(ev) {
 		const line = this.mouseEventToLine(ev);
 		// Don't change selection if right clicking within the selection.
-		if (ev.button !== 2 || line.address < this.props.selectionTop || line.address > this.props.selectionBottom) {
+		if (ev.button !== 2 || !this.isLineSelected(line)) {
 			this.applySelection(ev, line);
 		} else {
 			// But do change the cursor.
