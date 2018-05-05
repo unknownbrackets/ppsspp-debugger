@@ -114,7 +114,7 @@ class Disasm extends PureComponent {
 				}
 
 				if (start !== this.state.range.start || end !== this.state.range.end) {
-					return this.updateDisasmNow(true, { start, end });
+					return this.updateDisasmNow('nearest', { start, end });
 				}
 				return null;
 			});
@@ -364,7 +364,7 @@ class Disasm extends PureComponent {
 		listeners.listen({
 			'connection': () => {
 				if (this.props.started) {
-					this.updateDisasm(true);
+					this.updateDisasm('center');
 				}
 			},
 			'cpu.stepping': () => {
@@ -374,7 +374,7 @@ class Disasm extends PureComponent {
 			'cpu.setReg': (result) => {
 				// Need to re-render if pc is changed.
 				if (result.category === 0 && result.register === 32) {
-					this.updateDisasm(true);
+					this.updateDisasm('center');
 				}
 			},
 			'cpu.breakpoint.add': () => {
@@ -400,7 +400,7 @@ class Disasm extends PureComponent {
 		}
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
 			if (selectionTop < range.start || selectionBottom >= range.end) {
-				disasmChange = true;
+				disasmChange = 'center';
 			}
 		}
 		if (disasmChange !== null) {
@@ -441,10 +441,10 @@ class Disasm extends PureComponent {
 		});
 	}
 
-	updateDisasmNow(reset, newRange = null) {
+	updateDisasmNow(needsScroll, newRange = null) {
 		const { range, visibleLines, wantDisplaySymbols: displaySymbols } = this.state;
 		let updateRange;
-		if (reset || (range.start === 0 && range.end === 0)) {
+		if (newRange !== null || (range.start === 0 && range.end === 0)) {
 			const minBuffer = Math.max(MIN_BUFFER, visibleLines);
 			const defaultBuffer = Math.floor(minBuffer * 1.5);
 			updateRange = {
@@ -466,8 +466,8 @@ class Disasm extends PureComponent {
 				displaySymbols,
 			}).then((data) => {
 				const { range, branchGuides, lines } = data;
-				if (reset) {
-					this.needsScroll = 'center';
+				if (needsScroll) {
+					this.needsScroll = needsScroll;
 				} else {
 					this.needsOffsetFix = true;
 				}
@@ -516,7 +516,7 @@ class Disasm extends PureComponent {
 			}
 
 			if (start !== this.state.range.start || end !== this.state.range.end) {
-				return this.updateDisasmNow(true, { start, end });
+				return this.updateDisasmNow(false, { start, end });
 			}
 			return null;
 		});

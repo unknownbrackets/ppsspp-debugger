@@ -8,12 +8,11 @@ function isSubsetBounds(bounds, parentBounds) {
 	return true;
 }
 
-export function ensureInView(node, options) {
+export function isInView(node) {
 	const windowBounds = { top: 0, left: 0, bottom: window.innerHeight, right: window.innerWidth };
 	const rect = node.getBoundingClientRect();
 	if (!isSubsetBounds(rect, windowBounds)) {
-		node.scrollIntoView(options);
-		return true;
+		return false;
 	}
 
 	let parentNode = node;
@@ -26,10 +25,18 @@ export function ensureInView(node, options) {
 			}
 
 			if (!isSubsetBounds(rect, parentNode.getBoundingClientRect())) {
-				node.scrollIntoView(options);
-				return true;
+				return false;
 			}
 		}
+	}
+
+	return true;
+}
+
+export function ensureInView(node, options) {
+	if (!isInView(node)) {
+		node.scrollIntoView(options);
+		return true;
 	}
 
 	return false;
