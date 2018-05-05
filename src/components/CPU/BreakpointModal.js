@@ -5,6 +5,7 @@ import Field from '../common/Field';
 import Form from '../common/Form';
 import '../ext/react-modal.css';
 import './BreakpointModal.css';
+import { clearTimeout } from 'timers';
 
 const typeOptions = [
 	{ label: 'Memory', value: 'memory' },
@@ -36,6 +37,7 @@ class BreakpointModal extends PureComponent {
 		enabled: true,
 		log: true,
 	};
+	cleanTimeout = null;
 
 	constructor(props) {
 		super(props);
@@ -90,26 +92,44 @@ class BreakpointModal extends PureComponent {
 		);
 	}
 
-	onSave = () => {
-		if (this.state.type === 'execute') {
-			this.props.ppsspp.send({
-				event: 'cpu.breakpoint.add',
-				...this.state,
-			}).then(this.onClose, err => {
-				window.alert(err.message);
-			});
-		} else if (this.state.type === 'memory') {
-			this.props.ppsspp.send({
-				event: 'memory.breakpoint.add',
-				...this.state,
-			}).then(this.onClose, err => {
-				window.alert(err.message);
-			});
+	componentDidUpdate(prevProps, prevState) {
+		if (this.props.isOpen && this.cleanTimeout != null) {
+			clearTimeout(this.cleanTimeout);
+
+			this.setState(this.cleanState);
+			this.cleanTimeout = null;
 		}
 	}
 
+	onSave = () => {
+		let event;
+		if (this.state.type === 'execute') {
+			event = 'cpu.breakpoint.add';
+		} else if (this.state.type === 'memory') {
+			event = 'memory.breakpoint.add';
+		} else {
+			throw new Error('Unexpected type: ' + this.state.type);
+		}
+
+		this.props.ppsspp.send({
+			event: 'cpu.evaluate',
+			expression: this.state.address,
+		}).then(({ uintValue }) => {
+			return this.props.ppsspp.send({
+				event,
+				...this.state,
+				address: uintValue,
+			})
+		}).then(this.onClose, err => {
+			window.alert(err.message);
+		});
+	}
+
 	onClose = () => {
-		this.setState(this.cleanState);
+		this.cleanTimeout = setTimeout(() => {
+			this.setState(this.cleanState);
+			this.cleanTimeout = null;
+		}, 200);
 		this.props.onClose();
 	}
 }
