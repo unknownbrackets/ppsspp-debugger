@@ -111,7 +111,9 @@ class DisasmLine extends PureComponent {
 
 	ensureInView(needsScroll) {
 		const triggerNode = this.ref.current.parentNode;
-		ensureInView(triggerNode, { block: needsScroll });
+		if (needsScroll !== false) {
+			ensureInView(triggerNode, { block: needsScroll });
+		}
 		triggerNode.focus();
 	}
 

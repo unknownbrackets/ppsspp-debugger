@@ -1,0 +1,71 @@
+.DisasmSearch {
+	background: #3999bd;
+	padding: 7px;
+	position: absolute;
+	top: 25px;
+	right: 20px;
+}
+
+.DisasmSearch__field {
+	display: inline-block;
+	font-size: 13px;
+	overflow: hidden;
+	position: relative;
+	width: 24ex;
+	max-width: 80%;
+	vertical-align: top;
+}
+
+.DisasmSearch input[type="search"] {
+	background: #fff;
+	border: 0;
+	box-sizing: border-box;
+	font-size: inherit;
+	padding: 2px 6px;
+	width: 100%;
+}
+
+.DisasmSearch__field--progress::after {
+	animation: 2s DisasmSearch__progress ease-in-out infinite;
+	background: #f88;
+	content: '';
+	display: block;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 2px;
+	width: 30%;
+}
+
+@keyframes DisasmSearch__progress {
+	from {
+		left: -30%;
+	}
+
+	to {
+		left: 100%;
+	}
+}
+
+.DisasmSearch button {
+	border: 0;
+	background: transparent;
+	padding: 2px;
+	margin-left: 5px;
+	vertical-align: top;
+}
+
+.DisasmSearch button svg {
+	fill: transparent;
+	stroke: #000;
+	stroke-width: 16px;
+	stroke-linecap: round;
+	stroke-linejoin: miter;
+	vertical-align: top;
+}
+
+.DisasmSearch button:hover,
+.DisasmSearch button:active,
+.DisasmSearch button:focus {
+	background: rgba(255, 255, 255, 0.2);
+}

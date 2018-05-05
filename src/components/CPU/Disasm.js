@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import DisasmContextMenu from './DisasmContextMenu';
 import DisasmList from './DisasmList';
+import DisasmSearch from './DisasmSearch';
 import { toString08X } from '../../utils/format';
 import listeners from '../../utils/listeners.js';
 import './Disasm.css';
@@ -19,6 +20,8 @@ class Disasm extends PureComponent {
 		displaySymbols: true,
 		wantDisplaySymbols: true,
 		cursor: null,
+		searchString: null,
+		searchInProgress: false,
 		highlightText: null,
 	};
 	jumpStack = [];
@@ -28,12 +31,14 @@ class Disasm extends PureComponent {
 	lastSearch = null;
 	ref;
 	listRef;
+	searchRef;
 
 	constructor(props) {
 		super(props);
 
 		this.ref = React.createRef();
 		this.listRef = React.createRef();
+		this.searchRef = React.createRef();
 	}
 
 	render() {
@@ -58,10 +63,17 @@ class Disasm extends PureComponent {
 						toggleBreakpoint={this.toggleBreakpoint}
 						applyScroll={this.applyScroll}
 						gotoPromptAddress={this.gotoPromptAddress}
-						searchDisasm={this.searchDisasm}
+						searchPrompt={this.searchPrompt}
+						searchNext={this.searchNext}
 					/>
 				</div>
 				{this.renderContextMenu()}
+				<DisasmSearch ref={this.searchRef}
+					searchString={this.state.searchString}
+					searchNext={this.searchNext}
+					updateSearchString={this.updateSearchString}
+					inProgress={this.state.searchInProgress}
+				/>
 			</React.Fragment>
 		);
 	}
@@ -269,29 +281,24 @@ class Disasm extends PureComponent {
 	}
 
 	searchDisasm = (cont) => {
-		if (this.lastSearch && this.lastSearch.progress) {
+		if (this.state.searchInProgress) {
 			// Don't have cancel support right now, so ignore mashing.
 			return;
 		}
 
 		const { cursor } = this.state;
 		if (!cont || this.lastSearch === null) {
-			const match = window.prompt('Search text', this.lastSearch === null ? '' : this.lastSearch.match);
-			if (match === null) {
-				return;
-			}
-
 			this.lastSearch = {
-				match,
+				match: this.state.searchString,
 				end: cursor,
 				last: null,
 				progress: false,
 			};
 		}
 
-		const { match, end, last } = this.lastSearch;
-		this.lastSearch.progress = true;
+		this.setState({ searchInProgress: true });
 
+		const { match, end, last } = this.lastSearch;
 		this.props.ppsspp.send({
 			event: 'memory.searchDisasm',
 			address: cursor === last ? cursor + 4 : cursor,
@@ -309,9 +316,36 @@ class Disasm extends PureComponent {
 			} else {
 				window.alert('The specified text was not found:\n\n' + match);
 			}
-
-			this.setState({ highlightText: match.toLowerCase() });
+		}).finally(() => {
+			this.setState({ searchInProgress: false });
 		});
+	}
+
+	updateSearchString = (match) => {
+		const highlightText = match ? match.toLowerCase() : null;
+		this.setState({ highlightText, searchString: match });
+		if (this.lastSearch && this.lastSearch.match !== match && !this.state.searchInProgress) {
+			// Clear the search start position when changing the search.
+			this.lastSearch = null;
+		}
+
+		if (match === null) {
+			// Return focus to list.
+			if (this.listRef.current) {
+				this.listRef.current.ensureCursorInView(false);
+			}
+		}
+	}
+
+	searchPrompt = () => {
+		this.updateSearchString(this.state.searchString || (this.lastSearch ? this.lastSearch.match : ''));
+		if (!this.state.searchInProgress) {
+			this.searchRef.current.focus();
+		}
+	}
+
+	searchNext = () => {
+		this.searchDisasm(true);
 	}
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {

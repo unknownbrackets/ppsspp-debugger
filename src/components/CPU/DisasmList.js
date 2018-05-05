@@ -276,12 +276,12 @@ class DisasmList extends PureComponent {
 		}
 
 		if ((ev.key === 's' || ev.key === 'f') && modifiers === 'c') {
-			this.props.searchDisasm(false);
+			this.props.searchPrompt();
 			ev.preventDefault();
 		}
 
 		if ((ev.key === 'F3') && modifiers === '') {
-			this.props.searchDisasm(true);
+			this.props.searchNext();
 			ev.preventDefault();
 		}
 
@@ -354,7 +354,8 @@ DisasmList.propTypes = {
 	toggleBreakpoint: PropTypes.func.isRequired,
 	applyScroll: PropTypes.func.isRequired,
 	gotoPromptAddress: PropTypes.func.isRequired,
-	searchDisasm: PropTypes.func.isRequired,
+	searchPrompt: PropTypes.func.isRequired,
+	searchNext: PropTypes.func.isRequired,
 
 	range: PropTypes.shape({
 		start: PropTypes.number.isRequired,
