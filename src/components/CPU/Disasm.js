@@ -114,7 +114,7 @@ class Disasm extends PureComponent {
 				}
 
 				if (start !== this.state.range.start || end !== this.state.range.end) {
-					return this.updateDisasmNow('nearest', { start, end });
+					return this.updateDisasmNow('nearest', { address: start, end });
 				}
 				return null;
 			});
@@ -393,7 +393,7 @@ class Disasm extends PureComponent {
 		const { selectionTop, selectionBottom } = this.props;
 		const { range, lineHeight } = this.state;
 
-		let disasmChange = null;
+		let disasmChange = null, updateDisasmRange = null;
 		if (this.state.wantDisplaySymbols !== prevState.displaySymbols) {
 			// Keep the existing range, just update.
 			disasmChange = false;
@@ -401,10 +401,11 @@ class Disasm extends PureComponent {
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
 			if (selectionTop < range.start || selectionBottom >= range.end) {
 				disasmChange = 'center';
+				updateDisasmRange = true;
 			}
 		}
 		if (disasmChange !== null) {
-			this.updateDisasm(disasmChange);
+			this.updateDisasm(disasmChange, updateDisasmRange);
 		}
 
 		if (lineHeight === 0) {
@@ -435,24 +436,23 @@ class Disasm extends PureComponent {
 		}
 	}
 
-	updateDisasm(reset, newRange) {
+	updateDisasm(needsScroll, newRange) {
 		this.updatesSequence = this.updatesSequence.then(() => {
-			return this.updateDisasmNow(reset, newRange);
+			return this.updateDisasmNow(needsScroll, newRange);
 		});
 	}
 
 	updateDisasmNow(needsScroll, newRange = null) {
 		const { range, visibleLines, wantDisplaySymbols: displaySymbols } = this.state;
-		let updateRange;
-		if (newRange !== null || (range.start === 0 && range.end === 0)) {
+		let updateRange = newRange;
+		if (newRange === true || (newRange === null && range.start === 0 && range.end === 0)) {
 			const minBuffer = Math.max(MIN_BUFFER, visibleLines);
 			const defaultBuffer = Math.floor(minBuffer * 1.5);
 			updateRange = {
-				address: newRange === null ? this.props.selectionTop - defaultBuffer * 4 : newRange.start,
-				count: newRange === null ? defaultBuffer * 2 : undefined,
-				end: newRange !== null ? newRange.end : undefined,
+				address: this.props.selectionTop - defaultBuffer * 4,
+				count: defaultBuffer * 2,
 			};
-		} else {
+		} else if (newRange === null) {
 			updateRange = {
 				address: range.start,
 				end: range.end,
@@ -516,7 +516,7 @@ class Disasm extends PureComponent {
 			}
 
 			if (start !== this.state.range.start || end !== this.state.range.end) {
-				return this.updateDisasmNow(false, { start, end });
+				return this.updateDisasmNow(false, { address: start, end });
 			}
 			return null;
 		});
