@@ -17,6 +17,7 @@ class CPU extends Component {
 		selectionTop: null,
 		selectionBottom: null,
 		jumpMarker: null,
+		promptGotoMarker: null,
 		lastTicks: 0,
 		ticks: 0,
 	};
@@ -29,12 +30,12 @@ class CPU extends Component {
 		return (
 			<div id="CPU">
 				<div className="CPU__pane">
-					<GotoBox ppsspp={this.props.ppsspp} started={this.state.started} gotoDisasm={this.gotoDisasm} />
+					<GotoBox ppsspp={this.props.ppsspp} started={this.state.started} gotoDisasm={this.gotoDisasm} promptGotoMarker={this.state.promptGotoMarker} />
 					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
 					<DisasmButtons ppsspp={this.props.ppsspp} started={this.state.started} stepping={this.state.stepping} />
-					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} />
+					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
 			</div>
 		);
@@ -99,6 +100,12 @@ class CPU extends Component {
 			selectionBottom: pc,
 			// It just matters that this is a new object.
 			jumpMarker: {},
+		});
+	}
+
+	promptGoto = () => {
+		this.setState({
+			promptGotoMarker: {},
 		});
 	}
 }

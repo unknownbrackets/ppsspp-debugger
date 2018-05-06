@@ -6,6 +6,12 @@ class GotoBox extends PureComponent {
 	state = {
 		address: '',
 	};
+	ref;
+
+	constructor(props) {
+		super(props);
+		this.ref = React.createRef();
+	}
 
 	render() {
 		/* eslint no-script-url: "off" */
@@ -13,16 +19,23 @@ class GotoBox extends PureComponent {
 		return (
 			<form action="javascript://" className="GotoBox" onSubmit={this.handleSubmit}>
 				<label className="GotoBox__label" htmlFor="GotoBox__address">Go to:</label>
-				<input
+				<input ref={this.ref}
 					type="text" id="GotoBox__address"
 					value={this.state.address} onChange={this.handleChange}
-					title="Hexadecimal address, enter to submit"
+					title="Hexadecimal address or expression, enter to submit"
 					autoComplete="off"
 				/>
 				<button type="button" className="GotoBox__button" onClick={this.handlePC} disabled={disabled}>PC</button>
 				<button type="button" className="GotoBox__button" onClick={this.handleRA} disabled={disabled}>RA</button>
 			</form>
 		);
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (this.props.promptGotoMarker !== prevProps.promptGotoMarker) {
+			this.ref.current.focus();
+			this.ref.current.select();
+		}
 	}
 
 	jumpToReg(name) {

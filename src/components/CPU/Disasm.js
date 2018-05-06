@@ -53,6 +53,7 @@ class Disasm extends PureComponent {
 					<DisasmList ref={this.listRef} {...this.state}
 						onDoubleClick={this.onDoubleClick}
 						updateSelection={this.props.updateSelection}
+						promptGoto={this.props.promptGoto}
 						updateCursor={this.updateCursor}
 						updateDisplaySymbols={this.updateDisplaySymbols}
 						selectionTop={this.props.selectionTop}
@@ -62,7 +63,6 @@ class Disasm extends PureComponent {
 						assembleInstruction={this.assembleInstruction}
 						toggleBreakpoint={this.toggleBreakpoint}
 						applyScroll={this.applyScroll}
-						gotoPromptAddress={this.gotoPromptAddress}
 						searchPrompt={this.searchPrompt}
 						searchNext={this.searchNext}
 					/>
@@ -266,18 +266,6 @@ class Disasm extends PureComponent {
 			selectionTop: addr,
 			selectionBottom: addr,
 		});
-	}
-
-	gotoPromptAddress = () => {
-		const expression = window.prompt('Go to', '');
-		if (expression !== null) {
-			this.props.ppsspp.send({
-				event: 'cpu.evaluate',
-				expression,
-			}).then(({ uintValue }) => {
-				this.gotoAddress(uintValue);
-			});
-		}
 	}
 
 	searchDisasm = (cont) => {
@@ -552,12 +540,14 @@ class Disasm extends PureComponent {
 Disasm.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	log: PropTypes.func.isRequired,
-	updateSelection: PropTypes.func.isRequired,
 	selectionTop: PropTypes.number,
 	selectionBottom: PropTypes.number,
 	stepping: PropTypes.bool.isRequired,
 	started: PropTypes.bool.isRequired,
 	pc: PropTypes.number,
+
+	updateSelection: PropTypes.func.isRequired,
+	promptGoto: PropTypes.func.isRequired,
 };
 
 export default Disasm;

@@ -305,7 +305,7 @@ class DisasmList extends PureComponent {
 		}
 
 		if (ev.key === 'g' && modifiers === 'c') {
-			this.props.gotoPromptAddress();
+			this.props.promptGoto();
 			ev.preventDefault();
 		}
 	}
@@ -372,7 +372,7 @@ DisasmList.propTypes = {
 	assembleInstruction: PropTypes.func.isRequired,
 	toggleBreakpoint: PropTypes.func.isRequired,
 	applyScroll: PropTypes.func.isRequired,
-	gotoPromptAddress: PropTypes.func.isRequired,
+	promptGoto: PropTypes.func.isRequired,
 	searchPrompt: PropTypes.func.isRequired,
 	searchNext: PropTypes.func.isRequired,
 
