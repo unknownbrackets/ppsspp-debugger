@@ -77,11 +77,16 @@ class DisasmButtons extends PureComponent {
 
 	componentDidUpdate(prevProps, prevState) {
 		if (!prevState.connected && this.state.connected) {
-			this.updateThreadList(false);
+			this.updateThreadList(this.props.currentThread === undefined);
 		}
 	}
 
 	updateThreadList(resetCurrentThread) {
+		if (!this.state.connected) {
+			// This avoids a duplicate update during initial connect.
+			return;
+		}
+
 		this.props.ppsspp.send({
 			event: 'hle.thread.list',
 		}).then(({ threads }) => {

@@ -67,7 +67,7 @@ class RegPanel extends Component {
 
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
-			'connection': () => this.updateRegs(false),
+			'connection.change': (connected) => connected && this.updateRegs(false),
 			'cpu.stepping': () => this.updateRegs(false),
 			'cpu.setReg': (result) => this.updateReg(result),
 		});
