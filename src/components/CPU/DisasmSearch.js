@@ -21,13 +21,13 @@ class DisasmSearch extends PureComponent {
 				<div className={classes}>
 					<input type="search" value={value} placeholder="Find..." onChange={this.handleChange} onKeyDown={this.handleKeyDown} ref={this.ref} />
 				</div>
-				<button type="submit" disabled={this.props.inProgress}>
+				<button type="submit">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="15" height="15" role="img">
 						<title>Search / Next</title>
 						<path d="M10,50 l80,0 l-35,-40 m35,40 l-35,40" />
 					</svg>
 				</button>
-				<button type="button" onClick={this.handleCancel} disabled={this.props.inProgress}>
+				<button type="button" onClick={this.handleCancel}>
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="15" height="15" role="img">
 						<title>Cancel</title>
 						<path d="M30,30 l120,120 m-120,0 l120,-120" />
@@ -48,10 +48,8 @@ class DisasmSearch extends PureComponent {
 	}
 
 	handleNext = (ev) => {
-		if (!this.props.inProgress) {
-			this.props.searchNext();
-			this.focus();
-		}
+		this.props.searchNext();
+		this.focus();
 		ev.preventDefault();
 	}
 

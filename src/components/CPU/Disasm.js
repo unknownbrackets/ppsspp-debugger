@@ -272,21 +272,34 @@ class Disasm extends PureComponent {
 	}
 
 	searchDisasm = (cont) => {
-		if (this.state.searchInProgress) {
-			// Don't have cancel support right now, so ignore mashing.
+		const continueLast = cont && this.lastSearch !== null;
+		const { cursor, searchString } = this.state;
+		if (!continueLast && !searchString) {
+			// Prompt for a term so we can even do this.
+			this.searchPrompt();
 			return;
 		}
 
-		const { cursor } = this.state;
-		if (!cont || this.lastSearch === null) {
+		if (this.state.searchInProgress) {
+			if (continueLast) {
+				// Already doing that, silly.
+				return;
+			}
+
+			this.searchCancel();
+		}
+
+		if (!continueLast) {
 			this.lastSearch = {
-				match: this.state.searchString,
+				match: searchString,
 				end: cursor,
 				last: null,
-				progress: false,
 			};
 		}
 
+		// Set a new object so we can detect cancel uniquely.
+		const cancelState = { cancel: false };
+		this.lastSearch.cancelState = cancelState;
 		this.setState({ searchInProgress: true });
 
 		const { match, end, last } = this.lastSearch;
@@ -296,8 +309,12 @@ class Disasm extends PureComponent {
 			end,
 			match,
 		}).then(({ address }) => {
-			this.lastSearch.progress = false;
-			this.lastSearch.last = address;
+			if (cancelState.cancel) {
+				return;
+			}
+			if (this.lastSearch) {
+				this.lastSearch.last = address;
+			}
 
 			if (address !== null) {
 				this.gotoAddress(address);
@@ -308,15 +325,21 @@ class Disasm extends PureComponent {
 				window.alert('The specified text was not found:\n\n' + match);
 			}
 		}).finally(() => {
-			this.setState({ searchInProgress: false });
+			if (!cancelState.cancel) {
+				this.setState({ searchInProgress: false });
+				if (this.lastSearch) {
+					this.lastSearch.cancelState = null;
+				}
+			}
 		});
 	}
 
 	updateSearchString = (match) => {
 		const highlightText = match ? match.toLowerCase() : null;
 		this.setState({ highlightText, searchString: match });
-		if (this.lastSearch && this.lastSearch.match !== match && !this.state.searchInProgress) {
+		if (this.lastSearch && this.lastSearch.match !== match) {
 			// Clear the search start position when changing the search.
+			this.searchCancel();
 			this.lastSearch = null;
 		}
 
@@ -330,13 +353,19 @@ class Disasm extends PureComponent {
 
 	searchPrompt = () => {
 		this.updateSearchString(this.state.searchString || (this.lastSearch ? this.lastSearch.match : ''));
-		if (!this.state.searchInProgress) {
-			this.searchRef.current.focus();
-		}
+		this.searchRef.current.focus();
 	}
 
 	searchNext = () => {
 		this.searchDisasm(true);
+	}
+
+	searchCancel = () => {
+		if (this.lastSearch && this.lastSearch.cancelState) {
+			this.lastSearch.cancelState.cancel = true;
+			this.setState({ searchInProgress: false });
+			this.lastSearch.cancelState = null;
+		}
 	}
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
