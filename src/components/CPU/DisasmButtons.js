@@ -8,6 +8,7 @@ class DisasmButtons extends PureComponent {
 	state = {
 		breakpointModalOpen: false,
 		connected: false,
+		lastThread: '',
 		threads: [],
 	};
 	listeners_;
@@ -45,7 +46,7 @@ class DisasmButtons extends PureComponent {
 
 	renderThreadList() {
 		return (
-			<select onChange={this.handleThreadSelect} value={this.props.currentThread || ''}>
+			<select onChange={this.handleThreadSelect} value={this.props.currentThread || this.state.lastThread}>
 				{this.state.threads.map(thread => this.renderThread(thread))}
 			</select>
 		);
@@ -94,6 +95,9 @@ class DisasmButtons extends PureComponent {
 	}
 
 	handleGoStop = () => {
+		if (this.props.stepping) {
+			this.props.updateCurrentThread(undefined);
+		}
 		this.props.ppsspp.send({
 			event: this.props.stepping ? 'cpu.resume' : 'cpu.stepping',
 		}).catch(() => {
@@ -102,6 +106,7 @@ class DisasmButtons extends PureComponent {
 	}
 
 	handleStepInto = () => {
+		this.props.updateCurrentThread(undefined);
 		this.props.ppsspp.send({
 			event: 'cpu.stepInto',
 			thread: this.props.currentThread,
@@ -111,6 +116,7 @@ class DisasmButtons extends PureComponent {
 	}
 
 	handleStepOver = () => {
+		this.props.updateCurrentThread(undefined);
 		this.props.ppsspp.send({
 			event: 'cpu.stepOver',
 			thread: this.props.currentThread,
@@ -120,15 +126,19 @@ class DisasmButtons extends PureComponent {
 	}
 
 	handleStepOut = () => {
+		const threadID = this.props.currentThread;
+		this.props.updateCurrentThread(undefined);
 		this.props.ppsspp.send({
 			event: 'cpu.stepOut',
 			thread: this.props.currentThread,
 		}).catch(() => {
-			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
+			// This might fail if they aren't inside a function call on this thread, so restore the thread.
+			this.props.updateCurrentThread(threadID);
 		});
 	}
 
 	handleNextHLE = () => {
+		this.props.updateCurrentThread(undefined);
 		this.props.ppsspp.send({
 			event: 'cpu.nextHLE',
 		}).catch(() => {
@@ -152,10 +162,14 @@ class DisasmButtons extends PureComponent {
 	}
 
 	static getDerivedStateFromProps(nextProps, prevState) {
-		if (nextProps.stepping || nextProps.started) {
-			return { connected: true };
+		let update = null;
+		if (nextProps.currentThread && nextProps.currentThread !== prevState.lastThread) {
+			update = { ...update, lastThread: nextProps.currentThread || '' };
 		}
-		return null;
+		if (nextProps.stepping || nextProps.started) {
+			update = { ...update, connected: true };
+		}
+		return update;
 	}
 }
 

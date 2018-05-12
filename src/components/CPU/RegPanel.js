@@ -78,7 +78,7 @@ class RegPanel extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		if (this.props.currentThread !== prevProps.currentThread) {
+		if (this.props.currentThread && this.props.currentThread !== prevProps.currentThread) {
 			this.updateRegs(true);
 		}
 	}
