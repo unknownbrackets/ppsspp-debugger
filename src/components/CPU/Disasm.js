@@ -27,11 +27,13 @@ class Disasm extends PureComponent {
 	jumpStack = [];
 	needsScroll = false;
 	needsOffsetFix = false;
+	updatesCancel = false;
 	updatesSequence = Promise.resolve(null);
 	lastSearch = null;
 	ref;
 	listRef;
 	searchRef;
+	listeners_;
 
 	constructor(props) {
 		super(props);
@@ -110,6 +112,10 @@ class Disasm extends PureComponent {
 			this.setState({ cursor });
 
 			this.updatesSequence = this.updatesSequence.then(() => {
+				if (this.updatesCancel) {
+					return null;
+				}
+
 				let { start, end } = this.state.range;
 				const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
 				const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);
@@ -393,7 +399,7 @@ class Disasm extends PureComponent {
 	}
 
 	componentDidMount() {
-		listeners.listen({
+		this.listeners_ = listeners.listen({
 			'connection': () => {
 				if (this.props.started) {
 					this.updateDisasm('center');
@@ -419,6 +425,13 @@ class Disasm extends PureComponent {
 				this.updateDisasm();
 			},
 		});
+		this.updatesCancel = false;
+	}
+
+	componentWillUnmount() {
+		this.searchCancel();
+		this.updatesCancel = true;
+		listeners.forget(this.listeners_);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
@@ -473,6 +486,9 @@ class Disasm extends PureComponent {
 
 	updateDisasm(needsScroll, newRange) {
 		this.updatesSequence = this.updatesSequence.then(() => {
+			if (this.updatesCancel) {
+				return null;
+			}
 			return this.updateDisasmNow(needsScroll, newRange);
 		});
 	}
@@ -501,6 +517,10 @@ class Disasm extends PureComponent {
 				...updateRange,
 				displaySymbols,
 			}).then((data) => {
+				if (this.updatesCancel) {
+					return;
+				}
+
 				const { range, branchGuides, lines } = data;
 				if (needsScroll) {
 					this.needsScroll = needsScroll;
@@ -509,7 +529,9 @@ class Disasm extends PureComponent {
 				}
 				this.setState({ range, branchGuides: this.cleanupBranchGuides(branchGuides), lines, displaySymbols });
 			}, (err) => {
-				this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
+				if (!this.updatesCancel) {
+					this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
+				}
 			});
 		});
 	}
@@ -534,6 +556,10 @@ class Disasm extends PureComponent {
 
 	onScroll(ev) {
 		this.updatesSequence = this.updatesSequence.then(() => {
+			if (this.updatesCancel) {
+				return null;
+			}
+
 			const { bufferTop, bufferBottom } = this.bufferRange();
 			const minBuffer = Math.max(MIN_BUFFER, this.state.visibleLines);
 			const maxBuffer = Math.max(MAX_BUFFER, this.state.visibleLines * 5);

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import CPU from './CPU';
 import Log from './Log';
+import NotConnected from './NotConnected';
 import PPSSPP from '../sdk/ppsspp.js';
 import listeners from '../utils/listeners.js';
 import logo from '../assets/logo.svg';
@@ -43,10 +44,18 @@ class App extends Component {
 					<img src={logo} className="App-logo" alt="PPSSPP" />
 					<h1 className="App-title">Debugger</h1>
 				</header>
-				<CPU ppsspp={this.ppsspp} log={this.log} />
+				{this.renderContent()}
 				<Log ppsspp={this.ppsspp} ref={this.logRef} />
 			</div>
 		);
+	}
+
+	renderContent() {
+		if (!this.state.connected) {
+			return <NotConnected connecting={this.state.connecting} connect={this.connect} />;
+		}
+
+		return <CPU ppsspp={this.ppsspp} log={this.log} />;
 	}
 
 	button() {
@@ -55,15 +64,19 @@ class App extends Component {
 		} else if (this.state.connected) {
 			return <button onClick={this.handleDisconnect}>Disconnect</button>;
 		}
-		return <button onClick={this.handleConnect}>Connect</button>;
+		return <button onClick={this.handleAutoConnect}>Connect</button>;
 	}
 
 	componentDidMount() {
 		// Connect automatically on start.
-		this.handleConnect();
+		this.handleAutoConnect();
 	}
 
-	handleConnect = () => {
+	handleAutoConnect = () => {
+		this.connect(null);
+	}
+
+	connect = (uri) => {
 		this.setState({ connecting: true });
 
 		this.ppsspp.onClose = () => {
@@ -72,7 +85,14 @@ class App extends Component {
 			this.setState({ connected: false, connecting: false });
 		};
 
-		this.ppsspp.autoConnect().then(() => {
+		let connection;
+		if (uri === null) {
+			connection = this.ppsspp.autoConnect();
+		} else {
+			connection = this.ppsspp.connect(uri);
+		}
+
+		connection.then(() => {
 			this.log('Debugger connected');
 			listeners.change(true);
 			this.setState({ connected: true, connecting: false });
