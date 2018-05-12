@@ -20,7 +20,7 @@ class CPU extends Component {
 		promptGotoMarker: null,
 		lastTicks: 0,
 		ticks: 0,
-		currentThread: null,
+		currentThread: undefined,
 	};
 	listeners_;
 
@@ -51,7 +51,7 @@ class CPU extends Component {
 			'cpu.stepping': (data) => this.onStepping(data),
 			'cpu.resume': () => this.setState({ stepping: false }),
 			'game.start': () => this.setState({ started: true, paused: false }),
-			'game.quit': () => this.setState({ started: false, stepping: false, paused: true, pc: 0 }),
+			'game.quit': () => this.setState({ started: false, stepping: false, paused: true, pc: 0, currentThread: undefined }),
 			'game.pause': () => this.setState({ paused: true }),
 			'game.resume': () => this.setState({ paused: false }),
 			'cpu.setReg': (result) => {

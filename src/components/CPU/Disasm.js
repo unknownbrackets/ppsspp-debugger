@@ -83,6 +83,7 @@ class Disasm extends PureComponent {
 			ppsspp={this.props.ppsspp}
 			log={this.props.log}
 			stepping={this.props.stepping}
+			currentThread={this.props.currentThread}
 			getSelectedLines={this.getSelectedLines}
 			getSelectedDisasm={this.getSelectedDisasm}
 			followBranch={this.followBranch}
@@ -218,10 +219,12 @@ class Disasm extends PureComponent {
 		if (assignment.length >= 2) {
 			return this.props.ppsspp.send({
 				event: 'cpu.evaluate',
+				thread: this.props.currentThread,
 				expression: assignment[1],
 			}).then((result) => {
 				return this.props.ppsspp.send({
 					event: 'cpu.setReg',
+					thread: this.props.currentThread,
 					name: assignment[0],
 					value: result.uintValue,
 				});
@@ -545,6 +548,7 @@ Disasm.propTypes = {
 	stepping: PropTypes.bool.isRequired,
 	started: PropTypes.bool.isRequired,
 	pc: PropTypes.number,
+	currentThread: PropTypes.number,
 
 	updateSelection: PropTypes.func.isRequired,
 	promptGoto: PropTypes.func.isRequired,

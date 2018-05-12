@@ -35,6 +35,7 @@ class DisasmButtons extends PureComponent {
 
 				<BreakpointModal
 					ppsspp={this.props.ppsspp}
+					currentThread={this.props.currentThread}
 					isOpen={this.state.breakpointModalOpen}
 					onClose={this.handleBreakpointClose}
 				/>
@@ -103,6 +104,7 @@ class DisasmButtons extends PureComponent {
 	handleStepInto = () => {
 		this.props.ppsspp.send({
 			event: 'cpu.stepInto',
+			thread: this.props.currentThread,
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
@@ -111,6 +113,7 @@ class DisasmButtons extends PureComponent {
 	handleStepOver = () => {
 		this.props.ppsspp.send({
 			event: 'cpu.stepOver',
+			thread: this.props.currentThread,
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
@@ -119,6 +122,7 @@ class DisasmButtons extends PureComponent {
 	handleStepOut = () => {
 		this.props.ppsspp.send({
 			event: 'cpu.stepOut',
+			thread: this.props.currentThread,
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});

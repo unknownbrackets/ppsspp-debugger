@@ -101,7 +101,12 @@ class DisasmContextMenu extends PureComponent {
 	}
 
 	handleJumpPC = (ev, data) => {
-		this.props.ppsspp.send({ event: 'cpu.setReg', name: 'pc', value: data.line.address }).catch((err) => {
+		this.props.ppsspp.send({
+			event: 'cpu.setReg',
+			thread: this.props.currentThread,
+			name: 'pc',
+			value: data.line.address,
+		}).catch((err) => {
 			this.props.log('Failed to update PC: ' + err);
 		});
 	}
@@ -133,6 +138,8 @@ DisasmContextMenu.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	log: PropTypes.func.isRequired,
 	stepping: PropTypes.bool.isRequired,
+	currentThread: PropTypes.number,
+
 	getSelectedLines: PropTypes.func.isRequired,
 	getSelectedDisasm: PropTypes.func.isRequired,
 	followBranch: PropTypes.func.isRequired,

@@ -67,14 +67,20 @@ class RegPanel extends Component {
 
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
-			'connection': () => this.updateRegs(),
-			'cpu.stepping': () => this.updateRegs(),
+			'connection': () => this.updateRegs(false),
+			'cpu.stepping': () => this.updateRegs(false),
 			'cpu.setReg': (result) => this.updateReg(result),
 		});
 	}
 
 	componentWillUnmount() {
 		listeners.forget(this.listeners_);
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (this.props.currentThread !== prevProps.currentThread) {
+			this.updateRegs(true);
+		}
 	}
 
 	handleViewMemory = (ev, data) => {
@@ -102,6 +108,7 @@ class RegPanel extends Component {
 
 		const packet = {
 			event: 'cpu.setReg',
+			thread: this.props.currentThread,
 			category: data.cat,
 			register: data.reg,
 			value: newValue,
@@ -113,14 +120,18 @@ class RegPanel extends Component {
 		});
 	}
 
-	updateRegs() {
-		this.props.ppsspp.send({ event: 'cpu.getAllRegs' }).then((result) => {
+	updateRegs(keepLast) {
+		this.props.ppsspp.send({
+			event: 'cpu.getAllRegs',
+			thread: this.props.currentThread,
+		}).then((result) => {
 			let { categories } = result;
 			// Add values for change tracking.
 			const hasPrev = this.state.categories.length !== 0;
 			for (let cat of categories) {
-				cat.uintValuesLast = hasPrev ? this.state.categories[cat.id].uintValues : cat.uintValues;
-				cat.floatValuesLast = hasPrev ? this.state.categories[cat.id].floatValues : cat.floatValues;
+				const prevCat = hasPrev ? this.state.categories[cat.id] : null;
+				cat.uintValuesLast = hasPrev ? (keepLast ? prevCat.uintValuesLast : prevCat.uintValues) : cat.uintValues;
+				cat.floatValuesLast = hasPrev ? (keepLast ? prevCat.floatValuesLast : prevCat.floatValues) : cat.floatValues;
 			}
 			this.setState({ categories });
 		}, (err) => {
@@ -157,6 +168,7 @@ RegPanel.propTypes = {
 	log: PropTypes.func.isRequired,
 	stepping: PropTypes.bool,
 	gotoDisasm: PropTypes.func.isRequired,
+	currentThread: PropTypes.number,
 };
 
 export default RegPanel;

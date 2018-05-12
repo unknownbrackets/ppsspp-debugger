@@ -57,6 +57,7 @@ class GotoBox extends PureComponent {
 		if (this.props.started) {
 			this.props.ppsspp.send({
 				event: 'cpu.evaluate',
+				thread: this.props.currentThread,
 				expression: this.state.address,
 			}).then(({ uintValue }) => {
 				if (this.props.started) {
@@ -78,8 +79,10 @@ class GotoBox extends PureComponent {
 
 GotoBox.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
-	gotoDisasm: PropTypes.func.isRequired,
 	started: PropTypes.bool.isRequired,
+	currentThread: PropTypes.number,
+
+	gotoDisasm: PropTypes.func.isRequired,
 };
 
 export default GotoBox;

@@ -114,6 +114,7 @@ class BreakpointModal extends PureComponent {
 
 		this.props.ppsspp.send({
 			event: 'cpu.evaluate',
+			thread: this.props.currentThread,
 			expression: this.state.address,
 		}).then(({ uintValue }) => {
 			return this.props.ppsspp.send({
@@ -135,6 +136,8 @@ class BreakpointModal extends PureComponent {
 BreakpointModal.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	isOpen: PropTypes.bool.isRequired,
+	currentThread: PropTypes.number,
+
 	onClose: PropTypes.func.isRequired,
 };
 
