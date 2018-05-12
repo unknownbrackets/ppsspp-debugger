@@ -20,21 +20,24 @@ class CPU extends Component {
 		promptGotoMarker: null,
 		lastTicks: 0,
 		ticks: 0,
+		currentThread: null,
 	};
 	listeners_;
 
 	render() {
-		const { stepping, started, selectionTop, selectionBottom, jumpMarker, pc } = this.state;
-		const disasmProps = { stepping, started, selectionTop, selectionBottom, jumpMarker, pc };
+		const { stepping, started, currentThread } = this.state;
+		const commonProps = { stepping, started, currentThread };
+		const { selectionTop, selectionBottom, jumpMarker, pc } = this.state;
+		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc };
 
 		return (
 			<div id="CPU">
 				<div className="CPU__pane">
-					<GotoBox ppsspp={this.props.ppsspp} started={this.state.started} gotoDisasm={this.gotoDisasm} promptGotoMarker={this.state.promptGotoMarker} />
-					<RegPanel {...this.props} stepping={this.state.stepping} gotoDisasm={this.gotoDisasm} />
+					<GotoBox ppsspp={this.props.ppsspp} {...commonProps} gotoDisasm={this.gotoDisasm} promptGotoMarker={this.state.promptGotoMarker} />
+					<RegPanel {...this.props} {...commonProps} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
-					<DisasmButtons ppsspp={this.props.ppsspp} started={this.state.started} stepping={this.state.stepping} />
+					<DisasmButtons {...this.props} {...commonProps} updateCurrentThread={this.updateCurrentThread} />
 					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
 			</div>
@@ -107,6 +110,13 @@ class CPU extends Component {
 		this.setState({
 			promptGotoMarker: {},
 		});
+	}
+
+	updateCurrentThread = (currentThread, pc) => {
+		this.setState({ currentThread });
+		if (pc) {
+			this.gotoDisasm(pc);
+		}
 	}
 }
 

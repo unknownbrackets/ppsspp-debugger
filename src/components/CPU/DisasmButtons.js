@@ -8,6 +8,7 @@ class DisasmButtons extends PureComponent {
 	state = {
 		breakpointModalOpen: false,
 		connected: false,
+		threads: [],
 	};
 	listeners_;
 
@@ -28,8 +29,8 @@ class DisasmButtons extends PureComponent {
 				<span className="DisasmButtons__spacer"></span>
 				<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.state.connected}>Breakpoint</button>
 				<span className="DisasmButtons__spacer"></span>
-				<span className="DisasmButtons__thread">
-					Thread: TODO
+				<span className="DisasmButtons__thread-list">
+					Thread: {this.renderThreadList()}
 				</span>
 
 				<BreakpointModal
@@ -41,14 +42,54 @@ class DisasmButtons extends PureComponent {
 		);
 	}
 
+	renderThreadList() {
+		return (
+			<select onChange={this.handleThreadSelect} value={this.props.currentThread || ''}>
+				{this.state.threads.map(thread => this.renderThread(thread))}
+			</select>
+		);
+	}
+
+	renderThread(thread) {
+		const classes = 'DisasmButtons__thread' + (thread.isCurrent ? ' DisasmButtons__thread--current' : '');
+		return (
+			<option key={thread.id} value={thread.id} className={classes}>
+				{thread.name}{thread.isCurrent ? ' (current)' : ''}
+			</option>
+		);
+	}
+
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
 			'connection.change': (connected) => this.setState({ connected }),
+			'cpu.stepping': () => this.updateThreadList(true),
 		});
 	}
 
 	componentWillUnmount() {
 		listeners.forget(this.listeners_);
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (!prevState.connected && this.state.connected) {
+			this.updateThreadList(false);
+		}
+	}
+
+	updateThreadList(resetCurrentThread) {
+		this.props.ppsspp.send({
+			event: 'hle.thread.list',
+		}).then(({ threads }) => {
+			this.setState({ threads });
+			if (resetCurrentThread) {
+				const currentThread = threads.find(th => th.isCurrent);
+				if (currentThread && currentThread.id !== this.props.currentThread) {
+					this.props.updateCurrentThread(currentThread.id);
+				}
+			}
+		}, () => {
+			this.setState({ threads: [] });
+		});
 	}
 
 	handleGoStop = () => {
@@ -91,6 +132,13 @@ class DisasmButtons extends PureComponent {
 		});
 	}
 
+	handleThreadSelect = (ev) => {
+		const currentThread = this.state.threads.find(th => th.id === Number(ev.target.value));
+		if (currentThread) {
+			this.props.updateCurrentThread(currentThread.id, currentThread.pc);
+		}
+	}
+
 	handleBreakpointOpen = () => {
 		this.setState({ breakpointModalOpen: true });
 	}
@@ -111,6 +159,9 @@ DisasmButtons.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	started: PropTypes.bool.isRequired,
 	stepping: PropTypes.bool.isRequired,
+	currentThread: PropTypes.number,
+
+	updateCurrentThread: PropTypes.func.isRequired,
 };
 
 export default DisasmButtons;

@@ -11,3 +11,7 @@
 .DisasmButtons button {
 	margin-right: 3px;
 }
+
+.DisasmButtons__thread--current {
+	font-weight: bold;
+}
