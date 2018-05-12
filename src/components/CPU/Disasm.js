@@ -389,6 +389,9 @@ class Disasm extends PureComponent {
 			// Keep the existing range, just update.
 			disasmChange = false;
 		}
+		if (this.props.currentThread !== prevProps.currentThread) {
+			disasmChange = false;
+		}
 		if (selectionTop !== prevProps.selectionTop || selectionBottom !== prevProps.selectionBottom) {
 			if (selectionTop < range.start || selectionBottom >= range.end) {
 				disasmChange = 'center';
@@ -453,6 +456,7 @@ class Disasm extends PureComponent {
 		return Promise.resolve(null).then(() => {
 			return this.props.ppsspp.send({
 				event: 'memory.disasm',
+				thread: this.props.currentThread,
 				...updateRange,
 				displaySymbols,
 			}).then((data) => {
