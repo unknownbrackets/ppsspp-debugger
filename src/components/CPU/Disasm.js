@@ -47,6 +47,10 @@ class Disasm extends PureComponent {
 			onDragStart: ev => ev.preventDefault(),
 		};
 
+		if (!this.props.started) {
+			return this.renderNotStarted();
+		}
+
 		return (
 			<React.Fragment>
 				<div ref={this.ref} className="Disasm" {...events}>
@@ -75,6 +79,14 @@ class Disasm extends PureComponent {
 					inProgress={this.state.searchInProgress}
 				/>
 			</React.Fragment>
+		);
+	}
+
+	renderNotStarted() {
+		return (
+			<div className="Disasm--not-started">
+				Waiting for a game to start...
+			</div>
 		);
 	}
 
@@ -388,8 +400,8 @@ class Disasm extends PureComponent {
 				}
 			},
 			'cpu.stepping': () => {
-				this.needsScroll = 'nearest';
-				this.updateDisasm();
+				const hasRange = this.state.range.start !== 0 || this.state.range.end !== 0;
+				this.updateDisasm(hasRange ? 'nearest' : 'center');
 			},
 			'cpu.setReg': (result) => {
 				// Need to re-render if pc is changed.
@@ -580,6 +592,7 @@ Disasm.propTypes = {
 	selectionBottom: PropTypes.number,
 	stepping: PropTypes.bool.isRequired,
 	started: PropTypes.bool.isRequired,
+	paused: PropTypes.bool.isRequired,
 	pc: PropTypes.number,
 	currentThread: PropTypes.number,
 

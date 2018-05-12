@@ -7,6 +7,14 @@
 	overflow-y: auto;
 }
 
+.Disasm--not-started {
+	align-items: center;
+	display: flex;
+	flex: 1 1 auto;
+	font-size: larger;
+	justify-content: center;
+}
+
 .Disasm code {
 	font-family: Consolas, monospace;
 }

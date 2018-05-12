@@ -18,7 +18,7 @@ class DisasmButtons extends PureComponent {
 
 		return (
 			<div className="DisasmButtons">
-				<button type="button" disabled={!this.props.started} onClick={this.handleGoStop}>
+				<button type="button" disabled={!this.props.started || this.props.paused} onClick={this.handleGoStop}>
 					{this.props.stepping || !this.props.started ? 'Go' : 'Stop'}
 				</button>
 				<span className="DisasmButtons__spacer"></span>
@@ -28,7 +28,7 @@ class DisasmButtons extends PureComponent {
 				<span className="DisasmButtons__spacer"></span>
 				<button type="button" disabled={disabled} onClick={this.handleNextHLE}>Next HLE</button>
 				<span className="DisasmButtons__spacer"></span>
-				<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.state.connected}>Breakpoint</button>
+				<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.props.started}>Breakpoint</button>
 				<span className="DisasmButtons__spacer"></span>
 				<span className="DisasmButtons__thread-list">
 					Thread: {this.renderThreadList()}
@@ -45,6 +45,9 @@ class DisasmButtons extends PureComponent {
 	}
 
 	renderThreadList() {
+		if (this.state.threads.length === 0) {
+			return '(none)';
+		}
 		return (
 			<select onChange={this.handleThreadSelect} value={this.props.currentThread || this.state.lastThread}>
 				{this.state.threads.map(thread => this.renderThread(thread))}
@@ -169,6 +172,9 @@ class DisasmButtons extends PureComponent {
 		if (nextProps.stepping || nextProps.started) {
 			update = { ...update, connected: true };
 		}
+		if (!nextProps.started && prevState.threads.length) {
+			update = { ...update, threads: [] };
+		}
 		return update;
 	}
 }
@@ -176,6 +182,7 @@ class DisasmButtons extends PureComponent {
 DisasmButtons.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	started: PropTypes.bool.isRequired,
+	paused: PropTypes.bool.isRequired,
 	stepping: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
 

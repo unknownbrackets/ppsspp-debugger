@@ -25,8 +25,8 @@ class CPU extends Component {
 	listeners_;
 
 	render() {
-		const { stepping, started, currentThread } = this.state;
-		const commonProps = { stepping, started, currentThread };
+		const { paused, stepping, started, currentThread } = this.state;
+		const commonProps = { stepping: stepping && !paused, paused, started, currentThread };
 		const { selectionTop, selectionBottom, jumpMarker, pc } = this.state;
 		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc };
 
@@ -68,7 +68,7 @@ class CPU extends Component {
 
 	onConnectionChange(connected) {
 		// On any reconnect, assume paused until proven otherwise.
-		this.setState({ started: false, stepping: false, paused: true });
+		this.setState({ connected, started: false, stepping: false, paused: true });
 		if (!connected) {
 			this.setState({ currentThread: undefined });
 		}
@@ -79,7 +79,7 @@ class CPU extends Component {
 		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
 			const { stepping, paused, pc, ticks } = result;
 			const started = pc !== 0 || stepping;
-			this.setState({ started, stepping, paused, pc, ticks, lastTicks: ticks });
+			this.setState({ connected: true, started, stepping, paused, pc, ticks, lastTicks: ticks });
 		}, (err) => {
 			this.setState({ stepping: false, paused: true });
 		});
