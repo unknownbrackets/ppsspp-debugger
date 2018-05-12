@@ -47,7 +47,7 @@ class CPU extends Component {
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
 			'connection': () => this.onConnection(),
-			'connection.change': () => this.onConnectionChange(),
+			'connection.change': (connected) => this.onConnectionChange(connected),
 			'cpu.stepping': (data) => this.onStepping(data),
 			'cpu.resume': () => this.setState({ stepping: false }),
 			'game.start': () => this.setState({ started: true, paused: false }),
@@ -66,9 +66,12 @@ class CPU extends Component {
 		listeners.forget(this.listeners_);
 	}
 
-	onConnectionChange() {
+	onConnectionChange(connected) {
 		// On any reconnect, assume paused until proven otherwise.
 		this.setState({ started: false, stepping: false, paused: true });
+		if (!connected) {
+			this.setState({ currentThread: undefined });
+		}
 	}
 
 	onConnection() {
