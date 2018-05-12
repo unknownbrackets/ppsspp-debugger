@@ -35,7 +35,7 @@ class Listeners {
 				callback(true);
 			}
 		};
-		if (this.connected__) {
+		if (this.connected_) {
 			callback(true);
 		}
 

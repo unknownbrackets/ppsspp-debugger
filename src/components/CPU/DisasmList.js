@@ -180,6 +180,7 @@ class DisasmList extends PureComponent {
 
 	componentWillUnmount() {
 		forgetCopy('.Disasm__list', this.onCopy);
+		this.paramsTimeout.cancel();
 	}
 
 	componentDidUpdate(prevProps, prevState) {
