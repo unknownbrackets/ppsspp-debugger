@@ -439,7 +439,7 @@ class Disasm extends PureComponent {
 		const { range, lineHeight } = this.state;
 
 		let disasmChange = null, updateDisasmRange = null;
-		if (this.state.wantDisplaySymbols !== prevState.displaySymbols) {
+		if (this.state.wantDisplaySymbols !== prevState.wantDisplaySymbols) {
 			// Keep the existing range, just update.
 			disasmChange = false;
 		}
