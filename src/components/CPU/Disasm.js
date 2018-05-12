@@ -459,7 +459,8 @@ class Disasm extends PureComponent {
 		if (lineHeight === 0) {
 			const foundLine = document.querySelector('.DisasmLine');
 			if (foundLine) {
-				this.setState({ lineHeight: foundLine.getBoundingClientRect().height });
+				// Defer for other updates.
+				setTimeout(() => this.setState({ lineHeight: foundLine.getBoundingClientRect().height }), 0);
 			}
 		} else if (this.ref.current) {
 			const visibleLines = Math.floor(this.ref.current.clientHeight / lineHeight);
@@ -473,8 +474,11 @@ class Disasm extends PureComponent {
 		}
 		// Always associated with a state update.
 		if (this.needsScroll && this.listRef.current) {
-			this.listRef.current.ensureCursorInView(this.needsScroll);
-			this.needsScroll = false;
+			const list = this.listRef.current;
+			setTimeout(() => {
+				list.ensureCursorInView(this.needsScroll);
+				this.needsScroll = false;
+			}, 0);
 		}
 
 		if (snapshot && this.listRef.current) {
