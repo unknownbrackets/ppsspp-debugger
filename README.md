@@ -19,6 +19,8 @@ Contributions welcome.  New features, bug fixes, anything good for debugging.
 
 ### Getting started
 
+First make sure to install [Node.js](https://nodejs.org/) (LTS is fine) and [Yarn](https://yarnpkg.com/).
+
 ```sh
 git clone https://github.com/unknownbrackets/ppsspp-debugger.git
 yarn # or npm install
@@ -26,6 +28,16 @@ yarn start
 ```
 
 This will automatically open a browser with the development version of the app.
+
+### Debugging and editing
+
+Change files in src/, and the app will automatically reload.
+
+Many IDEs work well, including Visual Studio 2017 and vim.  The app runs in
+browser, so use the browser's debugger (IDE debuggers are for server-side.)
+
+Note that components aren't re-rendered unless their props or state change.
+These are shallow compares, so use `{ ...old, new: 1 }` to update objects.
 
 ### Building
 
