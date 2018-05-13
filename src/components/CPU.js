@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Disasm from './CPU/Disasm';
 import DisasmButtons from './CPU/DisasmButtons';
 import GotoBox from './CPU/GotoBox';
-import RegPanel from './CPU/RegPanel';
+import LeftPanel from './CPU/LeftPanel';
 import listeners from '../utils/listeners.js';
 import './CPU.css';
 
-class CPU extends Component {
+class CPU extends PureComponent {
 	state = {
 		stepping: false,
 		paused: true,
@@ -34,7 +34,7 @@ class CPU extends Component {
 			<div id="CPU">
 				<div className="CPU__pane">
 					<GotoBox ppsspp={this.props.ppsspp} {...commonProps} gotoDisasm={this.gotoDisasm} promptGotoMarker={this.state.promptGotoMarker} />
-					<RegPanel {...this.props} {...commonProps} gotoDisasm={this.gotoDisasm} />
+					<LeftPanel {...this.props} {...commonProps} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
 					<DisasmButtons {...this.props} {...commonProps} updateCurrentThread={this.updateCurrentThread} />

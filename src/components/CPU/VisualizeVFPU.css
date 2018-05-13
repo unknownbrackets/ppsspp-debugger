@@ -1,0 +1,45 @@
+.VisualizeVFPU__list {
+	column-count: 2;
+	column-gap: 14px;
+}
+
+.VisualizeVFPU__matrix {
+	border-collapse: collapse;
+	margin-top: 10px;
+}
+
+.VisualizeVFPU__matrix th,
+.VisualizeVFPU__matrix td {
+	border: 1px solid #ccc;
+	padding: 3px;
+}
+
+.VisualizeVFPU__matrix:first-child {
+	margin-top: 0;
+}
+
+th.VisualizeVFPU__name,
+th.VisualizeVFPU__row-header {
+	background-color: #eee;
+	border-top-color: #000;
+	border-bottom-color: #000;
+}
+
+th.VisualizeVFPU__name,
+th.VisualizeVFPU__col-header {
+	background-color: #eee;
+	border-left-color: #000;
+	border-right-color: #000;
+}
+
+.VisualizeVFPU__format {
+	margin-top: 1ex;
+}
+
+.VisualizeVFPU__format label {
+	margin-right: 2ex;
+}
+
+.VisualizeVFPU__format input[type="radio"] {
+	vertical-align: -1px;
+}

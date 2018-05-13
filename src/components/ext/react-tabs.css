@@ -38,3 +38,15 @@
 .react-tabs__tab-panel--selected {
 	display: block;
 }
+
+/* Nested tabs... */
+.react-tabs__tab-panel .react-tabs__tab-list {
+	background: #3999bd;
+	border-bottom: 2px solid #fff;
+	color: #fff;
+}
+
+.react-tabs__tab-panel .react-tabs__tab--selected {
+	background: #fff;
+	color: #3999bd;
+}

@@ -1,0 +1,40 @@
+.LeftPanel {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	width: 22ex;
+}
+
+.LeftPanel .react-tabs {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.LeftPanel .react-tabs__tab-panel--selected {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+}
+
+.LeftPanel__tools {
+	padding-top: 1ex;
+}
+
+.LeftPanel__tools button {
+	background: transparent;
+	border: 0;
+	font-size: inherit;
+	padding: 0 3px;
+	text-align: start;
+}
+
+.LeftPanel__tools button:enabled {
+	cursor: pointer;
+}
+
+.LeftPanel__tools button:enabled:active,
+.LeftPanel__tools button:enabled:hover,
+.LeftPanel__tools button:enabled:focus {
+	color: #279;
+}

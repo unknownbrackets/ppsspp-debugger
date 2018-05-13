@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ContextMenu, MenuItem } from 'react-contextmenu';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -9,7 +9,7 @@ import './RegPanel.css';
 import '../ext/react-contextmenu.css';
 import '../ext/react-tabs.css';
 
-class RegPanel extends Component {
+class RegPanel extends PureComponent {
 	state = {
 		categories: [],
 	};
