@@ -1,0 +1,13 @@
+language: node_js
+sudo: false
+node_js:
+  - node
+  - lts/*
+cache:
+  yarn: true
+  directories:
+    - node_modules
+script:
+  - yarn build
+  - yarn eslint src
+  - yarn test

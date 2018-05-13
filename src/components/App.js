@@ -69,7 +69,9 @@ class App extends Component {
 
 	componentDidMount() {
 		// Connect automatically on start.
-		this.handleAutoConnect();
+		if (!this.props.testing) {
+			this.handleAutoConnect();
+		}
 	}
 
 	handleAutoConnect = () => {
@@ -110,10 +112,18 @@ class App extends Component {
 
 	log = (message) => {
 		// Would rather keep Log managing its state, and pass this callback around.
-		this.logRef.current.addLogItem({ message: message + '\n' });
+		if (this.logRef.current) {
+			this.logRef.current.addLogItem({ message: message + '\n' });
+		} else {
+			console.error(message);
+		}
 	}
 
 	updateTitle = (data) => {
+		if (!document) {
+			return;
+		}
+
 		if (data.game) {
 			document.title = this.originalTitle + ' - ' + data.game.id + ': ' + data.game.title;
 		} else {
