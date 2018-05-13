@@ -97,7 +97,7 @@ class CPU extends PureComponent {
 	}
 
 	updateSelection = (data) => {
-		this.setState(data)
+		this.setState(data);
 	}
 
 	gotoDisasm = (pc) => {

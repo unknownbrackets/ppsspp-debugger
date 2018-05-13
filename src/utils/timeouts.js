@@ -33,4 +33,4 @@ export class Timeout {
 			this.handle = null;
 		}
 	}
-};
+}

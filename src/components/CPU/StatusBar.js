@@ -28,6 +28,8 @@ class StatusBar extends PureComponent {
 		} else if (line.type === 'data') {
 			return this.renderDataSymbol(line.dataSymbol, line.address);
 		}
+
+		return '';
 	}
 
 	renderDataAccess(dataAccess) {
