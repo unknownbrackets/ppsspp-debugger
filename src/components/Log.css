@@ -9,6 +9,7 @@
 	min-height: 2em;
 	overflow: auto;
 	margin: 1ex;
+	margin-top: 2px;
 	padding: 1ex;
 	resize: vertical;
 	white-space: pre-wrap;

@@ -1,0 +1,21 @@
+.StatusBar {
+	background: #eee;
+	border-top: 1px solid #ccc;
+	border-bottom-left-radius: 1ex;
+	border-bottom-right-radius: 1ex;
+	display: flex;
+	line-height: 1.5em;
+	height: 1.5em;
+	overflow: hidden;
+	padding: 1px 1ex;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.StatusBar__left {
+	flex: 1 1 auto;
+}
+
+.StatusBar__right {
+	text-align: right;
+}

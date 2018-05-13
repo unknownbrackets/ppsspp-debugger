@@ -4,6 +4,7 @@ import BreakpointModal from './BreakpointModal';
 import DisasmContextMenu from './DisasmContextMenu';
 import DisasmList from './DisasmList';
 import DisasmSearch from './DisasmSearch';
+import StatusBar from './StatusBar';
 import { toString08X } from '../../utils/format';
 import listeners from '../../utils/listeners.js';
 import './Disasm.css';
@@ -76,6 +77,8 @@ class Disasm extends PureComponent {
 						searchNext={this.searchNext}
 					/>
 				</div>
+				<StatusBar line={this.state.lines.find(l => l.address === this.state.cursor)} />
+
 				{this.renderContextMenu()}
 				<DisasmSearch ref={this.searchRef}
 					searchString={this.state.searchString}
@@ -565,10 +568,19 @@ class Disasm extends PureComponent {
 				} else {
 					this.needsOffsetFix = true;
 				}
-				this.setState({ range, branchGuides: this.cleanupBranchGuides(branchGuides), lines, displaySymbols });
+				this.setState({
+					range,
+					branchGuides: this.cleanupBranchGuides(branchGuides),
+					lines,
+					displaySymbols,
+				});
 			}, (err) => {
 				if (!this.updatesCancel) {
-					this.setState({ range: { start: 0, end: 0 }, branchGuides: [], lines: [] });
+					this.setState({
+						range: { start: 0, end: 0 },
+						branchGuides: [],
+						lines: [],
+					});
 				}
 			});
 		});
