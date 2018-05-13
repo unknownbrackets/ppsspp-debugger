@@ -294,6 +294,10 @@ class DisasmList extends PureComponent {
 			this.props.toggleBreakpoint(this.findCursorLine());
 			ev.preventDefault();
 		}
+		if (ev.key === 'd' && modifiers === 'c') {
+			this.props.toggleBreakpoint(this.findCursorLine(), true);
+			ev.preventDefault();
+		}
 
 		if ((ev.key === 's' || ev.key === 'f') && modifiers === 'c') {
 			this.props.searchPrompt();
@@ -307,6 +311,11 @@ class DisasmList extends PureComponent {
 
 		if (ev.key === 'g' && modifiers === 'c') {
 			this.props.promptGoto();
+			ev.preventDefault();
+		}
+
+		if (ev.key === 'e' && modifiers === 'c') {
+			this.props.editBreakpoint(this.findCursorLine());
 			ev.preventDefault();
 		}
 	}
@@ -376,6 +385,7 @@ DisasmList.propTypes = {
 	promptGoto: PropTypes.func.isRequired,
 	searchPrompt: PropTypes.func.isRequired,
 	searchNext: PropTypes.func.isRequired,
+	editBreakpoint: PropTypes.func.isRequired,
 
 	range: PropTypes.shape({
 		start: PropTypes.number.isRequired,

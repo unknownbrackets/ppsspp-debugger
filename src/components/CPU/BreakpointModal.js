@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import FitModal from '../common/FitModal';
 import Field from '../common/Field';
 import Form from '../common/Form';
+import { Timeout } from '../../utils/timeouts';
+import { toString08X } from '../../utils/format';
 import '../ext/react-modal.css';
 import './BreakpointModal.css';
-import { Timeout } from '../../utils/timeouts';
 
 const typeOptions = [
 	{ label: 'Memory', value: 'memory' },
@@ -26,6 +27,10 @@ const actionOptions = [
 class BreakpointModal extends PureComponent {
 	state = {};
 	cleanState = {
+		isOpen: false,
+		derivedBreakpoint: null,
+	};
+	cleanBreakpoint = {
 		type: 'memory',
 		address: '',
 		size: '0x00000001',
@@ -41,23 +46,22 @@ class BreakpointModal extends PureComponent {
 
 	constructor(props) {
 		super(props);
-		Object.assign(this.state, this.cleanState);
+		Object.assign(this.state, { ...this.cleanState, ...this.cleanBreakpoint, ...props.breakpoint });
 
 		this.cleanTimeout = new Timeout(() => {
-			this.setState(this.cleanState);
+			this.setState({ ...this.cleanState, ...this.cleanBreakpoint, ...this.props.breakpoint });
 		}, 200);
 	}
 
 	render() {
-		// TODO
-		const editing = false;
+		const editing = this.props.breakpoint !== null;
 
 		return (
 			<FitModal
 				contentLabel="Breakpoint settings"
 				isOpen={this.props.isOpen}
 				onClose={this.onClose}
-				confirmClose={this.state.address.length > 0 ? 'Discard changes?' : null}
+				confirmClose={this.hasChanges() ? 'Discard changes?' : null}
 			>
 				<Form heading={editing ? 'Edit Breakpoint' : 'Create Breakpoint'} onSubmit={this.onSave} className="BreakpointModal">
 					<Field type="radio" label="Type" options={typeOptions} prop="type" component={this} />
@@ -96,6 +100,11 @@ class BreakpointModal extends PureComponent {
 		);
 	}
 
+	hasChanges() {
+		const compareTo = this.state.derivedBreakpoint || this.cleanBreakpoint;
+		return Object.keys(compareTo).find(key => this.state[key] !== compareTo[key]) !== undefined;
+	}
+
 	componentDidUpdate(prevProps, prevState) {
 		if (this.props.isOpen && this.cleanTimeout != null) {
 			this.cleanTimeout.runEarly();
@@ -103,33 +112,87 @@ class BreakpointModal extends PureComponent {
 	}
 
 	onSave = () => {
-		let event;
-		if (this.state.type === 'execute') {
-			event = 'cpu.breakpoint.add';
-		} else if (this.state.type === 'memory') {
-			event = 'memory.breakpoint.add';
-		} else {
-			throw new Error('Unexpected type: ' + this.state.type);
-		}
-
-		this.props.ppsspp.send({
+		let operation = this.props.ppsspp.send({
 			event: 'cpu.evaluate',
 			thread: this.props.currentThread,
 			expression: this.state.address,
-		}).then(({ uintValue }) => {
-			return this.props.ppsspp.send({
-				event,
-				...this.state,
-				address: uintValue,
-			})
-		}).then(this.onClose, err => {
+		});
+
+		if (this.props.breakpoint !== null) {
+			const { derivedBreakpoint, address, size, type } = this.state;
+			if (type !== derivedBreakpoint.type || derivedBreakpoint.address !== address) {
+				operation = operation.then(this.deleteOld).then(this.saveNew);
+			} else if (type === 'memory' && derivedBreakpoint.size !== size) {
+				operation = operation.then(this.deleteOld).then(this.saveNew);
+			} else {
+				operation = operation.then(this.updateExisting);
+			}
+		} else {
+			operation = operation.then(this.saveNew);
+		}
+
+		operation.then(this.onClose, err => {
 			window.alert(err.message);
 		});
+	}
+
+	saveNew = ({ uintValue }) => {
+		return this.props.ppsspp.send({
+			event: this.getEvent(this.state.type, 'add'),
+			...this.state,
+			address: uintValue,
+		});
+	}
+
+	deleteOld = ({ uintValue }) => {
+		// This is used when changing the breakpoint type.
+		return this.props.ppsspp.send({
+			event: this.getEvent(this.props.breakpoint.type, 'remove'),
+			address: this.props.breakpoint.address,
+		}).then(() => {
+			// Return the original new address for easy sequencing.
+			return { uintValue };
+		});
+	}
+
+	updateExisting = ({ uintValue }) => {
+		return this.props.ppsspp.send({
+			event: this.getEvent(this.state.type, 'update'),
+			...this.state,
+			address: uintValue,
+		});
+	}
+
+	getEvent(type, event) {
+		if (type === 'execute') {
+			return 'cpu.breakpoint.' + event;
+		} else if (type === 'memory') {
+			return 'memory.breakpoint.' + event;
+		} else {
+			throw new Error('Unexpected type: ' + type);
+		}
 	}
 
 	onClose = () => {
 		this.cleanTimeout.start();
 		this.props.onClose();
+	}
+
+	static getDerivedStateFromProps(nextProps, prevState) {
+		if (nextProps.isOpen && !prevState.isOpen) {
+			let derivedBreakpoint = nextProps.breakpoint;
+			if (derivedBreakpoint) {
+				// This is the "derived" unchanged state for the "Discard changes?" prompt, and initial state.
+				derivedBreakpoint.address = '0x' + toString08X(derivedBreakpoint.address);
+				derivedBreakpoint.condition = derivedBreakpoint.condition || '';
+				derivedBreakpoint.logFormat = derivedBreakpoint.logFormat || '';
+			}
+			return { isOpen: true, ...derivedBreakpoint, derivedBreakpoint };
+		}
+		if (!nextProps.isOpen && prevState.derivedBreakpoint) {
+			return { derivedBreakpoint: null };
+		}
+		return null;
 	}
 }
 
@@ -137,6 +200,10 @@ BreakpointModal.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	isOpen: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
+	breakpoint: PropTypes.shape({
+		type: PropTypes.oneOf(['execute', 'memory']),
+		address: PropTypes.number.isRequired,
+	}),
 
 	onClose: PropTypes.func.isRequired,
 };

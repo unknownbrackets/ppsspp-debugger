@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import BreakpointModal from './BreakpointModal';
 import DisasmContextMenu from './DisasmContextMenu';
 import DisasmList from './DisasmList';
 import DisasmSearch from './DisasmSearch';
@@ -23,6 +24,7 @@ class Disasm extends PureComponent {
 		searchString: null,
 		searchInProgress: false,
 		highlightText: null,
+		editingBreakpoint: null,
 	};
 	jumpStack = [];
 	needsScroll = false;
@@ -68,6 +70,7 @@ class Disasm extends PureComponent {
 						followBranch={this.followBranch}
 						assembleInstruction={this.assembleInstruction}
 						toggleBreakpoint={this.toggleBreakpoint}
+						editBreakpoint={this.editBreakpoint}
 						applyScroll={this.applyScroll}
 						searchPrompt={this.searchPrompt}
 						searchNext={this.searchNext}
@@ -79,6 +82,13 @@ class Disasm extends PureComponent {
 					searchNext={this.searchNext}
 					updateSearchString={this.updateSearchString}
 					inProgress={this.state.searchInProgress}
+				/>
+				<BreakpointModal
+					ppsspp={this.props.ppsspp}
+					currentThread={this.props.currentThread}
+					isOpen={this.state.editingBreakpoint !== null}
+					onClose={this.closeEditBreakpoint}
+					breakpoint={this.state.editingBreakpoint}
 				/>
 			</React.Fragment>
 		);
@@ -254,7 +264,7 @@ class Disasm extends PureComponent {
 		}
 	}
 
-	toggleBreakpoint = (line) => {
+	toggleBreakpoint = (line, keep) => {
 		if (line.breakpoint === null) {
 			this.props.ppsspp.send({
 				event: 'cpu.breakpoint.add',
@@ -266,6 +276,12 @@ class Disasm extends PureComponent {
 				event: 'cpu.breakpoint.update',
 				address: line.address,
 				enabled: true,
+			});
+		} else if (keep) {
+			this.props.ppsspp.send({
+				event: 'cpu.breakpoint.update',
+				address: line.address,
+				enabled: false,
 			});
 		} else {
 			if (line.breakpoint.condition !== null) {
@@ -279,6 +295,24 @@ class Disasm extends PureComponent {
 				address: line.address,
 			});
 		}
+	}
+
+	editBreakpoint = (line) => {
+		this.props.ppsspp.send({
+			event: 'cpu.breakpoint.list',
+			address: line.address,
+			enabled: true,
+		}).then(({ breakpoints }) => {
+			const bp = breakpoints.find(bp => bp.address === line.address);
+			if (bp) {
+				const editingBreakpoint = { ...bp, type: 'execute' };
+				this.setState({ editingBreakpoint });
+			}
+		});
+	}
+
+	closeEditBreakpoint = () => {
+		this.setState({ editingBreakpoint: null });
 	}
 
 	gotoAddress = (addr, snap = 'center') => {
