@@ -1,4 +1,6 @@
 .FuncList {
+	display: flex;
+	flex-direction: column;
 	flex: 1 1 auto;
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -8,14 +10,16 @@
 
 .FuncList__search {
 	margin-top: 1ex;
+	margin-bottom: 1ex;
 	width: 95%;
 }
 
-.FuncList__listing,
-.FuncList__listing > li {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+.FuncList__loading {
+	line-height: 1.3;
+}
+
+.FuncList__listing {
+	flex: 1 1 auto;
 }
 
 .FuncList__listing button {

@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { AutoSizer, List } from 'react-virtualized';
 import listeners from '../../utils/listeners.js';
+import 'react-virtualized/styles.css';
 import './FuncList.css';
 
 class FuncList extends PureComponent {
@@ -8,35 +10,56 @@ class FuncList extends PureComponent {
 		connected: false,
 		// Lots of functions can take a while...
 		loading: true,
+		rowHeight: null,
 		functions: [],
 		filter: '',
+		filteredFunctions: [],
 	};
 	listeners_;
 
 	render() {
+		const { filter } = this.state;
 		return (
 			<div className="FuncList">
-				<input type="search" className="FuncList__search" value={this.state.filter} onChange={this.handleFilter} />
-				<ol className="FuncList__listing" onClick={this.handleClick}>
-					{this.state.functions.map(func => this.renderFunc(func))}
-				</ol>
-				{this.state.loading ? <div className="FuncList__loading">Loading...</div> : ''}
+				<input type="search" className="FuncList__search" value={filter} onChange={this.handleFilter} />
+				{this.renderList()}
 			</div>
 		);
 	}
 
-	renderFunc(func) {
-		const { filter } = this.state;
-		if (filter.length !== 0) {
-			if (func.name.toLowerCase().indexOf(filter.toLowerCase()) === -1) {
-				return null;
-			}
+	renderList() {
+		const { filter, loading, rowHeight } = this.state;
+		if (loading || !rowHeight) {
+			return <div className="FuncList__loading">Loading...</div>;
 		}
 
 		return (
-			<li key={func.address}>
+			<div className="FuncList__listing" onClick={this.handleClick}>
+				<AutoSizer filter={filter}>{this.renderSizedList}</AutoSizer>
+			</div>
+		);
+	}
+
+	renderSizedList = ({ height, width }) => {
+		const { filter, filteredFunctions, rowHeight } = this.state;
+		return (
+			<List
+				height={height}
+				rowHeight={rowHeight}
+				rowRenderer={this.renderFunc}
+				width={width}
+				rowCount={filteredFunctions.length}
+				filter={filter}
+			/>
+		);
+	}
+
+	renderFunc = ({ index, key, style }) => {
+		const func = this.state.filteredFunctions[index];
+		return (
+			<div key={key + '-' + func.address} style={style}>
 				<button type="button" data-address={func.address}>{func.name}</button>
-			</li>
+			</div>
 		);
 	}
 
@@ -48,6 +71,9 @@ class FuncList extends PureComponent {
 		if (this.state.connected) {
 			this.updateList();
 		}
+		if (!this.state.rowHeight) {
+			setTimeout(() => this.measureHeight(), 0);
+		}
 	}
 
 	componentWillUnmount() {
@@ -57,6 +83,17 @@ class FuncList extends PureComponent {
 	componentDidUpdate(prevProps, prevState) {
 		if (!prevState.connected && this.state.connected) {
 			this.updateList();
+		}
+		if (!this.state.rowHeight) {
+			setTimeout(() => this.measureHeight(), 0);
+		}
+	}
+
+	measureHeight() {
+		const node = document.querySelector('.FuncList__loading');
+		if (node) {
+			const rowHeight = node.getBoundingClientRect().height;
+			this.setState({ rowHeight });
 		}
 	}
 
@@ -73,15 +110,22 @@ class FuncList extends PureComponent {
 		this.props.ppsspp.send({
 			event: 'hle.func.list',
 		}).then(({ functions }) => {
-			this.setState({ functions, loading: false });
+			const filteredFunctions = this.applyFilter(functions, this.state.filter);
+			this.setState({ functions, filteredFunctions, loading: false });
 		}, () => {
-			this.setState({ functions: [], loading: false });
+			this.setState({ functions: [], filteredFunctions: [], loading: false });
 		});
+	}
+
+	applyFilter(functions, filter) {
+		const match = filter.toLowerCase();
+		return functions.filter(func => func.name.toLowerCase().indexOf(match) !== -1);
 	}
 
 	handleFilter = (ev) => {
 		const filter = ev.target.value;
-		this.setState({ filter });
+		const filteredFunctions = this.applyFilter(this.state.functions, filter);
+		this.setState({ filter, filteredFunctions });
 	}
 
 	handleClick = (ev) => {
@@ -96,7 +140,7 @@ class FuncList extends PureComponent {
 			update = { ...update, connected: true };
 		}
 		if (!nextProps.started && prevState.functions.length) {
-			update = { ...update, functions: [] };
+			update = { ...update, functions: [], filteredFunctions: [] };
 		}
 		return update;
 	}
