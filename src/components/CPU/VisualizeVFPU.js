@@ -29,13 +29,13 @@ class VisualizeVFPU extends PureComponent {
 		return (
 			<FitModal contentLabel="VFPU" isOpen={this.props.isOpen} onClose={this.props.onClose}>
 				<h2>VFPU Registers</h2>
-				<div class="VisualizeVFPU__list">
+				<div className="VisualizeVFPU__list">
 					{matrices}
 				</div>
-				<div class="VisualizeVFPU__format">
+				<div className="VisualizeVFPU__format">
 					Display as:
-					<label><input type="radio" checked={format === 'float'} value="float" onClick={this.handleFormat} /> Float</label>
-					<label><input type="radio" checked={format === 'uint'} value="uint" onClick={this.handleFormat} /> Hex</label>
+					<label><input type="radio" checked={format === 'float'} value="float" onChange={this.handleFormat} /> Float</label>
+					<label><input type="radio" checked={format === 'uint'} value="uint" onChange={this.handleFormat} /> Hex</label>
 				</div>
 			</FitModal>
 		);
@@ -44,17 +44,21 @@ class VisualizeVFPU extends PureComponent {
 	renderMatrix(m) {
 		return (
 			<table className="VisualizeVFPU__matrix" key={m}>
-				<tr>
-					<th className="VisualizeVFPU__name">M{m}00</th>
-					<th className="VisualizeVFPU__row-header">R{m}00</th>
-					<th className="VisualizeVFPU__row-header">R{m}01</th>
-					<th className="VisualizeVFPU__row-header">R{m}02</th>
-					<th className="VisualizeVFPU__row-header">R{m}03</th>
-				</tr>
-				{this.renderColumn(m, 0)}
-				{this.renderColumn(m, 1)}
-				{this.renderColumn(m, 2)}
-				{this.renderColumn(m, 3)}
+				<thead>
+					<tr>
+						<th className="VisualizeVFPU__name">M{m}00</th>
+						<th className="VisualizeVFPU__row-header">R{m}00</th>
+						<th className="VisualizeVFPU__row-header">R{m}01</th>
+						<th className="VisualizeVFPU__row-header">R{m}02</th>
+						<th className="VisualizeVFPU__row-header">R{m}03</th>
+					</tr>
+				</thead>
+				<tbody>
+					{this.renderColumn(m, 0)}
+					{this.renderColumn(m, 1)}
+					{this.renderColumn(m, 2)}
+					{this.renderColumn(m, 3)}
+				</tbody>
 			</table>
 		);
 	}
