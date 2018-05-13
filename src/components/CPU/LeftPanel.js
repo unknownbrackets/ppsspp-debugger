@@ -10,21 +10,23 @@ import '../ext/react-tabs.css';
 class LeftPanel extends PureComponent {
 	state = {
 		vfpuModalOpen: false,
+		// These can be slow, so we want to prevent render until it's selected.
+		everShownFuncs: false,
 	};
 
 	render() {
 		return (
 			<div className="LeftPanel">
-				<Tabs forceRenderTabPanel={true}>
+				<Tabs onSelect={this.handleSelect}>
 					<TabList>
 						<Tab>Regs</Tab>
 						<Tab>Funcs</Tab>
 						<Tab>Tools</Tab>
 					</TabList>
-					<TabPanel>
+					<TabPanel forceRender={true}>
 						<RegPanel {...this.props} />
 					</TabPanel>
-					<TabPanel>
+					<TabPanel forceRender={this.state.everShownFuncs}>
 						<FuncList {...this.props} />
 					</TabPanel>
 					<TabPanel className="react-tabs__tab-panel LeftPanel__tools">
@@ -35,6 +37,12 @@ class LeftPanel extends PureComponent {
 				<VisualizeVFPU {...this.props} isOpen={this.state.vfpuModalOpen} onClose={this.handleVFPUClose} />
 			</div>
 		);
+	}
+
+	handleSelect = (index) => {
+		if (index === 1 && !this.state.everShownFuncs) {
+			this.setState({ everShownFuncs: true });
+		}
 	}
 
 	handleVFPUOpen = () => {

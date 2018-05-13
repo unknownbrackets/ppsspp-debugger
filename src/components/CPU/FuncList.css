@@ -1,0 +1,35 @@
+.FuncList {
+	flex: 1 1 auto;
+	overflow-x: hidden;
+	overflow-y: auto;
+	padding-left: 1ex;
+	text-overflow: clip;
+}
+
+.FuncList__search {
+	margin-top: 1ex;
+	width: 95%;
+}
+
+.FuncList__listing,
+.FuncList__listing > li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.FuncList__listing button {
+	background: transparent;
+	border: 0;
+	cursor: pointer;
+	font-size: inherit;
+	padding: 0 3px;
+	text-align: start;
+	width: 100%;
+}
+
+.FuncList__listing button:hover,
+.FuncList__listing button:active,
+.FuncList__listing button:focus {
+	background: #e0e8ff;
+}
