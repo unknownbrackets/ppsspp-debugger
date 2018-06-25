@@ -18,8 +18,8 @@ class DisasmButtons extends PureComponent {
 
 		return (
 			<div className="DisasmButtons">
-				<button type="button" disabled={!this.props.started || this.props.paused} onClick={this.handleGoStop}>
-					{this.props.stepping || !this.props.started ? 'Go' : 'Stop'}
+				<button type="button" disabled={!this.props.started || this.props.paused} onClick={this.handleGoBreak}>
+					{this.props.stepping || !this.props.started ? 'Go' : 'Break'}
 				</button>
 				<span className="DisasmButtons__spacer"></span>
 				<button type="button" disabled={disabled} onClick={this.handleStepInto}>Step Into</button>
@@ -102,7 +102,7 @@ class DisasmButtons extends PureComponent {
 		});
 	}
 
-	handleGoStop = () => {
+	handleGoBreak = () => {
 		if (this.props.stepping) {
 			this.props.updateCurrentThread(undefined);
 		}
