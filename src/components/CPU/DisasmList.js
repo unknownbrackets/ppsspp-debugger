@@ -262,7 +262,7 @@ class DisasmList extends PureComponent {
 				dist = -dist;
 			}
 
-			if (modifiers === '') {
+			if (modifiers === '' || modifiers === 's') {
 				const lineIndex = this.findCursorLineIndex();
 				const newIndex = Math.min(this.props.lines.length - 1, Math.max(0, lineIndex + dist));
 				if (lineIndex !== newIndex) {
