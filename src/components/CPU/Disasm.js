@@ -489,7 +489,11 @@ class Disasm extends PureComponent {
 				updateDisasmRange = true;
 			}
 		}
-		if (disasmChange !== null) {
+		if (!disasmChange && !prevProps.setInitialPC && this.props.setInitialPC) {
+			disasmChange = 'center';
+			updateDisasmRange = true;
+		}
+		if (disasmChange !== null && this.props.setInitialPC) {
 			this.updateDisasm(disasmChange, updateDisasmRange);
 		}
 
@@ -535,6 +539,10 @@ class Disasm extends PureComponent {
 	}
 
 	updateDisasmNow(needsScroll, newRange = null) {
+		if (!this.props.setInitialPC) {
+			return;
+		}
+
 		const { range, visibleLines, wantDisplaySymbols: displaySymbols } = this.state;
 		let updateRange = newRange;
 		if (newRange === true || (newRange === null && range.start === 0 && range.end === 0)) {
@@ -670,6 +678,7 @@ Disasm.propTypes = {
 	started: PropTypes.bool.isRequired,
 	paused: PropTypes.bool.isRequired,
 	pc: PropTypes.number,
+	setInitialPC: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
 
 	updateSelection: PropTypes.func.isRequired,

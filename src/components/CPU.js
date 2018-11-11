@@ -13,6 +13,7 @@ class CPU extends PureComponent {
 		paused: true,
 		started: false,
 		pc: 0,
+		setInitialPC: false,
 		// Note: these are inclusive.
 		selectionTop: null,
 		selectionBottom: null,
@@ -27,8 +28,8 @@ class CPU extends PureComponent {
 	render() {
 		const { paused, stepping, started, currentThread } = this.state;
 		const commonProps = { stepping: stepping && !paused, paused, started, currentThread };
-		const { selectionTop, selectionBottom, jumpMarker, pc } = this.state;
-		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc };
+		const { selectionTop, selectionBottom, jumpMarker, pc, setInitialPC } = this.state;
+		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
 
 		return (
 			<div id="CPU">
@@ -50,14 +51,40 @@ class CPU extends PureComponent {
 			'connection.change': (connected) => this.onConnectionChange(connected),
 			'cpu.stepping': (data) => this.onStepping(data),
 			'cpu.resume': () => this.setState({ stepping: false }),
-			'game.start': () => this.setState({ started: true, paused: false }),
-			'game.quit': () => this.setState({ started: false, stepping: false, paused: true, pc: 0, currentThread: undefined }),
+			'game.start': () => {
+				// This may often not happen if the register list is visible.
+				if (!this.state.setInitialPC) {
+					this.updateInitialPC();
+				}
+				this.setState({ started: true, paused: false });
+			},
+			'game.quit': () => {
+				this.setState({
+					started: false,
+					stepping: false,
+					paused: true,
+					pc: 0,
+					setInitialPC: false,
+					currentThread: undefined,
+				});
+			},
 			'game.pause': () => this.setState({ paused: true }),
 			'game.resume': () => this.setState({ paused: false }),
 			'cpu.setReg': (result) => {
 				if (result.category === 0 && result.register === 32) {
-					this.setState({ pc: result.uintValue });
+					const pc = result.uintValue;
+					if (!this.state.setInitialPC) {
+						this.gotoDisasm(pc);
+					}
+					this.setState({ pc, setInitialPC: pc !== 0 });
 				}
+			},
+			'cpu.getAllRegs': (result) => {
+				const pc = result.categories[0].uintValues[32];
+				if (!this.state.setInitialPC) {
+					this.gotoDisasm(pc);
+				}
+				this.setState({ pc, setInitialPC: pc !== 0 });
 			},
 		});
 	}
@@ -79,7 +106,11 @@ class CPU extends PureComponent {
 		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
 			const { stepping, paused, pc, ticks } = result;
 			const started = pc !== 0 || stepping;
-			this.setState({ connected: true, started, stepping, paused, pc, ticks, lastTicks: ticks });
+
+			if (!this.state.setInitialPC) {
+				this.gotoDisasm(pc);
+			}
+			this.setState({ connected: true, started, stepping, paused, pc, setInitialPC: pc !== 0, ticks, lastTicks: ticks });
 		}, (err) => {
 			this.setState({ stepping: false, paused: true });
 		});
@@ -116,10 +147,20 @@ class CPU extends PureComponent {
 	}
 
 	updateCurrentThread = (currentThread, pc) => {
-		this.setState({ currentThread });
+		this.setState({ currentThread, pc, setInitialPC: pc !== 0 });
 		if (pc) {
 			this.gotoDisasm(pc);
 		}
+	}
+
+	updateInitialPC = () => {
+		this.props.ppsspp.send({ event: 'cpu.getReg', name: 'pc' }).then(result => {
+			const pc = result.uintValue;
+			if (!this.state.setInitialPC) {
+				this.gotoDisasm(pc);
+			}
+			this.setState({ pc, setInitialPC: pc !== 0 });
+		});
 	}
 }
 
