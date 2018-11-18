@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { NavLink, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import CPU from './CPU';
+import GPU from './GPU';
 import Log from './Log';
 import NotConnected from './NotConnected';
 import PPSSPP from '../sdk/ppsspp.js';
@@ -38,15 +40,20 @@ class App extends Component {
 
 	render() {
 		return (
-			<div className="App">
-				<header className="App-header">
-					<div className="App-button">{this.button()}</div>
-					<img src={logo} className="App-logo" alt="PPSSPP" />
-					<h1 className="App-title">Debugger</h1>
-				</header>
-				{this.renderContent()}
-				<Log ppsspp={this.ppsspp} ref={this.logRef} />
-			</div>
+			<Router>
+				<div className="App">
+					<header className="App-header">
+						<ul className="App-nav">
+							<NavLink to="/cpu">CPU</NavLink>
+							<NavLink to="/gpu">GPU</NavLink>
+						</ul>
+						<img src={logo} className="App-logo" alt="PPSSPP" />
+						<h1 className="App-title">Debugger</h1>
+					</header>
+					{this.renderContent()}
+					<Log ppsspp={this.ppsspp} ref={this.logRef} />
+				</div>
+			</Router>
 		);
 	}
 
@@ -55,16 +62,16 @@ class App extends Component {
 			return <NotConnected connecting={this.state.connecting} connect={this.connect} />;
 		}
 
-		return <CPU ppsspp={this.ppsspp} log={this.log} />;
-	}
-
-	button() {
-		if (this.state.connecting) {
-			return <button disabled="disabled">Connecting...</button>;
-		} else if (this.state.connected) {
-			return <button onClick={this.handleDisconnect}>Disconnect</button>;
-		}
-		return <button onClick={this.handleAutoConnect}>Connect</button>;
+		return (
+			<Switch>
+				<Route path="/gpu">
+					<GPU ppsspp={this.ppsspp} log={this.log} />
+				</Route>
+				<Route>
+					<CPU ppsspp={this.ppsspp} log={this.log} />
+				</Route>
+			</Switch>
+		);
 	}
 
 	componentDidMount() {

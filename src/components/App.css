@@ -31,9 +31,29 @@
 	margin: 0;
 }
 
-.App-button {
+.App-nav {
 	align-items: center;
 	display: flex;
 	float: left;
 	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.App-nav a {
+	color: #fff;
+	font-size: 16px;
+	margin-right: 2px;
+	padding: 10px 1ex;
+	text-decoration: none;
+}
+
+.App-nav a.active {
+	background: #3999bd;
+}
+
+.App-nav a:hover,
+.App-nav a:active,
+.App-nav a:focus {
+	background-color: #4cc2ed;
 }
