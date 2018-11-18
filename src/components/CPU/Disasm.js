@@ -540,7 +540,7 @@ class Disasm extends PureComponent {
 
 	updateDisasmNow(needsScroll, newRange = null) {
 		if (!this.props.setInitialPC) {
-			return;
+			return Promise.resolve(null);
 		}
 
 		const { range, visibleLines, wantDisplaySymbols: displaySymbols } = this.state;

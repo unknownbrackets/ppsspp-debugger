@@ -52,7 +52,7 @@ class GPU extends PureComponent {
 			const { stepping, paused, pc } = result;
 			const started = pc !== 0 || stepping;
 
-			this.setState({ connected: true, started, paused, });
+			this.setState({ connected: true, started, paused });
 		}, (err) => {
 			this.setState({ paused: true });
 		});
