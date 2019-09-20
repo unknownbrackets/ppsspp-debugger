@@ -17,7 +17,7 @@ class GotoBox extends PureComponent {
 		/* eslint no-script-url: "off" */
 		const disabled = !this.props.started;
 		return (
-			<form action="javascript://" className="GotoBox" onSubmit={this.handleSubmit}>
+			<form action="#" className="GotoBox" onSubmit={this.handleSubmit}>
 				<label className="GotoBox__label" htmlFor="GotoBox__address">Go to:</label>
 				<input ref={this.ref}
 					type="text" id="GotoBox__address"

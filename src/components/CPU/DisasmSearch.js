@@ -17,7 +17,7 @@ class DisasmSearch extends PureComponent {
 
 		return (
 			/* eslint no-script-url: "off" */
-			<form action="javascript://" className="DisasmSearch" hidden={this.props.searchString === null} onSubmit={this.handleNext}>
+			<form action="#" className="DisasmSearch" hidden={this.props.searchString === null} onSubmit={this.handleNext}>
 				<div className={classes}>
 					<input type="search" value={value} placeholder="Find..." onChange={this.handleChange} onKeyDown={this.handleKeyDown} ref={this.ref} />
 				</div>

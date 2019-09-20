@@ -6,7 +6,7 @@ import './Form.css';
 function Form(props) {
 	/* eslint no-script-url: "off" */
 	return (
-		<form action="javascript://" className={classNames(props.className, 'Form')} onSubmit={props.onSubmit}>
+		<form action="#" className={classNames(props.className, 'Form')} onSubmit={props.onSubmit}>
 			{props.heading ? <h2 className="Form__heading">{props.heading}</h2> : null}
 			{props.children}
 		</form>
