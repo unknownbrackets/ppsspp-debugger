@@ -41,8 +41,8 @@ class DisasmLine extends PureComponent {
 				<div className={className} style={{ backgroundColor: line.backgroundColor }} ref={this.ref} data-address={line.address}>
 					<BreakpointIcon className="DisasmLine__breakpoint-icon" />
 					{this.renderAddress(line)}
-					<code className="DisasmLine__opcode">{this.highlight(line.name)} </code>
-					<code className="DisasmLine__params">{this.highlightParams(line.params)}{this.renderConditional(line)}</code>
+					<code className="DisasmLine__opcode">{this.highlight(line.name, '', line.params)} </code>
+					<code className="DisasmLine__params">{this.highlightParams(line.params, line.name, '')}{this.renderConditional(line)}</code>
 				</div>
 			</ContextMenuTrigger>
 		);
@@ -72,16 +72,32 @@ class DisasmLine extends PureComponent {
 		return '';
 	}
 
-	highlight(text) {
+	highlight(text, before = '', after = '') {
 		const { highlight } = this.props;
 		if (highlight !== null) {
-			const pos = text.toLowerCase().indexOf(highlight);
+			const fullText = (before ? before + ' ' : '') + text + ' ' + after;
+			let pos = fullText.toLowerCase().indexOf(highlight);
+			let matchLength = highlight.length;
 			if (pos !== -1) {
+				const beforeLength = before ? before.length + 1 : 0;
+				if (pos < beforeLength) {
+					matchLength -= beforeLength - pos;
+					pos = matchLength > 0 ? 0 : -1;
+				} else {
+					pos -= beforeLength;
+				}
+			}
+
+			if (pos >= 0 && pos < text.length) {
+				const className = classNames({
+					'DisasmLine__highlight': true,
+					'DisasmLine__highlight--end': pos + matchLength > text.length + 1,
+				});
 				return (
 					<React.Fragment>
 						{text.substr(0, pos)}
-						<span className="DisasmLine__highlight">{text.substr(pos, highlight.length)}</span>
-						{text.substr(pos + highlight.length)}
+						<span className={className}>{text.substr(pos, matchLength)}</span>
+						{text.substr(pos + matchLength)}
 					</React.Fragment>
 				);
 			}
@@ -89,7 +105,7 @@ class DisasmLine extends PureComponent {
 		return text;
 	}
 
-	highlightParams(text) {
+	highlightParams(text, before = '', after = '') {
 		const { highlight, highlightParams } = this.props;
 		if (highlight === null) {
 			const params = text.split(/([,()])/);
@@ -102,7 +118,7 @@ class DisasmLine extends PureComponent {
 				return <span className={className} key={key}>{param}</span>;
 			});
 		}
-		return this.highlight(text);
+		return this.highlight(text, before, after);
 	}
 
 	onDoubleClick(ev, data) {

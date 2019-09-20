@@ -123,6 +123,7 @@
 
 .DisasmLine__params {
 	display: inline-block;
+	position: relative;
 	text-overflow: ellipsis;
 	vertical-align: top;
 }
@@ -132,8 +133,13 @@
 }
 
 .DisasmLine__highlight {
+	display: inline-block;
 	position: relative;
 	z-index: 0;
+}
+
+.DisasmLine__highlight--end {
+	width: 100%;
 }
 
 .DisasmLine__highlight::before {

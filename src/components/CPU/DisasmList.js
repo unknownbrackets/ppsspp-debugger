@@ -91,8 +91,7 @@ class DisasmList extends PureComponent {
 		if (line.symbol !== null) {
 			parts.push(line.symbol + ':');
 		}
-		parts.push(line.name);
-		parts.push(line.params);
+		parts.push(line.name + ' ' + line.params);
 
 		return parts.some(part => part.toLowerCase().indexOf(match) !== -1);
 	}
