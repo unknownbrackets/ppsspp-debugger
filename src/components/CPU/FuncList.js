@@ -110,6 +110,7 @@ class FuncList extends PureComponent {
 		this.props.ppsspp.send({
 			event: 'hle.func.list',
 		}).then(({ functions }) => {
+			functions.sort((a, b) => a.name.localeCompare(b.name));
 			const filteredFunctions = this.applyFilter(functions, this.state.filter);
 			this.setState({ functions, filteredFunctions, loading: false });
 		}, () => {
@@ -118,6 +119,9 @@ class FuncList extends PureComponent {
 	}
 
 	applyFilter(functions, filter) {
+		if (filter === '') {
+			return functions;
+		}
 		const match = filter.toLowerCase();
 		return functions.filter(func => func.name.toLowerCase().indexOf(match) !== -1);
 	}
