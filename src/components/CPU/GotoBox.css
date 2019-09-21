@@ -1,4 +1,5 @@
 .GotoBox {
+	flex: 0 0 auto;
 	padding: 5px;
 	padding-top: 2px;
 }

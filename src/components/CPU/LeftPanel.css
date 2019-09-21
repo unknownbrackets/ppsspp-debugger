@@ -26,7 +26,7 @@
 	border: 0;
 	font-size: inherit;
 	padding: 0 3px;
-	text-align: start;
+	text-align: inherit;
 }
 
 .LeftPanel__tools button:enabled {

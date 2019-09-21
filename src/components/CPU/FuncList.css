@@ -28,7 +28,7 @@
 	cursor: pointer;
 	font-size: inherit;
 	padding: 0 3px;
-	text-align: start;
+	text-align: inherit;
 	width: 100%;
 }
 

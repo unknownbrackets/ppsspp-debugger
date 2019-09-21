@@ -74,3 +74,19 @@
 	flex: 1 1 auto;
 	flex-direction: column;
 }
+
+/* These fix a bug in IE11. */
+.LeftPanel .react-tabs__tab-list {
+	flex: 0 0 auto;
+}
+
+.LeftPanel,
+.LeftPanel .react-tabs,
+.LeftPanel .react-tabs__tab-panel,
+#RegPanel {
+	height: 100%;
+}
+
+#RegPanel .react-tabs__tab-panel {
+	height: calc(100% - 22px);
+}
