@@ -111,7 +111,7 @@ class BreakpointModal extends PureComponent {
 		}
 	}
 
-	onSave = () => {
+	onSave = (e) => {
 		let operation = this.props.ppsspp.send({
 			event: 'cpu.evaluate',
 			thread: this.props.currentThread,
@@ -134,6 +134,8 @@ class BreakpointModal extends PureComponent {
 		operation.then(this.onClose, err => {
 			window.alert(err.message);
 		});
+
+		e.preventDefault();
 	}
 
 	saveNew = ({ uintValue }) => {
