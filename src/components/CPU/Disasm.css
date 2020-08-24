@@ -1,4 +1,5 @@
 .Disasm {
+	flex: 1;
 	font-family: Consolas, monospace;
 	font-size: 14px;
 	min-height: 10em;
