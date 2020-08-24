@@ -18,21 +18,35 @@ class DisasmButtons extends PureComponent {
 
 		return (
 			<div className="DisasmButtons">
-				<button type="button" disabled={!this.props.started || this.props.paused} onClick={this.handleGoBreak}>
-					{this.props.stepping || !this.props.started ? 'Go' : 'Break'}
-				</button>
-				<span className="DisasmButtons__spacer"></span>
-				<button type="button" disabled={disabled} onClick={this.handleStepInto}>Step Into</button>
-				<button type="button" disabled={disabled} onClick={this.handleStepOver}>Step Over</button>
-				<button type="button" disabled={disabled} onClick={this.handleStepOut}>Step Out</button>
-				<span className="DisasmButtons__spacer"></span>
-				<button type="button" disabled={disabled} onClick={this.handleNextHLE}>Next HLE</button>
-				<span className="DisasmButtons__spacer"></span>
-				<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.props.started}>Breakpoint</button>
-				<span className="DisasmButtons__spacer"></span>
-				<span className="DisasmButtons__thread-list">
-					Thread: {this.renderThreadList()}
-				</span>
+				<div className="DisasmButtons__group DisasmButtons__nav">
+					<button type="button" onClick={this.props.showNavTray}>Nav</button>
+					<span className="DisasmButtons__spacer"></span>
+				</div>
+				<div className="DisasmButtons__group">
+					<button type="button" disabled={!this.props.started || this.props.paused} onClick={this.handleGoBreak}>
+						{this.props.stepping || !this.props.started ? 'Go' : 'Break'}
+					</button>
+					<span className="DisasmButtons__spacer"></span>
+				</div>
+				<div className="DisasmButtons__group">
+					<button type="button" disabled={disabled} onClick={this.handleStepInto}>Step Into</button>
+					<button type="button" disabled={disabled} onClick={this.handleStepOver}>Step Over</button>
+					<button type="button" disabled={disabled} onClick={this.handleStepOut}>Step Out</button>
+					<span className="DisasmButtons__spacer"></span>
+				</div>
+				<div className="DisasmButtons__group">
+					<button type="button" disabled={disabled} onClick={this.handleNextHLE}>Next HLE</button>
+					<span className="DisasmButtons__spacer"></span>
+				</div>
+				<div className="DisasmButtons__group">
+					<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.props.started}>Breakpoint</button>
+					<span className="DisasmButtons__spacer"></span>
+				</div>
+				<div className="DisasmButtons__group">
+					<span className="DisasmButtons__thread-list">
+						Thread: {this.renderThreadList()}
+					</span>
+				</div>
 
 				<BreakpointModal
 					ppsspp={this.props.ppsspp}
@@ -190,6 +204,7 @@ DisasmButtons.propTypes = {
 	paused: PropTypes.bool.isRequired,
 	stepping: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
+	showNavTray: PropTypes.func.isRequired,
 
 	updateCurrentThread: PropTypes.func.isRequired,
 };

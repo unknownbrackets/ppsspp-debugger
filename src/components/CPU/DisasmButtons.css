@@ -15,3 +15,22 @@
 .DisasmButtons__thread--current {
 	font-weight: bold;
 }
+
+.DisasmButtons__group {
+	display: inline-block;
+	padding-bottom: 2px;
+	white-space: nowrap;
+}
+
+@media only screen and (max-width: 700px) {
+	.DisasmButtons {
+		height: auto;
+		min-height: 25px;
+	}
+}
+
+@media only screen and (min-width: 701px) {
+	.DisasmButtons__nav {
+		display: none;
+	}
+}

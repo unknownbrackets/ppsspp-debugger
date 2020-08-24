@@ -20,6 +20,7 @@
 
 .FuncList__listing {
 	flex: 1 1 auto;
+	flex-basis: 50vh;
 }
 
 .FuncList__listing button {

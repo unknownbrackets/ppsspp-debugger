@@ -10,3 +10,24 @@
 	flex: 0 0 auto;
 	flex-direction: column;
 }
+
+.CPU__paneClose {
+	display: none;
+}
+
+@media only screen and (max-width: 700px) {
+	.CPU__pane {
+		background: #fff;
+		display: none;
+		position: absolute;
+		z-index: 1;
+	}
+
+	.CPU__pane--open {
+		display: flex;
+	}
+
+	.CPU__paneClose {
+		display: block;
+	}
+}

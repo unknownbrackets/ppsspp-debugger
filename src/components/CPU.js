@@ -22,23 +22,25 @@ class CPU extends PureComponent {
 		lastTicks: 0,
 		ticks: 0,
 		currentThread: undefined,
+		navTray: false,
 	};
 	listeners_;
 
 	render() {
-		const { paused, stepping, started, currentThread } = this.state;
+		const { paused, stepping, started, currentThread, navTray } = this.state;
 		const commonProps = { stepping: stepping && !paused, paused, started, currentThread };
 		const { selectionTop, selectionBottom, jumpMarker, pc, setInitialPC } = this.state;
 		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
 
 		return (
 			<div id="CPU">
-				<div className="CPU__pane">
+				<div className={navTray ? 'CPU__pane CPU__pane--open' : 'CPU__pane'}>
+					<button type="button" onClick={this.hideNavTray} className="CPU__paneClose">Close</button>
 					<GotoBox ppsspp={this.props.ppsspp} {...commonProps} gotoDisasm={this.gotoDisasm} promptGotoMarker={this.state.promptGotoMarker} />
 					<LeftPanel {...this.props} {...commonProps} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
-					<DisasmButtons {...this.props} {...commonProps} updateCurrentThread={this.updateCurrentThread} />
+					<DisasmButtons {...this.props} {...commonProps} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
 					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
 			</div>
@@ -151,6 +153,14 @@ class CPU extends PureComponent {
 		if (pc) {
 			this.gotoDisasm(pc);
 		}
+	}
+
+	showNavTray = () => {
+		this.setState({ navTray: true });
+	}
+
+	hideNavTray = () => {
+		this.setState({ navTray: false });
 	}
 
 	updateInitialPC = () => {
