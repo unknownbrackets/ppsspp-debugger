@@ -52,7 +52,7 @@ class DisasmBranchGuide extends PureComponent {
 			path.push(sourceEdge);
 		}
 
-		return path;
+		return path.join(' ');
 	}
 
 	calcPos() {
