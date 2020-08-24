@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
 import { ensureInView } from '../../utils/dom';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import BreakpointIcon from './BreakpointIcon';
 
 class DisasmLine extends PureComponent {
