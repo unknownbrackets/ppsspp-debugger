@@ -16,7 +16,6 @@ class GotoBox extends PureComponent {
 	}
 
 	render() {
-		const disabled = !this.props.started;
 		return (
 			<form action="#" className="GotoBox" onSubmit={this.handleSubmit}>
 				<label className="GotoBox__label" htmlFor={this.id}>Go to:</label>
@@ -77,6 +76,10 @@ class GotoBox extends PureComponent {
 				if (this.props.started) {
 					this.props.gotoAddress(uintValue);
 				}
+			}, err => {
+				// Probably a bad reference.
+				this.ref.current.focus();
+				this.ref.current.select();
 			});
 		}
 		ev.preventDefault();
