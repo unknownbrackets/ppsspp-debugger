@@ -67,7 +67,7 @@ class RegPanel extends PureComponent {
 
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
-			'connection.change': (connected) => connected && this.updateRegs(false),
+			'connection': () => this.updateRegs(false),
 			'cpu.stepping': () => this.updateRegs(false),
 			'cpu.setReg': (result) => this.updateReg(result),
 		});
