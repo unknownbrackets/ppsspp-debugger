@@ -6,6 +6,7 @@ import Log from './Log';
 import NotConnected from './NotConnected';
 import PPSSPP from '../sdk/ppsspp.js';
 import listeners from '../utils/listeners.js';
+import GameStatus from '../utils/game.js';
 import logo from '../assets/logo.svg';
 import './App.css';
 
@@ -18,7 +19,9 @@ class App extends Component {
 	state = {
 		connected: false,
 		connecting: false,
+		gameStatus: null,
 	};
+	gameStatus;
 	logRef;
 	ppsspp;
 	originalTitle;
@@ -28,6 +31,7 @@ class App extends Component {
 
 		this.logRef = React.createRef();
 		this.ppsspp = new PPSSPP();
+		this.gameStatus = new GameStatus();
 		this.originalTitle = document.title;
 
 		listeners.init(this.ppsspp);
@@ -35,6 +39,10 @@ class App extends Component {
 			'connection.change': this.onConnectionChange,
 			'game.start': this.updateTitle,
 			'game.quit': this.updateTitle,
+		});
+		this.gameStatus.init(this.ppsspp);
+		this.gameStatus.listenState(gameStatus => {
+			this.setState({ gameStatus });
 		});
 	}
 
@@ -65,10 +73,10 @@ class App extends Component {
 		return (
 			<Switch>
 				<Route path="/gpu">
-					<GPU ppsspp={this.ppsspp} log={this.log} />
+					<GPU ppsspp={this.ppsspp} gameStatus={this.state.gameStatus} log={this.log} />
 				</Route>
 				<Route>
-					<CPU ppsspp={this.ppsspp} log={this.log} />
+					<CPU ppsspp={this.ppsspp} gameStatus={this.state.gameStatus} log={this.log} />
 				</Route>
 			</Switch>
 		);

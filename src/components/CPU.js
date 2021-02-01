@@ -9,10 +9,6 @@ import './CPU.css';
 
 class CPU extends PureComponent {
 	state = {
-		stepping: false,
-		paused: true,
-		started: false,
-		pc: 0,
 		setInitialPC: false,
 		// Note: these are inclusive.
 		selectionTop: null,
@@ -21,15 +17,14 @@ class CPU extends PureComponent {
 		promptGotoMarker: null,
 		lastTicks: 0,
 		ticks: 0,
-		currentThread: undefined,
 		navTray: false,
 	};
 	listeners_;
 
 	render() {
-		const { paused, stepping, started, currentThread, navTray } = this.state;
+		const { stepping, paused, started, pc, currentThread } = this.props.gameStatus;
 		const commonProps = { stepping: stepping && !paused, paused, started, currentThread };
-		const { selectionTop, selectionBottom, jumpMarker, pc, setInitialPC } = this.state;
+		const { selectionTop, selectionBottom, jumpMarker, setInitialPC, navTray } = this.state;
 		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
 
 		return (
@@ -50,35 +45,25 @@ class CPU extends PureComponent {
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
 			'connection': () => this.onConnection(),
-			'connection.change': (connected) => this.onConnectionChange(connected),
 			'cpu.stepping': (data) => this.onStepping(data),
-			'cpu.resume': () => this.setState({ stepping: false }),
 			'game.start': () => {
 				// This may often not happen if the register list is visible.
 				if (!this.state.setInitialPC) {
 					this.updateInitialPC();
 				}
-				this.setState({ started: true, paused: false });
 			},
 			'game.quit': () => {
 				this.setState({
-					started: false,
-					stepping: false,
-					paused: true,
-					pc: 0,
 					setInitialPC: false,
-					currentThread: undefined,
 				});
 			},
-			'game.pause': () => this.setState({ paused: true }),
-			'game.resume': () => this.setState({ paused: false }),
 			'cpu.setReg': (result) => {
 				if (result.category === 0 && result.register === 32) {
 					const pc = result.uintValue;
 					if (!this.state.setInitialPC) {
 						this.gotoDisasm(pc);
 					}
-					this.setState({ pc, setInitialPC: pc !== 0 });
+					this.setState({ setInitialPC: pc !== 0 });
 				}
 			},
 			'cpu.getAllRegs': (result) => {
@@ -86,7 +71,7 @@ class CPU extends PureComponent {
 				if (!this.state.setInitialPC) {
 					this.gotoDisasm(pc);
 				}
-				this.setState({ pc, setInitialPC: pc !== 0 });
+				this.setState({ setInitialPC: pc !== 0 });
 			},
 		});
 	}
@@ -95,33 +80,20 @@ class CPU extends PureComponent {
 		listeners.forget(this.listeners_);
 	}
 
-	onConnectionChange(connected) {
-		// On any reconnect, assume paused until proven otherwise.
-		this.setState({ connected, started: false, stepping: false, paused: true });
-		if (!connected) {
-			this.setState({ currentThread: undefined });
-		}
-	}
-
 	onConnection() {
 		// Update the status of this connection immediately too.
 		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
-			const { stepping, paused, pc, ticks } = result;
-			const started = pc !== 0 || stepping;
+			const { pc, ticks } = result;
 
 			if (!this.state.setInitialPC) {
 				this.gotoDisasm(pc);
 			}
-			this.setState({ connected: true, started, stepping, paused, pc, setInitialPC: pc !== 0, ticks, lastTicks: ticks });
-		}, (err) => {
-			this.setState({ stepping: false, paused: true });
+			this.setState({ setInitialPC: pc !== 0, ticks, lastTicks: ticks });
 		});
 	}
 
 	onStepping(data) {
 		this.setState({
-			stepping: true,
-			pc: data.pc,
 			selectionTop: data.pc,
 			selectionBottom: data.pc,
 			lastTicks: this.state.ticks,
@@ -149,8 +121,10 @@ class CPU extends PureComponent {
 	}
 
 	updateCurrentThread = (currentThread, pc) => {
-		this.setState({ currentThread, pc, setInitialPC: pc !== 0 });
-		if (pc) {
+		this.setState({ setInitialPC: pc !== 0 && pc !== undefined });
+		this.props.gameStatus.setState({ currentThread });
+		if (pc !== 0 && pc !== undefined) {
+			this.props.gameStatus.setState({ pc });
 			this.gotoDisasm(pc);
 		}
 	}
@@ -169,7 +143,8 @@ class CPU extends PureComponent {
 			if (!this.state.setInitialPC) {
 				this.gotoDisasm(pc);
 			}
-			this.setState({ pc, setInitialPC: pc !== 0 });
+			this.setState({ setInitialPC: pc !== 0 });
+			this.props.gameStatus.setState({ pc });
 		});
 	}
 }
@@ -177,6 +152,15 @@ class CPU extends PureComponent {
 CPU.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	log: PropTypes.func.isRequired,
+	gameStatus: PropTypes.shape({
+		connected: PropTypes.bool.isRequired,
+		stepping: PropTypes.bool.isRequired,
+		paused: PropTypes.bool.isRequired,
+		started: PropTypes.bool.isRequired,
+		pc: PropTypes.number.isRequired,
+		currentThread: PropTypes.number,
+		setState: PropTypes.func.isRequired,
+	}).isRequired,
 };
 
 export default CPU;
