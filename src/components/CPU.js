@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Disasm from './CPU/Disasm';
 import DisasmButtons from './CPU/DisasmButtons';
-import GotoBox from './CPU/GotoBox';
+import GotoBox from './common/GotoBox';
 import LeftPanel from './CPU/LeftPanel';
 import listeners from '../utils/listeners.js';
 import './CPU.css';
@@ -36,7 +36,7 @@ class CPU extends PureComponent {
 			<div id="CPU">
 				<div className={navTray ? 'CPU__pane CPU__pane--open' : 'CPU__pane'}>
 					<button type="button" onClick={this.hideNavTray} className="CPU__paneClose">Close</button>
-					<GotoBox ppsspp={this.props.ppsspp} {...commonProps} gotoDisasm={this.gotoDisasm} promptGotoMarker={this.state.promptGotoMarker} />
+					<GotoBox ppsspp={this.props.ppsspp} {...commonProps} gotoAddress={this.gotoDisasm} includePC={true} promptGotoMarker={this.state.promptGotoMarker} />
 					<LeftPanel {...this.props} {...commonProps} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">

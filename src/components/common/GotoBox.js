@@ -7,27 +7,41 @@ class GotoBox extends PureComponent {
 		address: '',
 	};
 	ref;
+	id;
 
 	constructor(props) {
 		super(props);
 		this.ref = React.createRef();
+		this.id = 'GotoBox__address--' + Math.random().toString(36).substr(2, 9);
 	}
 
 	render() {
-		/* eslint no-script-url: "off" */
 		const disabled = !this.props.started;
 		return (
 			<form action="#" className="GotoBox" onSubmit={this.handleSubmit}>
-				<label className="GotoBox__label" htmlFor="GotoBox__address">Go to:</label>
+				<label className="GotoBox__label" htmlFor={this.id}>Go to:</label>
 				<input ref={this.ref}
-					type="text" id="GotoBox__address"
+					type="text" id={this.id}
+					className="GotoBox__address"
 					value={this.state.address} onChange={this.handleChange}
 					title="Hexadecimal address or expression, enter to submit"
 					autoComplete="off"
 				/>
+				{this.renderPCButtons()}
+			</form>
+		);
+	}
+
+	renderPCButtons() {
+		if (!this.includePC) {
+			return null;
+		}
+		const disabled = !this.props.started;
+		return (
+			<>
 				<button type="button" className="GotoBox__button" onClick={this.handlePC} disabled={disabled}>PC</button>
 				<button type="button" className="GotoBox__button" onClick={this.handleRA} disabled={disabled}>RA</button>
-			</form>
+			</>
 		);
 	}
 
@@ -44,7 +58,7 @@ class GotoBox extends PureComponent {
 			name,
 		}).then((result) => {
 			if (this.props.started) {
-				this.props.gotoDisasm(result.uintValue);
+				this.props.gotoAddress(result.uintValue);
 			}
 		});
 	}
@@ -61,7 +75,7 @@ class GotoBox extends PureComponent {
 				expression: this.state.address,
 			}).then(({ uintValue }) => {
 				if (this.props.started) {
-					this.props.gotoDisasm(uintValue);
+					this.props.gotoAddress(uintValue);
 				}
 			});
 		}
@@ -81,8 +95,10 @@ GotoBox.propTypes = {
 	ppsspp: PropTypes.object.isRequired,
 	started: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
+	includePC: PropTypes.bool.isRequired,
+	promptGotoMarker: PropTypes.any,
 
-	gotoDisasm: PropTypes.func.isRequired,
+	gotoAddress: PropTypes.func.isRequired,
 };
 
 export default GotoBox;
