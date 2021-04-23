@@ -277,13 +277,13 @@ class Disasm extends PureComponent {
 		} else if (!line.breakpoint.enabled) {
 			this.props.ppsspp.send({
 				event: 'cpu.breakpoint.update',
-				address: line.address,
+				address: line.breakpoint.address || line.address,
 				enabled: true,
 			});
 		} else if (keep) {
 			this.props.ppsspp.send({
 				event: 'cpu.breakpoint.update',
-				address: line.address,
+				address: line.breakpoint.address || line.address,
 				enabled: false,
 			});
 		} else {
@@ -295,18 +295,20 @@ class Disasm extends PureComponent {
 
 			this.props.ppsspp.send({
 				event: 'cpu.breakpoint.remove',
-				address: line.address,
+				address: line.breakpoint.address || line.address,
 			});
 		}
 	}
 
 	editBreakpoint = (line) => {
+		// In case it's actually in the middle of a macro.
+		const breakpointAddress = line.breakpoint.address || line.address;
 		this.props.ppsspp.send({
 			event: 'cpu.breakpoint.list',
-			address: line.address,
+			address: breakpointAddress,
 			enabled: true,
 		}).then(({ breakpoints }) => {
-			const bp = breakpoints.find(bp => bp.address === line.address);
+			const bp = breakpoints.find(bp => bp.address === breakpointAddress);
 			if (bp) {
 				const editingBreakpoint = { ...bp, type: 'execute' };
 				this.setState({ editingBreakpoint });
