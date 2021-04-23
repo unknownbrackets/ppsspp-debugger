@@ -24,6 +24,8 @@ class StatusBar extends PureComponent {
 				return this.renderDataAccess(line.dataAccess);
 			} else if (line.branch) {
 				return this.renderBranch(line.branch);
+			} else if (line.relevantData && typeof line.relevantData.stringValue === 'string') {
+				return this.renderString(line.relevantData);
 			}
 		} else if (line.type === 'data') {
 			return this.renderDataSymbol(line.dataSymbol, line.address);
@@ -62,6 +64,10 @@ class StatusBar extends PureComponent {
 			status += ' = ' + branch.symbol;
 		}
 		return status;
+	}
+
+	renderString(data) {
+		return '[' + toString08X(data.address) + '] = ' + JSON.stringify(data.stringValue);
 	}
 
 	renderDataSymbol(dataSymbol, address) {
