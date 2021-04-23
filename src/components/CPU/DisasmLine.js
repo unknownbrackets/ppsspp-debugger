@@ -37,7 +37,7 @@ class DisasmLine extends PureComponent {
 		};
 
 		return (
-			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} attributes={attributes}>
+			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" collect={mapData} attributes={attributes} holdToDisplay={-1}>
 				<div className={className} style={{ backgroundColor: line.backgroundColor }} ref={this.ref} data-address={line.address}>
 					<BreakpointIcon className="DisasmLine__breakpoint-icon" />
 					{this.renderAddress(line)}

@@ -45,7 +45,7 @@ class RegList extends PureComponent {
 		const ref = this.state.cursor === reg ? this.cursorRef : undefined;
 
 		return (
-			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" attributes={attributes} collect={mapData} key={reg}>
+			<ContextMenuTrigger id={this.props.contextmenu} renderTag="a" attributes={attributes} collect={mapData} holdToDisplay={-1} key={reg}>
 				<dt>{name}</dt>
 				<dd className={classNames(ddClasses)} ref={ref}>
 					{this.format(reg)}
