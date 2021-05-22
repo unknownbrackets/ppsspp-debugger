@@ -25,6 +25,7 @@
 
 	.CPU__pane--open {
 		display: flex;
+		height: 70vh;
 	}
 
 	.CPU__paneClose {
