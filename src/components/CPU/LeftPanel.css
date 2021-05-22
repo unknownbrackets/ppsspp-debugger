@@ -1,24 +1,24 @@
 .LeftPanel {
 	display: flex;
-	flex: 1 1 auto;
+	flex: 1;
 	flex-direction: column;
 	width: 22ex;
 }
 
 .LeftPanel .react-tabs {
 	display: flex;
+	flex: 1;
 	flex-direction: column;
-	flex-grow: 1;
 }
 
 .LeftPanel .react-tabs__tab-panel--selected {
 	display: flex;
-	flex: 1 1 auto;
+	flex: 1;
 	flex-direction: column;
 }
 
 .LeftPanel__tools {
-	padding-top: 1ex;
+	padding: 1ex 0;
 }
 
 .LeftPanel__tools button {
