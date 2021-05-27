@@ -26,6 +26,7 @@ class Disasm extends PureComponent {
 		searchInProgress: false,
 		highlightText: null,
 		editingBreakpoint: null,
+		creatingBreakpoint: null,
 	};
 	jumpStack = [];
 	needsScroll = false;
@@ -89,9 +90,10 @@ class Disasm extends PureComponent {
 				<BreakpointModal
 					ppsspp={this.props.ppsspp}
 					currentThread={this.props.currentThread}
-					isOpen={this.state.editingBreakpoint !== null}
+					isOpen={this.state.editingBreakpoint !== null || this.state.creatingBreakpoint !== null}
 					onClose={this.closeEditBreakpoint}
 					breakpoint={this.state.editingBreakpoint}
+					initialOverrides={this.state.creatingBreakpoint}
 				/>
 			</React.Fragment>
 		);
@@ -302,7 +304,7 @@ class Disasm extends PureComponent {
 
 	editBreakpoint = (line) => {
 		// In case it's actually in the middle of a macro.
-		const breakpointAddress = line.breakpoint.address || line.address;
+		const breakpointAddress = line.breakpoint?.address || line.address;
 		this.props.ppsspp.send({
 			event: 'cpu.breakpoint.list',
 			address: breakpointAddress,
@@ -312,12 +314,15 @@ class Disasm extends PureComponent {
 			if (bp) {
 				const editingBreakpoint = { ...bp, type: 'execute' };
 				this.setState({ editingBreakpoint });
+			} else {
+				const creatingBreakpoint = { address: breakpointAddress, type: 'execute' };
+				this.setState({ creatingBreakpoint });
 			}
 		});
 	}
 
 	closeEditBreakpoint = () => {
-		this.setState({ editingBreakpoint: null });
+		this.setState({ editingBreakpoint: null, creatingBreakpoint: null });
 	}
 
 	gotoAddress = (addr, snap = 'center') => {
