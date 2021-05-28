@@ -46,15 +46,15 @@ class BreakpointModal extends PureComponent {
 
 	constructor(props) {
 		super(props);
-		Object.assign(this.state, { ...this.cleanState, ...this.cleanBreakpoint, ...props.breakpoint });
+		Object.assign(this.state, { ...this.cleanState, ...this.cleanBreakpoint, ...props.breakpoint, ...props.initialOverrides });
 
 		this.cleanTimeout = new Timeout(() => {
-			this.setState({ ...this.cleanState, ...this.cleanBreakpoint, ...this.props.breakpoint });
+			this.setState({ ...this.cleanState, ...this.cleanBreakpoint, ...this.props.breakpoint, ...this.props.initialOverrides });
 		}, 200);
 	}
 
 	render() {
-		const editing = this.props.breakpoint !== null;
+		const editing = !!this.props.breakpoint;
 
 		return (
 			<FitModal
@@ -118,7 +118,7 @@ class BreakpointModal extends PureComponent {
 			expression: this.state.address,
 		});
 
-		if (this.props.breakpoint !== null) {
+		if (this.props.breakpoint) {
 			const { derivedBreakpoint, address, size, type } = this.state;
 			if (type !== derivedBreakpoint.type || derivedBreakpoint.address !== address) {
 				operation = operation.then(this.deleteOld).then(this.saveNew);
@@ -182,14 +182,18 @@ class BreakpointModal extends PureComponent {
 
 	static getDerivedStateFromProps(nextProps, prevState) {
 		if (nextProps.isOpen && !prevState.isOpen) {
-			let derivedBreakpoint = nextProps.breakpoint;
+			const derivedBreakpoint = nextProps.breakpoint;
 			if (derivedBreakpoint) {
 				// This is the "derived" unchanged state for the "Discard changes?" prompt, and initial state.
 				derivedBreakpoint.address = '0x' + toString08X(derivedBreakpoint.address);
 				derivedBreakpoint.condition = derivedBreakpoint.condition || '';
 				derivedBreakpoint.logFormat = derivedBreakpoint.logFormat || '';
 			}
-			return { isOpen: true, ...derivedBreakpoint, derivedBreakpoint };
+			const initialOverrides = nextProps.initialOverrides;
+			if (initialOverrides) {
+				initialOverrides.address = '0x' + toString08X(initialOverrides.address);
+			}
+			return { isOpen: true, ...derivedBreakpoint, derivedBreakpoint, ...initialOverrides };
 		}
 		if (!nextProps.isOpen && prevState.derivedBreakpoint) {
 			return { derivedBreakpoint: null };
@@ -203,6 +207,10 @@ BreakpointModal.propTypes = {
 	isOpen: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
 	breakpoint: PropTypes.shape({
+		type: PropTypes.oneOf(['execute', 'memory']),
+		address: PropTypes.number.isRequired,
+	}),
+	initialOverrides: PropTypes.shape({
 		type: PropTypes.oneOf(['execute', 'memory']),
 		address: PropTypes.number.isRequired,
 	}),
