@@ -44,7 +44,7 @@ class App extends Component {
 				<div className="App">
 					<header className="App-header">
 						<ul className="App-nav">
-							<NavLink to="/cpu">CPU</NavLink>
+							<NavLink to="/cpu" isActive={(m, l) => m || l.pathname === '/'}>CPU</NavLink>
 							<NavLink to="/gpu">GPU</NavLink>
 						</ul>
 						<img src={logo} className="App-logo" alt="PPSSPP" />
