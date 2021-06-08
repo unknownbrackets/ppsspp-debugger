@@ -27,9 +27,8 @@ class CPU extends PureComponent {
 
 	render() {
 		const { stepping, paused, started, pc, currentThread } = this.context.gameStatus;
-		const commonProps = { stepping: stepping && !paused, paused, started, currentThread };
 		const { selectionTop, selectionBottom, jumpMarker, setInitialPC, navTray } = this.state;
-		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
+		const disasmProps = { currentThread, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
 
 		return (
 			<div id="CPU">
@@ -40,7 +39,7 @@ class CPU extends PureComponent {
 				</div>
 				<div className="Disasm__container">
 					<DisasmButtons stepping={stepping && !paused} started={started} currentThread={currentThread} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
-					<Disasm {...this.props} {...this.context} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
+					<Disasm {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
 			</div>
 		);

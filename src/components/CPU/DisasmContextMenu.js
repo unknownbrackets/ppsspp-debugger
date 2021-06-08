@@ -1,13 +1,19 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import { ContextMenu, MenuItem, connectMenu } from 'react-contextmenu';
 import { copyText } from '../../utils/clipboard';
 import { toString08X } from '../../utils/format';
 
 class DisasmContextMenu extends PureComponent {
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
+
 	render() {
 		const { id, trigger } = this.props;
-		const disabled = !this.props.stepping;
+		const disabled = !this.context.gameStatus.stepping || this.context.gameStatus.paused;
 		const line = trigger && trigger.line;
 
 		const followBranch = line && (line.branch !== null || line.relevantData !== null || line.type === 'data');
@@ -91,7 +97,7 @@ class DisasmContextMenu extends PureComponent {
 	}
 
 	handleRunUntil = (ev, data) => {
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.runUntil',
 			address: data.line.address,
 		}).catch(() => {
@@ -101,13 +107,13 @@ class DisasmContextMenu extends PureComponent {
 	}
 
 	handleJumpPC = (ev, data) => {
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.setReg',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 			name: 'pc',
 			value: data.line.address,
 		}).catch((err) => {
-			this.props.log('Failed to update PC: ' + err);
+			this.context.log('Failed to update PC: ' + err);
 		});
 	}
 
@@ -135,10 +141,6 @@ DisasmContextMenu.propTypes = {
 			relevantData: PropTypes.object,
 		}),
 	}),
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
-	stepping: PropTypes.bool.isRequired,
-	currentThread: PropTypes.number,
 
 	getSelectedLines: PropTypes.func.isRequired,
 	getSelectedDisasm: PropTypes.func.isRequired,
@@ -146,5 +148,7 @@ DisasmContextMenu.propTypes = {
 	assembleInstruction: PropTypes.func.isRequired,
 	toggleBreakpoint: PropTypes.func.isRequired,
 };
+
+DisasmContextMenu.contextType = DebuggerContext;
 
 export default connectMenu('disasm')(DisasmContextMenu);

@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { createRef, PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import BreakpointModal from './BreakpointModal';
 import DisasmContextMenu from './DisasmContextMenu';
@@ -28,6 +29,10 @@ class Disasm extends PureComponent {
 		editingBreakpoint: null,
 		creatingBreakpoint: null,
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	jumpStack = [];
 	needsScroll = false;
 	needsOffsetFix = false;
@@ -42,9 +47,9 @@ class Disasm extends PureComponent {
 	constructor(props) {
 		super(props);
 
-		this.ref = React.createRef();
-		this.listRef = React.createRef();
-		this.searchRef = React.createRef();
+		this.ref = createRef();
+		this.listRef = createRef();
+		this.searchRef = createRef();
 	}
 
 	render() {
@@ -53,12 +58,12 @@ class Disasm extends PureComponent {
 			onDragStart: ev => ev.preventDefault(),
 		};
 
-		if (!this.props.started) {
+		if (!this.context.gameStatus.started) {
 			return this.renderNotStarted();
 		}
 
 		return (
-			<React.Fragment>
+			<>
 				<div ref={this.ref} className="Disasm" {...events}>
 					<DisasmList ref={this.listRef} {...this.state}
 						onDoubleClick={this.onDoubleClick}
@@ -88,14 +93,12 @@ class Disasm extends PureComponent {
 					inProgress={this.state.searchInProgress}
 				/>
 				<BreakpointModal
-					ppsspp={this.props.ppsspp}
-					currentThread={this.props.currentThread}
 					isOpen={this.state.editingBreakpoint !== null || this.state.creatingBreakpoint !== null}
 					onClose={this.closeEditBreakpoint}
 					breakpoint={this.state.editingBreakpoint}
 					initialOverrides={this.state.creatingBreakpoint}
 				/>
-			</React.Fragment>
+			</>
 		);
 	}
 
@@ -109,10 +112,6 @@ class Disasm extends PureComponent {
 
 	renderContextMenu() {
 		return <DisasmContextMenu
-			ppsspp={this.props.ppsspp}
-			log={this.props.log}
-			stepping={this.props.stepping}
-			currentThread={this.props.currentThread}
 			getSelectedLines={this.getSelectedLines}
 			getSelectedDisasm={this.getSelectedDisasm}
 			followBranch={this.followBranch}
@@ -228,7 +227,7 @@ class Disasm extends PureComponent {
 		}
 
 		const writeInstruction = () => {
-			return this.props.ppsspp.send({
+			return this.context.ppsspp.send({
 				event: 'memory.assemble',
 				address: address,
 				code,
@@ -250,19 +249,19 @@ class Disasm extends PureComponent {
 		// Check if this is actually a register assignment.
 		const assignment = code.split(/\s*=\s*(.+)$/, 2);
 		if (assignment.length >= 2) {
-			return this.props.ppsspp.send({
+			return this.context.ppsspp.send({
 				event: 'cpu.evaluate',
-				thread: this.props.currentThread,
+				thread: this.context.gameStatus.currentThread,
 				expression: assignment[1],
 			}).then((result) => {
-				return this.props.ppsspp.send({
+				return this.context.ppsspp.send({
 					event: 'cpu.setReg',
-					thread: this.props.currentThread,
+					thread: this.context.gameStatus.currentThread,
 					name: assignment[0],
 					value: result.uintValue,
 				});
 			}).then(({ uintValue }) => {
-				this.props.log('Updated ' + assignment[0] + ' to ' + toString08X(uintValue));
+				this.context.log('Updated ' + assignment[0] + ' to ' + toString08X(uintValue));
 			}, writeInstruction);
 		} else {
 			return writeInstruction();
@@ -271,19 +270,19 @@ class Disasm extends PureComponent {
 
 	toggleBreakpoint = (line, keep) => {
 		if (line.breakpoint === null) {
-			this.props.ppsspp.send({
+			this.context.ppsspp.send({
 				event: 'cpu.breakpoint.add',
 				address: line.address,
 				enabled: true,
 			});
 		} else if (!line.breakpoint.enabled) {
-			this.props.ppsspp.send({
+			this.context.ppsspp.send({
 				event: 'cpu.breakpoint.update',
 				address: line.breakpoint.address || line.address,
 				enabled: true,
 			});
 		} else if (keep) {
-			this.props.ppsspp.send({
+			this.context.ppsspp.send({
 				event: 'cpu.breakpoint.update',
 				address: line.breakpoint.address || line.address,
 				enabled: false,
@@ -295,7 +294,7 @@ class Disasm extends PureComponent {
 				}
 			}
 
-			this.props.ppsspp.send({
+			this.context.ppsspp.send({
 				event: 'cpu.breakpoint.remove',
 				address: line.breakpoint.address || line.address,
 			});
@@ -305,7 +304,7 @@ class Disasm extends PureComponent {
 	editBreakpoint = (line) => {
 		// In case it's actually in the middle of a macro.
 		const breakpointAddress = line.breakpoint?.address || line.address;
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.breakpoint.list',
 			address: breakpointAddress,
 			enabled: true,
@@ -365,7 +364,7 @@ class Disasm extends PureComponent {
 		this.setState({ searchInProgress: true });
 
 		const { match, end, last } = this.lastSearch;
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'memory.searchDisasm',
 			address: cursor === last ? cursor + 4 : cursor,
 			end,
@@ -445,7 +444,7 @@ class Disasm extends PureComponent {
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
 			'connection': () => {
-				if (this.props.started) {
+				if (this.context.gameStatus.started) {
 					this.updateDisasm('center');
 				}
 			},
@@ -567,9 +566,9 @@ class Disasm extends PureComponent {
 		}
 
 		return Promise.resolve(null).then(() => {
-			return this.props.ppsspp.send({
+			return this.context.ppsspp.send({
 				event: 'memory.disasm',
-				thread: this.props.currentThread,
+				thread: this.context.gameStatus.currentThread,
 				...updateRange,
 				displaySymbols,
 			}).then((data) => {
@@ -677,13 +676,8 @@ class Disasm extends PureComponent {
 }
 
 Disasm.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
 	selectionTop: PropTypes.number,
 	selectionBottom: PropTypes.number,
-	stepping: PropTypes.bool.isRequired,
-	started: PropTypes.bool.isRequired,
-	paused: PropTypes.bool.isRequired,
 	pc: PropTypes.number,
 	setInitialPC: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
@@ -691,5 +685,7 @@ Disasm.propTypes = {
 	updateSelection: PropTypes.func.isRequired,
 	promptGoto: PropTypes.func.isRequired,
 };
+
+Disasm.contextType = DebuggerContext;
 
 export default Disasm;
