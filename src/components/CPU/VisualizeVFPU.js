@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import FitModal from '../common/FitModal';
 import listeners from '../../utils/listeners';
@@ -101,10 +101,7 @@ class VisualizeVFPU extends PureComponent {
 }
 
 VisualizeVFPU.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
 	isOpen: PropTypes.bool.isRequired,
-
 	onClose: PropTypes.func.isRequired,
 };
 

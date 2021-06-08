@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import { AutoSizer, List } from 'react-virtualized';
 import listeners from '../../utils/listeners.js';
@@ -15,6 +16,10 @@ class FuncList extends PureComponent {
 		filter: '',
 		filteredFunctions: [],
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	listeners_;
 
 	render() {
@@ -107,7 +112,7 @@ class FuncList extends PureComponent {
 			this.setState({ loading: true });
 		}
 
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'hle.func.list',
 		}).then(({ functions }) => {
 			functions.sort((a, b) => a.name.localeCompare(b.name));
@@ -151,9 +156,10 @@ class FuncList extends PureComponent {
 }
 
 FuncList.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
+	started: PropTypes.bool,
 	gotoDisasm: PropTypes.func.isRequired,
 };
+
+FuncList.contextType = DebuggerContext;
 
 export default FuncList;

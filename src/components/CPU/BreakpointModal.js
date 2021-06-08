@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import FitModal from '../common/FitModal';
 import Field from '../common/Field';
@@ -26,6 +27,10 @@ const actionOptions = [
 
 class BreakpointModal extends PureComponent {
 	state = {};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	cleanState = {
 		isOpen: false,
 		derivedBreakpoint: null,
@@ -82,10 +87,10 @@ class BreakpointModal extends PureComponent {
 			return null;
 		}
 		return (
-			<React.Fragment>
+			<>
 				<Field type="hex" label="Size" prop="size" component={this} />
 				<Field type="checkboxes" label="Operations" options={operationOptions} component={this} />
-			</React.Fragment>
+			</>
 		);
 	}
 
@@ -94,9 +99,9 @@ class BreakpointModal extends PureComponent {
 			return null;
 		}
 		return (
-			<React.Fragment>
+			<>
 				<Field type="text" label="Condition" prop="condition" component={this} />
-			</React.Fragment>
+			</>
 		);
 	}
 
@@ -112,9 +117,9 @@ class BreakpointModal extends PureComponent {
 	}
 
 	onSave = (e) => {
-		let operation = this.props.ppsspp.send({
+		let operation = this.context.ppsspp.send({
 			event: 'cpu.evaluate',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 			expression: this.state.address,
 		});
 
@@ -139,7 +144,7 @@ class BreakpointModal extends PureComponent {
 	}
 
 	saveNew = ({ uintValue }) => {
-		return this.props.ppsspp.send({
+		return this.context.ppsspp.send({
 			event: this.getEvent(this.state.type, 'add'),
 			...this.state,
 			address: uintValue,
@@ -148,7 +153,7 @@ class BreakpointModal extends PureComponent {
 
 	deleteOld = ({ uintValue }) => {
 		// This is used when changing the breakpoint type.
-		return this.props.ppsspp.send({
+		return this.context.ppsspp.send({
 			event: this.getEvent(this.props.breakpoint.type, 'remove'),
 			address: this.props.breakpoint.address,
 		}).then(() => {
@@ -158,7 +163,7 @@ class BreakpointModal extends PureComponent {
 	}
 
 	updateExisting = ({ uintValue }) => {
-		return this.props.ppsspp.send({
+		return this.context.ppsspp.send({
 			event: this.getEvent(this.state.type, 'update'),
 			...this.state,
 			address: uintValue,
@@ -203,9 +208,7 @@ class BreakpointModal extends PureComponent {
 }
 
 BreakpointModal.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
 	isOpen: PropTypes.bool.isRequired,
-	currentThread: PropTypes.number,
 	breakpoint: PropTypes.shape({
 		type: PropTypes.oneOf(['execute', 'memory']),
 		address: PropTypes.number.isRequired,
@@ -217,5 +220,7 @@ BreakpointModal.propTypes = {
 
 	onClose: PropTypes.func.isRequired,
 };
+
+BreakpointModal.contextType = DebuggerContext;
 
 export default BreakpointModal;

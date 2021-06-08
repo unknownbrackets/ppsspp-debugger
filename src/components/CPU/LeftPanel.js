@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import FuncList from './FuncList';
@@ -13,6 +14,10 @@ class LeftPanel extends PureComponent {
 		// These can be slow, so we want to prevent render until it's selected.
 		everShownFuncs: false,
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 
 	render() {
 		return (
@@ -24,17 +29,17 @@ class LeftPanel extends PureComponent {
 						<Tab>Tools</Tab>
 					</TabList>
 					<TabPanel forceRender={true}>
-						<RegPanel {...this.props} />
+						<RegPanel gotoDisasm={this.props.gotoDisasm} currentThread={this.context.gameStatus.currentThread} />
 					</TabPanel>
 					<TabPanel forceRender={this.state.everShownFuncs}>
-						<FuncList {...this.props} />
+						<FuncList gotoDisasm={this.props.gotoDisasm} started={this.context.gameStatus.started} />
 					</TabPanel>
 					<TabPanel className="react-tabs__tab-panel LeftPanel__tools">
 						<button type="button" onClick={this.handleVFPUOpen}>Visualize VFPU</button>
 					</TabPanel>
 				</Tabs>
 
-				<VisualizeVFPU {...this.props} isOpen={this.state.vfpuModalOpen} onClose={this.handleVFPUClose} />
+				<VisualizeVFPU isOpen={this.state.vfpuModalOpen} onClose={this.handleVFPUClose} />
 			</div>
 		);
 	}
@@ -55,11 +60,9 @@ class LeftPanel extends PureComponent {
 }
 
 LeftPanel.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
-	stepping: PropTypes.bool,
 	gotoDisasm: PropTypes.func.isRequired,
-	currentThread: PropTypes.number,
 };
+
+LeftPanel.contextType = DebuggerContext;
 
 export default LeftPanel;

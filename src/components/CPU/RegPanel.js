@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import { ContextMenu, MenuItem } from 'react-contextmenu';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -13,6 +14,10 @@ class RegPanel extends PureComponent {
 	state = {
 		categories: [],
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 
 	render() {
 		return (
@@ -45,7 +50,7 @@ class RegPanel extends PureComponent {
 	}
 
 	renderContextMenu() {
-		const disabled = !this.props.stepping;
+		const disabled = !this.context.gameStatus.stepping;
 		return (
 			<ContextMenu id="reglist">
 				<MenuItem onClick={this.handleViewMemory}>
@@ -108,22 +113,22 @@ class RegPanel extends PureComponent {
 
 		const packet = {
 			event: 'cpu.setReg',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 			category: data.cat,
 			register: data.reg,
 			value: newValue,
 		};
 
 		// The result is automatically listened for.
-		this.props.ppsspp.send(packet).catch((err) => {
+		this.context.ppsspp.send(packet).catch((err) => {
 			window.alert(err);
 		});
 	}
 
 	updateRegs(keepLast) {
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.getAllRegs',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 		}).then((result) => {
 			let { categories } = result;
 			// Add values for change tracking.
@@ -164,11 +169,10 @@ class RegPanel extends PureComponent {
 }
 
 RegPanel.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
-	stepping: PropTypes.bool,
 	gotoDisasm: PropTypes.func.isRequired,
 	currentThread: PropTypes.number,
 };
+
+RegPanel.contextType = DebuggerContext;
 
 export default RegPanel;

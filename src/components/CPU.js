@@ -35,11 +35,11 @@ class CPU extends PureComponent {
 			<div id="CPU">
 				<div className={navTray ? 'CPU__pane CPU__pane--open' : 'CPU__pane'}>
 					<button type="button" onClick={this.hideNavTray} className="CPU__paneClose">Close</button>
-					<GotoBox ppsspp={this.context.ppsspp} {...commonProps} gotoAddress={this.gotoDisasm} includePC={true} promptGotoMarker={this.state.promptGotoMarker} />
-					<LeftPanel {...this.props} {...this.context} {...commonProps} gotoDisasm={this.gotoDisasm} />
+					<GotoBox gotoAddress={this.gotoDisasm} includePC={true} promptGotoMarker={this.state.promptGotoMarker} />
+					<LeftPanel gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
-					<DisasmButtons {...this.props} {...this.context} {...commonProps} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
+					<DisasmButtons stepping={stepping && !paused} started={started} currentThread={currentThread} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
 					<Disasm {...this.props} {...this.context} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
 			</div>

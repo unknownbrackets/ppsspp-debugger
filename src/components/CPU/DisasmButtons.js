@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import BreakpointModal from './BreakpointModal';
 import listeners from '../../utils/listeners.js';
@@ -11,10 +12,15 @@ class DisasmButtons extends PureComponent {
 		lastThread: '',
 		threads: [],
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	listeners_;
 
 	render() {
-		const disabled = !this.props.started || !this.props.stepping;
+		const { started, paused, stepping } = this.context.gameStatus;
+		const disabled = !started || !stepping || paused;
 
 		return (
 			<div className="DisasmButtons">
@@ -23,8 +29,8 @@ class DisasmButtons extends PureComponent {
 					<span className="DisasmButtons__spacer"></span>
 				</div>
 				<div className="DisasmButtons__group">
-					<button type="button" disabled={!this.props.started || this.props.paused} onClick={this.handleGoBreak}>
-						{this.props.stepping || !this.props.started ? 'Go' : 'Break'}
+					<button type="button" disabled={!started || paused} onClick={this.handleGoBreak}>
+						{stepping || !started ? 'Go' : 'Break'}
 					</button>
 					<span className="DisasmButtons__spacer"></span>
 				</div>
@@ -39,7 +45,7 @@ class DisasmButtons extends PureComponent {
 					<span className="DisasmButtons__spacer"></span>
 				</div>
 				<div className="DisasmButtons__group">
-					<button type="button" onClick={this.handleBreakpointOpen} disabled={!this.props.started}>Breakpoint</button>
+					<button type="button" onClick={this.handleBreakpointOpen} disabled={!started}>Breakpoint</button>
 					<span className="DisasmButtons__spacer"></span>
 				</div>
 				<div className="DisasmButtons__group">
@@ -49,8 +55,6 @@ class DisasmButtons extends PureComponent {
 				</div>
 
 				<BreakpointModal
-					ppsspp={this.props.ppsspp}
-					currentThread={this.props.currentThread}
 					isOpen={this.state.breakpointModalOpen}
 					onClose={this.handleBreakpointClose}
 				/>
@@ -63,7 +67,7 @@ class DisasmButtons extends PureComponent {
 			return '(none)';
 		}
 		return (
-			<select onChange={this.handleThreadSelect} value={this.props.currentThread || this.state.lastThread}>
+			<select onChange={this.handleThreadSelect} value={this.context.gameStatus.currentThread || this.state.lastThread}>
 				{this.state.threads.map(thread => this.renderThread(thread))}
 			</select>
 		);
@@ -91,7 +95,7 @@ class DisasmButtons extends PureComponent {
 
 	componentDidUpdate(prevProps, prevState) {
 		if (!prevState.connected && this.state.connected) {
-			this.updateThreadList(this.props.currentThread === undefined);
+			this.updateThreadList(this.context.gameStatus.currentThread === undefined);
 		}
 	}
 
@@ -101,13 +105,13 @@ class DisasmButtons extends PureComponent {
 			return;
 		}
 
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'hle.thread.list',
 		}).then(({ threads }) => {
 			this.setState({ threads });
 			if (resetCurrentThread) {
 				const currentThread = threads.find(th => th.isCurrent);
-				if (currentThread && currentThread.id !== this.props.currentThread) {
+				if (currentThread && currentThread.id !== this.context.gameStatus.currentThread) {
 					this.props.updateCurrentThread(currentThread.id);
 				}
 			}
@@ -117,11 +121,11 @@ class DisasmButtons extends PureComponent {
 	}
 
 	handleGoBreak = () => {
-		if (this.props.stepping) {
+		if (this.context.gameStatus.stepping) {
 			this.props.updateCurrentThread(undefined);
 		}
-		this.props.ppsspp.send({
-			event: this.props.stepping ? 'cpu.resume' : 'cpu.stepping',
+		this.context.ppsspp.send({
+			event: this.context.gameStatus.stepping ? 'cpu.resume' : 'cpu.stepping',
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
@@ -129,9 +133,9 @@ class DisasmButtons extends PureComponent {
 
 	handleStepInto = () => {
 		this.props.updateCurrentThread(undefined);
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.stepInto',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
@@ -139,20 +143,20 @@ class DisasmButtons extends PureComponent {
 
 	handleStepOver = () => {
 		this.props.updateCurrentThread(undefined);
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.stepOver',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
 	}
 
 	handleStepOut = () => {
-		const threadID = this.props.currentThread;
+		const threadID = this.context.gameStatus.currentThread;
 		this.props.updateCurrentThread(undefined);
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.stepOut',
-			thread: this.props.currentThread,
+			thread: this.context.gameStatus.currentThread,
 		}).catch(() => {
 			// This might fail if they aren't inside a function call on this thread, so restore the thread.
 			this.props.updateCurrentThread(threadID);
@@ -161,7 +165,7 @@ class DisasmButtons extends PureComponent {
 
 	handleNextHLE = () => {
 		this.props.updateCurrentThread(undefined);
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.nextHLE',
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
@@ -199,14 +203,14 @@ class DisasmButtons extends PureComponent {
 }
 
 DisasmButtons.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
 	started: PropTypes.bool.isRequired,
-	paused: PropTypes.bool.isRequired,
 	stepping: PropTypes.bool.isRequired,
 	currentThread: PropTypes.number,
 	showNavTray: PropTypes.func.isRequired,
 
 	updateCurrentThread: PropTypes.func.isRequired,
 };
+
+DisasmButtons.contextType = DebuggerContext;
 
 export default DisasmButtons;

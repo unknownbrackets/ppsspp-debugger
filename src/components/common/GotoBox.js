@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import { createRef, PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from '../DebuggerContext';
 import PropTypes from 'prop-types';
 import './GotoBox.css';
 
@@ -6,12 +7,16 @@ class GotoBox extends PureComponent {
 	state = {
 		address: '',
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	ref;
 	id;
 
 	constructor(props) {
 		super(props);
-		this.ref = React.createRef();
+		this.ref = createRef();
 		this.id = 'GotoBox__address--' + Math.random().toString(36).substr(2, 9);
 	}
 
@@ -35,7 +40,7 @@ class GotoBox extends PureComponent {
 		if (!this.includePC) {
 			return null;
 		}
-		const disabled = !this.props.started;
+		const disabled = !this.context.gameStatus.started;
 		return (
 			<>
 				<button type="button" className="GotoBox__button" onClick={this.handlePC} disabled={disabled}>PC</button>
@@ -52,11 +57,11 @@ class GotoBox extends PureComponent {
 	}
 
 	jumpToReg(name) {
-		this.props.ppsspp.send({
+		this.context.ppsspp.send({
 			event: 'cpu.getReg',
 			name,
 		}).then((result) => {
-			if (this.props.started) {
+			if (this.context.gameStatus.started) {
 				this.props.gotoAddress(result.uintValue);
 			}
 		});
@@ -67,13 +72,13 @@ class GotoBox extends PureComponent {
 	}
 
 	handleSubmit = (ev) => {
-		if (this.props.started) {
-			this.props.ppsspp.send({
+		if (this.context.gameStatus.started) {
+			this.context.ppsspp.send({
 				event: 'cpu.evaluate',
-				thread: this.props.currentThread,
+				thread: this.context.gameStatus.currentThread,
 				expression: this.state.address,
 			}).then(({ uintValue }) => {
-				if (this.props.started) {
+				if (this.context.gameStatus.started) {
 					this.props.gotoAddress(uintValue);
 				}
 			}, err => {
@@ -95,13 +100,11 @@ class GotoBox extends PureComponent {
 }
 
 GotoBox.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	started: PropTypes.bool.isRequired,
-	currentThread: PropTypes.number,
 	includePC: PropTypes.bool.isRequired,
 	promptGotoMarker: PropTypes.any,
-
 	gotoAddress: PropTypes.func.isRequired,
 };
+
+GotoBox.contextType = DebuggerContext;
 
 export default GotoBox;
