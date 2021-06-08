@@ -3,6 +3,7 @@ import { NavLink, BrowserRouter as Router, Route, Switch } from 'react-router-do
 import CPU from './CPU';
 import GPU from './GPU';
 import Log from './Log';
+import { DebuggerProvider } from './DebuggerContext';
 import NotConnected from './NotConnected';
 import PPSSPP from '../sdk/ppsspp.js';
 import listeners from '../utils/listeners.js';
@@ -49,18 +50,20 @@ class App extends Component {
 	render() {
 		return (
 			<Router>
-				<div className="App">
-					<header className="App-header">
-						<ul className="App-nav">
-							<NavLink to="/cpu" isActive={(m, l) => m || l.pathname === '/'}>CPU</NavLink>
-							<NavLink to="/gpu">GPU</NavLink>
-						</ul>
-						<img src={logo} className="App-logo" alt="PPSSPP" />
-						<h1 className="App-title">Debugger</h1>
-					</header>
-					{this.renderContent()}
-					<Log ppsspp={this.ppsspp} ref={this.logRef} />
-				</div>
+				<DebuggerProvider gameStatus={this.state.gameStatus} log={this.log} ppsspp={this.ppsspp}>
+					<div className="App">
+						<header className="App-header">
+							<ul className="App-nav">
+								<NavLink to="/cpu" isActive={(m, l) => m || l.pathname === '/'}>CPU</NavLink>
+								<NavLink to="/gpu">GPU</NavLink>
+							</ul>
+							<img src={logo} className="App-logo" alt="PPSSPP" />
+							<h1 className="App-title">Debugger</h1>
+						</header>
+						{this.renderContent()}
+						<Log ref={this.logRef} />
+					</div>
+				</DebuggerProvider>
 			</Router>
 		);
 	}
@@ -73,10 +76,10 @@ class App extends Component {
 		return (
 			<Switch>
 				<Route path="/gpu">
-					<GPU ppsspp={this.ppsspp} gameStatus={this.state.gameStatus} log={this.log} />
+					<GPU />
 				</Route>
 				<Route>
-					<CPU ppsspp={this.ppsspp} gameStatus={this.state.gameStatus} log={this.log} />
+					<CPU />
 				</Route>
 			</Switch>
 		);

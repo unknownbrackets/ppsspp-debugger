@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import listeners from '../utils/listeners.js';
 import './GPU.css';
 
@@ -10,6 +10,10 @@ class GPU extends PureComponent {
 		paused: true,
 		recording: false,
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 
 	render() {
 		return (
@@ -48,7 +52,7 @@ class GPU extends PureComponent {
 
 	onConnection() {
 		// Update the status of this connection immediately too.
-		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
+		this.context.ppsspp.send({ event: 'cpu.status' }).then((result) => {
 			const { stepping, paused, pc } = result;
 			const started = pc !== 0 || stepping;
 
@@ -60,7 +64,7 @@ class GPU extends PureComponent {
 
 	beginRecord = (ev) => {
 		this.setState({ recording: true });
-		this.props.ppsspp.send({ event: 'gpu.record.dump' }).then(result => {
+		this.context.ppsspp.send({ event: 'gpu.record.dump' }).then(result => {
 			var a = document.createElement('a');
 			a.setAttribute('download', 'recording.ppdmp');
 			a.href = result.uri;
@@ -75,9 +79,6 @@ class GPU extends PureComponent {
 	}
 }
 
-GPU.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
-};
+GPU.contextType = DebuggerContext;
 
 export default GPU;

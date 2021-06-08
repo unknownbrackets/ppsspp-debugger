@@ -1,6 +1,20 @@
 import listeners from '../utils/listeners.js';
 
+/**
+ * @typedef GameStatusValues
+ * @property {boolean} connected Whether a connection to PPSSPP is active.
+ * @property {boolean} stepping Whether CPU is in stepping / break mode.
+ * @property {boolean} paused Whether game emulation is paused.
+ * @property {boolean} started Whether game emulation has been started yet.
+ * @property {number} pc Integer PC value, or 0.
+ * @property {number} currentThread Thread ID of active thread or undefined.
+ * @property {Function} setState Method to update state.
+ */
+
 class GameStatus {
+	/**
+	 * @type {GameStatusValues}
+	 */
 	state = {
 		connected: false,
 		stepping: false,

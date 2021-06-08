@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import { createRef, PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import LogItem from './LogItem';
 import listeners from '../utils/listeners.js';
 import './Log.css';
@@ -11,12 +11,16 @@ class Log extends PureComponent {
 		id: 0,
 		items: [],
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	divRef;
 
 	constructor(props) {
 		super(props);
 
-		this.divRef = React.createRef();
+		this.divRef = createRef();
 	}
 
 	render() {
@@ -42,7 +46,7 @@ class Log extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.props.ppsspp.onError = (message, level) => {
+		this.context.ppsspp.onError = (message, level) => {
 			const newItem = { message: message + '\n', level };
 			this.addLogItem(newItem);
 		};
@@ -69,8 +73,6 @@ class Log extends PureComponent {
 	}
 }
 
-Log.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-};
+Log.contextType = DebuggerContext;
 
 export default Log;

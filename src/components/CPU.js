@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import { PureComponent } from 'react';
+import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import Disasm from './CPU/Disasm';
 import DisasmButtons from './CPU/DisasmButtons';
 import GotoBox from './common/GotoBox';
@@ -19,10 +19,14 @@ class CPU extends PureComponent {
 		ticks: 0,
 		navTray: false,
 	};
+	/**
+	 * @type {DebuggerContextValues}
+	 */
+	context;
 	listeners_;
 
 	render() {
-		const { stepping, paused, started, pc, currentThread } = this.props.gameStatus;
+		const { stepping, paused, started, pc, currentThread } = this.context.gameStatus;
 		const commonProps = { stepping: stepping && !paused, paused, started, currentThread };
 		const { selectionTop, selectionBottom, jumpMarker, setInitialPC, navTray } = this.state;
 		const disasmProps = { ...commonProps, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
@@ -31,12 +35,12 @@ class CPU extends PureComponent {
 			<div id="CPU">
 				<div className={navTray ? 'CPU__pane CPU__pane--open' : 'CPU__pane'}>
 					<button type="button" onClick={this.hideNavTray} className="CPU__paneClose">Close</button>
-					<GotoBox ppsspp={this.props.ppsspp} {...commonProps} gotoAddress={this.gotoDisasm} includePC={true} promptGotoMarker={this.state.promptGotoMarker} />
-					<LeftPanel {...this.props} {...commonProps} gotoDisasm={this.gotoDisasm} />
+					<GotoBox ppsspp={this.context.ppsspp} {...commonProps} gotoAddress={this.gotoDisasm} includePC={true} promptGotoMarker={this.state.promptGotoMarker} />
+					<LeftPanel {...this.props} {...this.context} {...commonProps} gotoDisasm={this.gotoDisasm} />
 				</div>
 				<div className="Disasm__container">
-					<DisasmButtons {...this.props} {...commonProps} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
-					<Disasm {...this.props} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
+					<DisasmButtons {...this.props} {...this.context} {...commonProps} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
+					<Disasm {...this.props} {...this.context} {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
 			</div>
 		);
@@ -82,7 +86,7 @@ class CPU extends PureComponent {
 
 	onConnection() {
 		// Update the status of this connection immediately too.
-		this.props.ppsspp.send({ event: 'cpu.status' }).then((result) => {
+		this.context.ppsspp.send({ event: 'cpu.status' }).then((result) => {
 			const { pc, ticks } = result;
 
 			if (!this.state.setInitialPC) {
@@ -122,9 +126,9 @@ class CPU extends PureComponent {
 
 	updateCurrentThread = (currentThread, pc) => {
 		this.setState({ setInitialPC: pc !== 0 && pc !== undefined });
-		this.props.gameStatus.setState({ currentThread });
+		this.context.gameStatus.setState({ currentThread });
 		if (pc !== 0 && pc !== undefined) {
-			this.props.gameStatus.setState({ pc });
+			this.context.gameStatus.setState({ pc });
 			this.gotoDisasm(pc);
 		}
 	}
@@ -138,29 +142,17 @@ class CPU extends PureComponent {
 	}
 
 	updateInitialPC = () => {
-		this.props.ppsspp.send({ event: 'cpu.getReg', name: 'pc' }).then(result => {
+		this.context.ppsspp.send({ event: 'cpu.getReg', name: 'pc' }).then(result => {
 			const pc = result.uintValue;
 			if (!this.state.setInitialPC) {
 				this.gotoDisasm(pc);
 			}
 			this.setState({ setInitialPC: pc !== 0 });
-			this.props.gameStatus.setState({ pc });
+			this.context.gameStatus.setState({ pc });
 		});
 	}
 }
 
-CPU.propTypes = {
-	ppsspp: PropTypes.object.isRequired,
-	log: PropTypes.func.isRequired,
-	gameStatus: PropTypes.shape({
-		connected: PropTypes.bool.isRequired,
-		stepping: PropTypes.bool.isRequired,
-		paused: PropTypes.bool.isRequired,
-		started: PropTypes.bool.isRequired,
-		pc: PropTypes.number.isRequired,
-		currentThread: PropTypes.number,
-		setState: PropTypes.func.isRequired,
-	}).isRequired,
-};
+CPU.contextType = DebuggerContext;
 
 export default CPU;
