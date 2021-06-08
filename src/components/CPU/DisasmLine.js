@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import { createRef, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
@@ -12,7 +12,7 @@ class DisasmLine extends PureComponent {
 	constructor(props) {
 		super(props);
 
-		this.ref = React.createRef();
+		this.ref = createRef();
 	}
 
 	render() {
@@ -94,11 +94,11 @@ class DisasmLine extends PureComponent {
 					'DisasmLine__highlight--end': pos + matchLength > text.length + 1,
 				});
 				return (
-					<React.Fragment>
+					<>
 						{text.substr(0, pos)}
 						<span className={className}>{text.substr(pos, matchLength)}</span>
 						{text.substr(pos + matchLength)}
-					</React.Fragment>
+					</>
 				);
 			}
 		}

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import { createRef, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import DisasmBranchGuide from './DisasmBranchGuide';
 import DisasmLine from './DisasmLine';
@@ -26,8 +26,8 @@ class DisasmList extends PureComponent {
 	constructor(props) {
 		super(props);
 
-		this.ref = React.createRef();
-		this.cursorRef = React.createRef();
+		this.ref = createRef();
+		this.cursorRef = createRef();
 		this.focusTimeout = new Timeout(() => null, 20);
 		this.paramsTimeout = new Timeout(() => {
 			this.setState({ selectedLineParams: this.state.pendingLineParams });

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import { createRef, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { toString08X } from '../../utils/format';
@@ -15,7 +15,7 @@ class RegList extends PureComponent {
 	constructor(props) {
 		super(props);
 
-		this.cursorRef = React.createRef();
+		this.cursorRef = createRef();
 	}
 
 	render() {
