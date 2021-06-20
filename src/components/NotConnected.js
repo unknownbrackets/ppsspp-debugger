@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import './NotConnected.css';
+import LogView from './LogView';
 
 export default function NotConnected(props) {
 	const connectManually = (ev) => {
@@ -12,8 +13,8 @@ export default function NotConnected(props) {
 		ev.preventDefault();
 	};
 
-	return (
-		<div id="NotConnected">
+	const mainDiv = (
+		<div className="NotConnected__main">
 			{props.connecting ? 'Connecting to PPSSPP...' : 'Not connected to PPSSPP'}
 
 			<div className="NotConnected__info">
@@ -28,8 +29,22 @@ export default function NotConnected(props) {
 			</form>
 		</div>
 	);
+
+	const subDiv = (
+		<div className="NotConnected__sub">
+			<LogView logHistory={props.logHistory}/>
+		</div>
+	);
+
+	return (
+		<div id="NotConnected">
+			{mainDiv}
+			{subDiv}
+		</div>
+	);
 }
 
 NotConnected.propTypes = {
 	connect: PropTypes.func.isRequired,
+	logHistory: PropTypes.object,
 };

@@ -28,7 +28,7 @@ export default function BreakpointPanelItem(props) {
 
 	const breakCheckbox = (
 		<td className="BreakpointPanelItem__break-check-cell">
-			<input type="checkbox" checked={breakpoint.enabled} className="BreakpointPanelItem__break-check" onChange={() => props.handleToggleBreakpoint(breakpoint, type)}/>
+			<input type="checkbox" checked={breakpoint.enabled} className="BreakpointPanelItem__break-check" onChange={() => props.toggleBreakpoint(breakpoint, type)}/>
 		</td>
 	);
 

@@ -8,6 +8,8 @@ import listeners from '../utils/listeners.js';
 import './CPU.css';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import BreakpointPanel from './CPU/BreakpointPanel';
+import LogView from './LogView';
+import PropTypes from 'prop-types';
 
 class CPU extends PureComponent {
 	state = {
@@ -34,13 +36,13 @@ class CPU extends PureComponent {
 
 		return (
 			<div id="CPU">
-				{this.renderCpuMain(navTray, disasmProps)}
-				{this.renderCpuSub()}
+				{this.renderMain(navTray, disasmProps)}
+				{this.renderSub()}
 			</div>
 		);
 	}
 
-	renderCpuMain(navTray, disasmProps) {
+	renderMain(navTray, disasmProps) {
 		const { stepping, paused, started, currentThread } = this.context.gameStatus;
 
 		return (
@@ -58,15 +60,19 @@ class CPU extends PureComponent {
 		);
 	}
 
-	renderCpuSub() {
+	renderSub() {
 		return (
 			<div className="CPU__sub">
 				<Tabs onSelect={this.handleSelect} defaultIndex={1}>
 					<TabList>
 						<Tab>Breakpoints</Tab>
+						<Tab>Log</Tab>
 					</TabList>
 					<TabPanel>
 						<BreakpointPanel gotoDisasm={this.gotoDisasm}/>
+					</TabPanel>
+					<TabPanel>
+						<LogView logHistory={this.props.logHistory}/>
 					</TabPanel>
 				</Tabs>
 			</div>
@@ -181,5 +187,9 @@ class CPU extends PureComponent {
 }
 
 CPU.contextType = DebuggerContext;
+
+CPU.propTypes = {
+	logHistory: PropTypes.object,
+};
 
 export default CPU;

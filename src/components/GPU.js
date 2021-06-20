@@ -2,6 +2,8 @@ import { PureComponent } from 'react';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import listeners from '../utils/listeners.js';
 import './GPU.css';
+import PropTypes from 'prop-types';
+import LogView from './LogView';
 
 class GPU extends PureComponent {
 	state = {
@@ -18,6 +20,15 @@ class GPU extends PureComponent {
 	render() {
 		return (
 			<div id="GPU">
+				{this.renderMain()}
+				{this.renderSub()}
+			</div>
+		);
+	}
+
+	renderMain() {
+		return (
+			<div className="GPU__main">
 				<div className="GPU__info">
 					{this.state.started && !this.state.paused ? 'Click below to generate a GE dump.  It will download as a file.' : 'Waiting for a game to start...'}
 				</div>
@@ -26,6 +37,14 @@ class GPU extends PureComponent {
 						<button disabled={this.state.recording}>{this.state.recording ? 'Recording...' : 'Record'}</button>
 					</form>
 				) : null}
+			</div>
+		);
+	}
+
+	renderSub() {
+		return (
+			<div className="GPU__sub">
+				<LogView logHistory={this.props.logHistory}/>
 			</div>
 		);
 	}
@@ -80,5 +99,9 @@ class GPU extends PureComponent {
 }
 
 GPU.contextType = DebuggerContext;
+
+GPU.propTypes = {
+	logHistory: PropTypes.object,
+};
 
 export default GPU;

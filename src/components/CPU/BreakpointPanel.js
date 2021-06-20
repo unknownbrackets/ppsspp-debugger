@@ -151,7 +151,7 @@ export default function BreakpointPanel(props) {
 
 	return (
 		<>
-			<ContextMenuTrigger id="breakpointPanel" holdToDisplay={-1} attributes={{ id: 'BreakpointPanel' }}>
+			<ContextMenuTrigger id="breakpointPanel" renderTag="div" holdToDisplay={-1} attributes={{ id: 'BreakpointPanel' }}>
 				<table className="BreakpointPanel__table" onKeyDown={onKeyDown} tabIndex={0}>
 					<thead>
 						<tr>

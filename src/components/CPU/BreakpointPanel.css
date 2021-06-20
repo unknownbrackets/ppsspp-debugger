@@ -1,5 +1,6 @@
 #BreakpointPanel {
 	flex: 1;
+	overflow-y: auto;
 }
 
 .BreakpointPanel__no-breakpoints {

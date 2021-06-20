@@ -70,16 +70,16 @@ class App extends Component {
 
 	renderContent() {
 		if (!this.state.connected) {
-			return <NotConnected connecting={this.state.connecting} connect={this.connect} />;
+			return <NotConnected connecting={this.state.connecting} connect={this.connect} logHistory={this.logRef.current?.state} />;
 		}
 
 		return (
 			<Switch>
 				<Route path="/gpu">
-					<GPU />
+					<GPU logHistory={this.logRef.current?.state} />
 				</Route>
 				<Route>
-					<CPU />
+					<CPU logHistory={this.logRef.current?.state} />
 				</Route>
 			</Switch>
 		);

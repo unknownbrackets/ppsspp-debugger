@@ -1,6 +1,5 @@
 import { createRef, PureComponent } from 'react';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
-import LogItem from './LogItem';
 import listeners from '../utils/listeners.js';
 import './Log.css';
 
@@ -24,15 +23,7 @@ class Log extends PureComponent {
 	}
 
 	render() {
-		return (
-			<div id="Log" ref={this.divRef}>
-				{this.state.items.map(this.renderItem.bind(this))}
-			</div>
-		);
-	}
-
-	renderItem(item) {
-		return <LogItem key={item.id} item={item} />;
+		return null;
 	}
 
 	addLogItem(newItem) {
@@ -54,13 +45,6 @@ class Log extends PureComponent {
 		this.listeners_ = listeners.listen({
 			'log': this.onLogEvent.bind(this),
 		});
-	}
-
-	componentDidUpdate(prevProps, prevState) {
-		if (prevState.id !== this.state.id) {
-			const div = this.divRef.current;
-			div.scrollTop = div.scrollHeight - div.clientHeight;
-		}
 	}
 
 	componentWillUnmount() {
