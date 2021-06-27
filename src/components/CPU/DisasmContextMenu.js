@@ -75,9 +75,9 @@ class DisasmContextMenu extends PureComponent {
 	handleCopyHex = (ev, data) => {
 		const hexLines = this.props.getSelectedLines().map(line => {
 			// Include each opcode of a macro if it's a macro.
-			return line.macroEncoding ? line.macroEncoding.map(toString08X).join("\n") : toString08X(line.encoding);
+			return line.macroEncoding ? line.macroEncoding.map(toString08X).join('\n') : toString08X(line.encoding);
 		});
-		copyText(hexLines.join("\n"));
+		copyText(hexLines.join('\n'));
 		data.node.focus();
 	}
 

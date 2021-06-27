@@ -20,6 +20,7 @@ module.exports = {
 		'no-extra-semi': 'error',
 		'semi': ['error', 'always'],
 		'jsdoc/require-jsdoc': 0,
+		'quotes': ['error', 'single'],
 		'jsx-quotes': ['error', 'prefer-double'],
 		'no-unexpected-multiline': 'warn',
 		'no-extra-boolean-cast': 'warn',
