@@ -1,8 +1,33 @@
 #CPU {
 	display: flex;
 	flex: 1;
+	flex-direction: column;
+}
+
+.CPU__main {
+	display: flex;
+	flex: 1;
 	max-height: 70vh;
 	min-height: 20em;
+}
+
+.CPU__sub {
+	display: flex;
+	flex: 1;
+	max-height: 20vh;
+	min-height: 5em;
+}
+
+.CPU__sub .react-tabs {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.CPU__sub .react-tabs__tab-panel--selected {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
 }
 
 .CPU__pane {

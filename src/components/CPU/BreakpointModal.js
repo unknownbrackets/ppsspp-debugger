@@ -156,6 +156,7 @@ class BreakpointModal extends PureComponent {
 		return this.context.ppsspp.send({
 			event: this.getEvent(this.props.breakpoint.type, 'remove'),
 			address: this.props.breakpoint.address,
+			size: this.props.breakpoint.size
 		}).then(() => {
 			// Return the original new address for easy sequencing.
 			return { uintValue };
@@ -191,12 +192,18 @@ class BreakpointModal extends PureComponent {
 			if (derivedBreakpoint) {
 				// This is the "derived" unchanged state for the "Discard changes?" prompt, and initial state.
 				derivedBreakpoint.address = '0x' + toString08X(derivedBreakpoint.address);
+				if (derivedBreakpoint.size) {
+					derivedBreakpoint.size = '0x' + toString08X(derivedBreakpoint.size);
+				}
 				derivedBreakpoint.condition = derivedBreakpoint.condition || '';
 				derivedBreakpoint.logFormat = derivedBreakpoint.logFormat || '';
 			}
 			const initialOverrides = nextProps.initialOverrides;
 			if (initialOverrides) {
 				initialOverrides.address = '0x' + toString08X(initialOverrides.address);
+				if (initialOverrides.size) {
+					initialOverrides.size = '0x' + toString08X(initialOverrides.size);
+				}
 			}
 			return { isOpen: true, ...derivedBreakpoint, derivedBreakpoint, ...initialOverrides };
 		}
