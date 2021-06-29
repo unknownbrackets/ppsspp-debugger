@@ -156,7 +156,7 @@ class BreakpointModal extends PureComponent {
 		return this.context.ppsspp.send({
 			event: this.getEvent(this.props.breakpoint.type, 'remove'),
 			address: this.props.breakpoint.address,
-			size: this.props.breakpoint.size
+			size: this.props.breakpoint.size,
 		}).then(() => {
 			// Return the original new address for easy sequencing.
 			return { uintValue };

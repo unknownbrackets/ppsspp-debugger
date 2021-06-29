@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import './Log.css';
 import LogItem from './LogItem';
+import './Log.css';
 
 export default function LogView(props) {
 	const { logHistory } = props;
@@ -21,5 +21,5 @@ export default function LogView(props) {
 }
 
 LogView.propTypes = {
-	logHistory: PropTypes.object
+	logHistory: PropTypes.object,
 };

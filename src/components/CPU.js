@@ -1,15 +1,15 @@
 import { PureComponent } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import PropTypes from 'prop-types';
+import BreakpointPanel from './CPU/BreakpointPanel';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import Disasm from './CPU/Disasm';
 import DisasmButtons from './CPU/DisasmButtons';
 import GotoBox from './common/GotoBox';
 import LeftPanel from './CPU/LeftPanel';
 import listeners from '../utils/listeners.js';
-import './CPU.css';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import BreakpointPanel from './CPU/BreakpointPanel';
 import LogView from './LogView';
-import PropTypes from 'prop-types';
+import './CPU.css';
 
 class CPU extends PureComponent {
 	state = {
@@ -37,7 +37,7 @@ class CPU extends PureComponent {
 		return (
 			<div id="CPU">
 				{this.renderMain(navTray, disasmProps)}
-				{this.renderSub()}
+				{this.renderUtilityPanel()}
 			</div>
 		);
 	}
@@ -60,19 +60,19 @@ class CPU extends PureComponent {
 		);
 	}
 
-	renderSub() {
+	renderUtilityPanel() {
 		return (
-			<div className="CPU__sub">
-				<Tabs onSelect={this.handleSelect} defaultIndex={1}>
+			<div className="CPU__utilityPanel">
+				<Tabs onSelect={this.handleSelect}>
 					<TabList>
-						<Tab>Breakpoints</Tab>
 						<Tab>Log</Tab>
+						<Tab>Breakpoints</Tab>
 					</TabList>
 					<TabPanel>
-						<BreakpointPanel gotoDisasm={this.gotoDisasm}/>
+						<LogView logHistory={this.props.logHistory} />
 					</TabPanel>
 					<TabPanel>
-						<LogView logHistory={this.props.logHistory}/>
+						<BreakpointPanel gotoDisasm={this.gotoDisasm} />
 					</TabPanel>
 				</Tabs>
 			</div>

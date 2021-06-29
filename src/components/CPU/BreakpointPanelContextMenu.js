@@ -1,6 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { connectMenu, ContextMenu, MenuItem } from 'react-contextmenu';
+import PropTypes from 'prop-types';
 
 function BreakpointPanelContextMenu(props) {
 	const { id, trigger } = props;
@@ -8,16 +7,19 @@ function BreakpointPanelContextMenu(props) {
 	return (
 		<ContextMenu id={id}>
 			{trigger?.breakpoint ? (<>
-				<MenuItem onClick={() => props.toggleBreakpoint(trigger.breakpoint, trigger.type)}>
-						Toggle Break
+				<MenuItem onClick={() => props.toggleBreakpoint(trigger.breakpoint)}>
+					Toggle Break
 				</MenuItem>
-				<MenuItem onClick={() => props.editBreakpoint(trigger.breakpoint, trigger.type)}>
-						Edit
+				<MenuItem onClick={() => props.editBreakpoint(trigger.breakpoint)}>
+					Edit&hellip;
 				</MenuItem>
-				<MenuItem divider/>
+				<MenuItem onClick={() => props.removeBreakpoint(trigger.breakpoint)}>
+					Remove
+				</MenuItem>
+				<MenuItem divider />
 			</>) : null}
 			<MenuItem onClick={() => props.createBreakpoint()}>
-				Add New
+				Add New&hellip;
 			</MenuItem>
 		</ContextMenu>
 	);
@@ -27,11 +29,11 @@ BreakpointPanelContextMenu.propTypes = {
 	id: PropTypes.string.isRequired,
 	trigger: PropTypes.shape({
 		breakpoint: PropTypes.object,
-		type: PropTypes.oneOf(['execute', 'memory']),
 	}),
 
 	toggleBreakpoint: PropTypes.func.isRequired,
 	editBreakpoint: PropTypes.func.isRequired,
+	removeBreakpoint: PropTypes.func.isRequired,
 	createBreakpoint: PropTypes.func.isRequired,
 };
 

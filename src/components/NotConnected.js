@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import './NotConnected.css';
 import LogView from './LogView';
+import './NotConnected.css';
 
 export default function NotConnected(props) {
 	const connectManually = (ev) => {
@@ -30,16 +30,16 @@ export default function NotConnected(props) {
 		</div>
 	);
 
-	const subDiv = (
-		<div className="NotConnected__sub">
-			<LogView logHistory={props.logHistory}/>
+	const utilityPanelDiv = (
+		<div className="NotConnected__utilityPanel">
+			<LogView logHistory={props.logHistory} />
 		</div>
 	);
 
 	return (
 		<div id="NotConnected">
 			{mainDiv}
-			{subDiv}
+			{utilityPanelDiv}
 		</div>
 	);
 }

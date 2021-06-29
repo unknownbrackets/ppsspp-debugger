@@ -11,14 +11,14 @@
 	flex-direction: column;
 	font-size: larger;
 	justify-content: center;
-	max-height: calc(80vh - 24px);
+	max-height: calc(75vh - 24px);
 	min-height: 20em;
 }
 
-.NotConnected__sub {
+.NotConnected__utilityPanel {
 	display: flex;
 	flex: 1;
-	max-height: calc(20vh - 24px);
+	max-height: calc(25vh - 24px);
 	min-height: 5em;
 }
 

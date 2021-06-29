@@ -1,0 +1,39 @@
+#BreakpointPanelList {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.BreakpointPanelList__no-breakpoints {
+	font-size: larger;
+	justify-content: center;
+	padding: .5em;
+	text-align: center;
+}
+
+.BreakpointPanelList__table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.BreakpointPanelList__table th {
+	background: #eee;
+	border-bottom: 1px solid #ccc;
+	text-align: start;
+	padding: 3px;
+}
+
+.BreakpointPanelList__table td {
+	padding: 2px;
+}
+
+.BreakpointPanelList__table-column {
+	width: 18%;
+}
+
+.BreakpointPanelList__table-column-break {
+	width: 1%;
+}
+
+.BreakpointPanelList__table-column-hits {
+	width: 9%;
+}

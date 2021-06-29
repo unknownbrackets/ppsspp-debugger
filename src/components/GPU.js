@@ -1,9 +1,9 @@
 import { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import listeners from '../utils/listeners.js';
-import './GPU.css';
-import PropTypes from 'prop-types';
 import LogView from './LogView';
+import './GPU.css';
 
 class GPU extends PureComponent {
 	state = {
@@ -21,7 +21,7 @@ class GPU extends PureComponent {
 		return (
 			<div id="GPU">
 				{this.renderMain()}
-				{this.renderSub()}
+				{this.renderUtilityPanel()}
 			</div>
 		);
 	}
@@ -41,10 +41,10 @@ class GPU extends PureComponent {
 		);
 	}
 
-	renderSub() {
+	renderUtilityPanel() {
 		return (
-			<div className="GPU__sub">
-				<LogView logHistory={this.props.logHistory}/>
+			<div className="GPU__utilityPanel">
+				<LogView logHistory={this.props.logHistory} />
 			</div>
 		);
 	}
