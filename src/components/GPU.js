@@ -1,8 +1,7 @@
 import { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import listeners from '../utils/listeners.js';
-import LogView from './LogView';
+import Log from './Log';
 import './GPU.css';
 
 class GPU extends PureComponent {
@@ -44,7 +43,7 @@ class GPU extends PureComponent {
 	renderUtilityPanel() {
 		return (
 			<div className="GPU__utilityPanel">
-				<LogView logHistory={this.props.logHistory} />
+				<Log />
 			</div>
 		);
 	}
@@ -99,9 +98,5 @@ class GPU extends PureComponent {
 }
 
 GPU.contextType = DebuggerContext;
-
-GPU.propTypes = {
-	logHistory: PropTypes.object,
-};
 
 export default GPU;

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import LogView from './LogView';
+import Log from './Log';
 import './NotConnected.css';
 
 export default function NotConnected(props) {
@@ -32,7 +32,7 @@ export default function NotConnected(props) {
 
 	const utilityPanelDiv = (
 		<div className="NotConnected__utilityPanel">
-			<LogView logHistory={props.logHistory} />
+			<Log />
 		</div>
 	);
 
@@ -46,5 +46,4 @@ export default function NotConnected(props) {
 
 NotConnected.propTypes = {
 	connect: PropTypes.func.isRequired,
-	logHistory: PropTypes.object,
 };

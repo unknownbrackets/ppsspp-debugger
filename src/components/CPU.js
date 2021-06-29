@@ -1,6 +1,5 @@
 import { PureComponent } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import PropTypes from 'prop-types';
 import BreakpointPanel from './CPU/BreakpointPanel';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import Disasm from './CPU/Disasm';
@@ -8,7 +7,7 @@ import DisasmButtons from './CPU/DisasmButtons';
 import GotoBox from './common/GotoBox';
 import LeftPanel from './CPU/LeftPanel';
 import listeners from '../utils/listeners.js';
-import LogView from './LogView';
+import Log from './Log';
 import './CPU.css';
 
 class CPU extends PureComponent {
@@ -68,8 +67,8 @@ class CPU extends PureComponent {
 						<Tab>Log</Tab>
 						<Tab>Breakpoints</Tab>
 					</TabList>
-					<TabPanel>
-						<LogView logHistory={this.props.logHistory} />
+					<TabPanel forceRender={true}>
+						<Log />
 					</TabPanel>
 					<TabPanel>
 						<BreakpointPanel gotoDisasm={this.gotoDisasm} />
@@ -187,9 +186,5 @@ class CPU extends PureComponent {
 }
 
 CPU.contextType = DebuggerContext;
-
-CPU.propTypes = {
-	logHistory: PropTypes.object,
-};
 
 export default CPU;
