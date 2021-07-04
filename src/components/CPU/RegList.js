@@ -88,12 +88,12 @@ class RegList extends PureComponent {
 		}
 		if (ev.key === 'ArrowUp' && this.state.cursor > 0) {
 			this.needsScroll = true;
-			this.setState({ cursor: this.state.cursor - 1 });
+			this.setState(prevState => ({ cursor: prevState.cursor - 1 }));
 			ev.preventDefault();
 		}
 		if (ev.key === 'ArrowDown' && this.state.cursor < this.props.registerNames.length - 1) {
 			this.needsScroll = true;
-			this.setState({ cursor: this.state.cursor + 1 });
+			this.setState(prevState => ({ cursor: prevState.cursor + 1 }));
 			ev.preventDefault();
 		}
 	}

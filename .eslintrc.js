@@ -33,6 +33,7 @@ module.exports = {
 		'react/jsx-no-useless-fragment': 'error',
 		'react/jsx-props-no-multi-spaces': 'error',
 		'react/jsx-tag-spacing': ['error', { beforeClosing: 'never' }],
+		'react/no-access-state-in-setstate': 'error',
 		'react/no-children-prop': 'error',
 		'react/no-deprecated': 'warn',
 		'react/no-direct-mutation-state': 'error',

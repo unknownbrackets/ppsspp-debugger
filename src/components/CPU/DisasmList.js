@@ -30,7 +30,7 @@ class DisasmList extends PureComponent {
 		this.cursorRef = createRef();
 		this.focusTimeout = new Timeout(() => null, 20);
 		this.paramsTimeout = new Timeout(() => {
-			this.setState({ selectedLineParams: this.state.pendingLineParams });
+			this.setState(prevState => ({ selectedLineParams: prevState.pendingLineParams }));
 		}, 20);
 	}
 

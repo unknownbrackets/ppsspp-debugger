@@ -129,12 +129,12 @@ class CPU extends PureComponent {
 	}
 
 	onStepping(data) {
-		this.setState({
+		this.setState(prevState => ({
 			selectionTop: data.pc,
 			selectionBottom: data.pc,
-			lastTicks: this.state.ticks,
+			lastTicks: prevState.ticks,
 			ticks: data.ticks,
-		});
+		}));
 	}
 
 	updateSelection = (data) => {

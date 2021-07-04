@@ -150,21 +150,21 @@ class RegPanel extends PureComponent {
 			return arr.slice(0, index).concat([item]).concat(arr.slice(index + 1));
 		};
 
-		const categories = this.state.categories.map((cat) => {
-			if (cat.id === result.category) {
-				return {
-					...cat,
-					// Keep values from last time, until next stepping.
-					uintValuesLast: cat.uintValuesLast,
-					floatValuesLast: cat.floatValuesLast,
-					uintValues: replaceCopy(cat.uintValues, result.register, result.uintValue),
-					floatValues: replaceCopy(cat.floatValues, result.register, result.floatValue),
-				};
-			}
-			return cat;
-		});
-
-		this.setState({ categories });
+		this.setState(prevState => ({
+			categories: prevState.categories.map((cat) => {
+				if (cat.id === result.category) {
+					return {
+						...cat,
+						// Keep values from last time, until next stepping.
+						uintValuesLast: cat.uintValuesLast,
+						floatValuesLast: cat.floatValuesLast,
+						uintValues: replaceCopy(cat.uintValues, result.register, result.uintValue),
+						floatValues: replaceCopy(cat.floatValues, result.register, result.floatValue),
+					};
+				}
+				return cat;
+			}),
+		}));
 	}
 }
 

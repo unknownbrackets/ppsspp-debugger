@@ -116,8 +116,11 @@ class FuncList extends PureComponent {
 			event: 'hle.func.list',
 		}).then(({ functions }) => {
 			functions.sort((a, b) => a.name.localeCompare(b.name));
-			const filteredFunctions = this.applyFilter(functions, this.state.filter);
-			this.setState({ functions, filteredFunctions, loading: false });
+			this.setState(prevState => ({
+				functions,
+				filteredFunctions: this.applyFilter(functions, prevState.filter),
+				loading: false,
+			}));
 		}, () => {
 			this.setState({ functions: [], filteredFunctions: [], loading: false });
 		});
@@ -133,8 +136,10 @@ class FuncList extends PureComponent {
 
 	handleFilter = (ev) => {
 		const filter = ev.target.value;
-		const filteredFunctions = this.applyFilter(this.state.functions, filter);
-		this.setState({ filter, filteredFunctions });
+		this.setState(prevState => ({
+			filter,
+			filteredFunctions: this.applyFilter(prevState.functions, filter),
+		}));
 	}
 
 	handleClick = (ev) => {
