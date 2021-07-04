@@ -135,8 +135,7 @@ export default function BreakpointPanelList(props) {
 				</table>
 				{breakpoints.length === 0 ?
 					<div className="BreakpointPanelList__no-breakpoints">No breakpoints set</div>
-					: null
-				}
+					: null}
 			</ContextMenuTrigger>
 			<BreakpointModal
 				isOpen={!!(editingBreakpoint || creatingBreakpoint)}

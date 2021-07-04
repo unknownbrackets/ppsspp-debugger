@@ -99,9 +99,7 @@ class BreakpointModal extends PureComponent {
 			return null;
 		}
 		return (
-			<>
-				<Field type="text" label="Condition" prop="condition" component={this} />
-			</>
+			<Field type="text" label="Condition" prop="condition" component={this} />
 		);
 	}
 

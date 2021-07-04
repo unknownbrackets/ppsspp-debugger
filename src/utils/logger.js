@@ -36,7 +36,7 @@ class Logger {
 	}
 
 	listen(listener) {
-		if(!this.changeListeners_.includes(listener)) {
+		if (!this.changeListeners_.includes(listener)) {
 			this.changeListeners_.push(listener);
 			listener(this.items_); // Make sure listener receives initial state
 		}
