@@ -129,7 +129,7 @@ export default function BreakpointPanelList(props) {
 								selected={index === selectedRow}
 								gotoBreakpoint={handleGotoBreakpoint}
 								toggleBreakpoint={handleToggleBreakpoint}
-								onSelect={() => setSelectedRow(index)} />,
+								onSelect={() => setSelectedRow(index)} />
 						)}
 					</tbody>
 				</table>

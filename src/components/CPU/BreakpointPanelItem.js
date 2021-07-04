@@ -1,9 +1,12 @@
 import { ContextMenuTrigger } from 'react-contextmenu';
 import PropTypes from 'prop-types';
+import { useDebuggerContext } from '../DebuggerContext';
 import { toString08X } from '../../utils/format';
 import './BreakpointPanelItem.css';
 
 export default function BreakpointPanelItem(props) {
+	const context = useDebuggerContext();
+
 	const { breakpoint, selected } = props;
 
 	const mapData = (props) => {
@@ -51,6 +54,9 @@ export default function BreakpointPanelItem(props) {
 				<td>{breakpoint.hits}</td>
 			</ContextMenuTrigger>
 		);
+	} else {
+		context.log('Unhandled breakpoint type: ' + breakpoint.type);
+		return null;
 	}
 }
 
