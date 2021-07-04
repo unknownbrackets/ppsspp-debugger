@@ -33,7 +33,7 @@ class GPU extends PureComponent {
 				</div>
 				{this.state.started && !this.state.paused ? (
 					<form className="GPU__form" onSubmit={this.beginRecord}>
-						<button disabled={this.state.recording}>{this.state.recording ? 'Recording...' : 'Record'}</button>
+						<button type="submit" disabled={this.state.recording}>{this.state.recording ? 'Recording...' : 'Record'}</button>
 					</form>
 				) : null}
 			</div>

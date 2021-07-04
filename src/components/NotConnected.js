@@ -18,14 +18,14 @@ export default function NotConnected(props) {
 			{props.connecting ? 'Connecting to PPSSPP...' : 'Not connected to PPSSPP'}
 
 			<div className="NotConnected__info">
-				Make sure "Allow remote debugger" is enabled in Developer tools.
+				Make sure &quot;Allow remote debugger&quot; is enabled in Developer tools.
 			</div>
 			<form className="NotConnected__form" onSubmit={connectManually}>
 				<input type="text" name="debugger-uri" placeholder="ws://ip:port/debugger" className="NotConnected__uri" />
-				<button disabled={props.connecting}>Connect Manually</button>
+				<button type="submit" disabled={props.connecting}>Connect Manually</button>
 			</form>
 			<form className="NotConnected__form" onSubmit={connectAutomatically}>
-				<button disabled={props.connecting}>Connect Automatically</button>
+				<button type="submit" disabled={props.connecting}>Connect Automatically</button>
 			</form>
 		</div>
 	);

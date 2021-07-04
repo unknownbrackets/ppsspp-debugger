@@ -20,7 +20,7 @@ Form.propTypes = {
 
 Form.Buttons = function (props) {
 	const saveHandler = props.onSave !== true ? props.onSave : undefined;
-	const saveButton = props.onSave ? <button onClick={saveHandler}>Save</button> : null;
+	const saveButton = props.onSave ? <button type="submit" onClick={saveHandler}>Save</button> : null;
 	const cancelButton = props.onCancel ? <button type="button" onClick={props.onCancel}>Cancel</button> : null;
 
 	return (
