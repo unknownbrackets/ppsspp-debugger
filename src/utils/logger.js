@@ -27,7 +27,7 @@ class Logger {
 	}
 
 	addLogItem(newItem) {
-		const id = this.id_ + 1;
+		const id = ++this.id_;
 		const itemWithId = { id, ...newItem };
 		this.items_ = this.items_.concat([itemWithId ]).slice(-MAX_LINES);
 		for (let listener of this.changeListeners_) {
