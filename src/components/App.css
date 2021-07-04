@@ -58,3 +58,23 @@
 .App-nav a:focus {
 	background-color: #4cc2ed;
 }
+
+.App-utilityPanel {
+	display: flex;
+	flex: 1;
+	max-height: calc(25vh - 24px);
+	min-height: 5em;
+}
+
+.App-utilityPanel .react-tabs {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+
+.App-utilityPanel .react-tabs__tab-panel--selected {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-height: 0;
+}

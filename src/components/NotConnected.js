@@ -31,7 +31,7 @@ export default function NotConnected(props) {
 	);
 
 	const utilityPanelDiv = (
-		<div className="NotConnected__utilityPanel">
+		<div className="NotConnected__utilityPanel App-utilityPanel">
 			<Log />
 		</div>
 	);

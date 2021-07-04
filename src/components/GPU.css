@@ -15,13 +15,6 @@
 	min-height: 20em;
 }
 
-.GPU__utilityPanel {
-	display: flex;
-	flex: 1;
-	max-height: calc(25vh - 24px);
-	min-height: 5em;
-}
-
 .GPU__info {
 	font-size: 14px;
 	margin-top: 2ex;

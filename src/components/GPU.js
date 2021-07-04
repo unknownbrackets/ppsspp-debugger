@@ -42,7 +42,7 @@ class GPU extends PureComponent {
 
 	renderUtilityPanel() {
 		return (
-			<div className="GPU__utilityPanel">
+			<div className="GPU__utilityPanel App-utilityPanel">
 				<Log />
 			</div>
 		);

@@ -61,7 +61,7 @@ class CPU extends PureComponent {
 
 	renderUtilityPanel() {
 		return (
-			<div className="CPU__utilityPanel">
+			<div className="CPU__utilityPanel App-utilityPanel">
 				<Tabs onSelect={this.handleSelect}>
 					<TabList>
 						<Tab>Log</Tab>
