@@ -6,6 +6,7 @@
 .VisualizeVFPU__matrix {
 	border-collapse: collapse;
 	margin-top: 10px;
+	width: 100%;
 }
 
 .VisualizeVFPU__matrix th,
@@ -30,6 +31,7 @@ th.VisualizeVFPU__col-header {
 	background-color: #eee;
 	border-left-color: #000;
 	border-right-color: #000;
+	width: 4ex;
 }
 
 .VisualizeVFPU__format {
