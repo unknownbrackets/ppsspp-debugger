@@ -1,6 +1,7 @@
 import { PureComponent } from 'react';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import listeners from '../utils/listeners.js';
+import Log from './Log';
 import './GPU.css';
 
 class GPU extends PureComponent {
@@ -18,6 +19,15 @@ class GPU extends PureComponent {
 	render() {
 		return (
 			<div id="GPU">
+				{this.renderMain()}
+				{this.renderUtilityPanel()}
+			</div>
+		);
+	}
+
+	renderMain() {
+		return (
+			<div className="GPU__main">
 				<div className="GPU__info">
 					{this.state.started && !this.state.paused ? 'Click below to generate a GE dump.  It will download as a file.' : 'Waiting for a game to start...'}
 				</div>
@@ -26,6 +36,14 @@ class GPU extends PureComponent {
 						<button disabled={this.state.recording}>{this.state.recording ? 'Recording...' : 'Record'}</button>
 					</form>
 				) : null}
+			</div>
+		);
+	}
+
+	renderUtilityPanel() {
+		return (
+			<div className="GPU__utilityPanel">
+				<Log />
 			</div>
 		);
 	}

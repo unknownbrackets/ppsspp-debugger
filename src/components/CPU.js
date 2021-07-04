@@ -1,10 +1,13 @@
 import { PureComponent } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import BreakpointPanel from './CPU/BreakpointPanel';
 import DebuggerContext, { DebuggerContextValues } from './DebuggerContext';
 import Disasm from './CPU/Disasm';
 import DisasmButtons from './CPU/DisasmButtons';
 import GotoBox from './common/GotoBox';
 import LeftPanel from './CPU/LeftPanel';
 import listeners from '../utils/listeners.js';
+import Log from './Log';
 import './CPU.css';
 
 class CPU extends PureComponent {
@@ -26,12 +29,23 @@ class CPU extends PureComponent {
 	listeners_;
 
 	render() {
-		const { stepping, paused, started, pc, currentThread } = this.context.gameStatus;
+		const { pc, currentThread } = this.context.gameStatus;
 		const { selectionTop, selectionBottom, jumpMarker, setInitialPC, navTray } = this.state;
 		const disasmProps = { currentThread, selectionTop, selectionBottom, jumpMarker, pc, setInitialPC };
 
 		return (
 			<div id="CPU">
+				{this.renderMain(navTray, disasmProps)}
+				{this.renderUtilityPanel()}
+			</div>
+		);
+	}
+
+	renderMain(navTray, disasmProps) {
+		const { stepping, paused, started, currentThread } = this.context.gameStatus;
+
+		return (
+			<div className="CPU__main">
 				<div className={navTray ? 'CPU__pane CPU__pane--open' : 'CPU__pane'}>
 					<button type="button" onClick={this.hideNavTray} className="CPU__paneClose">Close</button>
 					<GotoBox gotoAddress={this.gotoDisasm} includePC={true} promptGotoMarker={this.state.promptGotoMarker} />
@@ -41,6 +55,25 @@ class CPU extends PureComponent {
 					<DisasmButtons stepping={stepping && !paused} started={started} currentThread={currentThread} updateCurrentThread={this.updateCurrentThread} showNavTray={this.showNavTray} />
 					<Disasm {...disasmProps} updateSelection={this.updateSelection} promptGoto={this.promptGoto} />
 				</div>
+			</div>
+		);
+	}
+
+	renderUtilityPanel() {
+		return (
+			<div className="CPU__utilityPanel">
+				<Tabs onSelect={this.handleSelect}>
+					<TabList>
+						<Tab>Log</Tab>
+						<Tab>Breakpoints</Tab>
+					</TabList>
+					<TabPanel forceRender={true}>
+						<Log />
+					</TabPanel>
+					<TabPanel>
+						<BreakpointPanel gotoDisasm={this.gotoDisasm} />
+					</TabPanel>
+				</Tabs>
 			</div>
 		);
 	}

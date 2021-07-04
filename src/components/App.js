@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { NavLink, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, NavLink, Route, Switch } from 'react-router-dom';
 import CPU from './CPU';
 import GPU from './GPU';
-import Log from './Log';
 import { DebuggerProvider } from './DebuggerContext';
 import NotConnected from './NotConnected';
 import PPSSPP from '../sdk/ppsspp.js';
 import listeners from '../utils/listeners.js';
+import logger from '../utils/logger.js';
 import GameStatus from '../utils/game.js';
 import logo from '../assets/logo.svg';
 import './App.css';
@@ -23,14 +23,12 @@ class App extends Component {
 		gameStatus: null,
 	};
 	gameStatus;
-	logRef;
 	ppsspp;
 	originalTitle;
 
 	constructor(props) {
 		super(props);
 
-		this.logRef = React.createRef();
 		this.ppsspp = new PPSSPP();
 		this.gameStatus = new GameStatus();
 		this.originalTitle = document.title;
@@ -41,6 +39,7 @@ class App extends Component {
 			'game.start': this.updateTitle,
 			'game.quit': this.updateTitle,
 		});
+		logger.init(this.ppsspp);
 		this.gameStatus.init(this.ppsspp);
 		this.gameStatus.listenState(gameStatus => {
 			this.setState({ gameStatus });
@@ -61,7 +60,6 @@ class App extends Component {
 							<h1 className="App-title">Debugger</h1>
 						</header>
 						{this.renderContent()}
-						<Log ref={this.logRef} />
 					</div>
 				</DebuggerProvider>
 			</Router>
@@ -129,12 +127,8 @@ class App extends Component {
 	}
 
 	log = (message) => {
-		// Would rather keep Log managing its state, and pass this callback around.
-		if (this.logRef.current) {
-			this.logRef.current.addLogItem({ message: message + '\n' });
-		} else {
-			console.error(message);
-		}
+		// Would rather keep Logger managing its state, and pass this callback around.
+		logger.addLogItem({ message: message + '\n' });
 	}
 
 	updateTitle = (data) => {

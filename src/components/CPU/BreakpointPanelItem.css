@@ -1,0 +1,13 @@
+.BreakpointPanelItem--selected {
+	background: #39f;
+	color: #fff;
+}
+
+.BreakpointPanelItem__break-check {
+	margin: 0;
+	padding: 0;
+}
+
+.BreakpointPanelItem__break-check-cell {
+	text-align: center;
+}

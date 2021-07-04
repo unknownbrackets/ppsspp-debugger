@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import Log from './Log';
 import './NotConnected.css';
 
 export default function NotConnected(props) {
@@ -12,8 +13,8 @@ export default function NotConnected(props) {
 		ev.preventDefault();
 	};
 
-	return (
-		<div id="NotConnected">
+	const mainDiv = (
+		<div className="NotConnected__main">
 			{props.connecting ? 'Connecting to PPSSPP...' : 'Not connected to PPSSPP'}
 
 			<div className="NotConnected__info">
@@ -26,6 +27,19 @@ export default function NotConnected(props) {
 			<form className="NotConnected__form" onSubmit={connectAutomatically}>
 				<button disabled={props.connecting}>Connect Automatically</button>
 			</form>
+		</div>
+	);
+
+	const utilityPanelDiv = (
+		<div className="NotConnected__utilityPanel">
+			<Log />
+		</div>
+	);
+
+	return (
+		<div id="NotConnected">
+			{mainDiv}
+			{utilityPanelDiv}
 		</div>
 	);
 }

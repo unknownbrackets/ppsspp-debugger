@@ -1,8 +1,34 @@
 #CPU {
 	display: flex;
 	flex: 1;
-	max-height: 70vh;
+	flex-direction: column;
+}
+
+.CPU__main {
+	display: flex;
+	flex: 1;
+	max-height: calc(75vh - 24px);
 	min-height: 20em;
+}
+
+.CPU__utilityPanel {
+	display: flex;
+	flex: 1;
+	max-height: calc(25vh - 24px);
+	min-height: 5em;
+}
+
+.CPU__utilityPanel .react-tabs {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+
+.CPU__utilityPanel .react-tabs__tab-panel--selected {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-height: 0;
 }
 
 .CPU__pane {
@@ -25,7 +51,7 @@
 
 	.CPU__pane--open {
 		display: flex;
-		height: 70vh;
+		height: 75vh;
 	}
 
 	.CPU__paneClose {

@@ -1,12 +1,25 @@
 #GPU {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+}
+
+.GPU__main {
 	align-items: center;
 	display: flex;
 	flex: 1;
 	flex-direction: column;
 	font-size: larger;
 	justify-content: center;
-	max-height: 70vh;
+	max-height: calc(75vh - 24px);
 	min-height: 20em;
+}
+
+.GPU__utilityPanel {
+	display: flex;
+	flex: 1;
+	max-height: calc(25vh - 24px);
+	min-height: 5em;
 }
 
 .GPU__info {
