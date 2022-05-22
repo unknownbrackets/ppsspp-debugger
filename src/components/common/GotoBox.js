@@ -37,7 +37,7 @@ class GotoBox extends PureComponent {
 	}
 
 	renderPCButtons() {
-		if (!this.includePC) {
+		if (!this.props.includePC) {
 			return null;
 		}
 		const disabled = !this.context.gameStatus.started;
