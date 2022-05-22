@@ -57,7 +57,7 @@ class FuncList extends PureComponent {
 				filter={filter}
 			/>
 		);
-	}
+	};
 
 	renderFunc = ({ index, key, style }) => {
 		const func = this.state.filteredFunctions[index];
@@ -66,7 +66,7 @@ class FuncList extends PureComponent {
 				<button type="button" data-address={func.address}>{func.name}</button>
 			</div>
 		);
-	}
+	};
 
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
@@ -140,13 +140,13 @@ class FuncList extends PureComponent {
 			filter,
 			filteredFunctions: this.applyFilter(prevState.functions, filter),
 		}));
-	}
+	};
 
 	handleClick = (ev) => {
 		const { address } = ev.target.dataset;
 		this.props.gotoDisasm(Number(address));
 		ev.preventDefault();
-	}
+	};
 
 	static getDerivedStateFromProps(nextProps, prevState) {
 		let update = null;

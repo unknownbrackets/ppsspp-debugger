@@ -69,7 +69,7 @@ class GotoBox extends PureComponent {
 
 	handleChange = (ev) => {
 		this.setState({ address: ev.target.value });
-	}
+	};
 
 	handleSubmit = (ev) => {
 		if (this.context.gameStatus.started) {
@@ -88,15 +88,15 @@ class GotoBox extends PureComponent {
 			});
 		}
 		ev.preventDefault();
-	}
+	};
 
 	handlePC = (ev) => {
 		this.jumpToReg('pc');
-	}
+	};
 
 	handleRA = (ev) => {
 		this.jumpToReg('ra');
-	}
+	};
 }
 
 GotoBox.propTypes = {

@@ -80,7 +80,7 @@ class RegList extends PureComponent {
 		if (ev.button === 0) {
 			this.props.onDoubleClick(ev, data);
 		}
-	}
+	};
 
 	onKeyDown(ev) {
 		if (hasContextMenu()) {

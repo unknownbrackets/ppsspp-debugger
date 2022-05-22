@@ -45,24 +45,24 @@ class DisasmSearch extends PureComponent {
 
 	handleChange = (ev) => {
 		this.props.updateSearchString(ev.target.value);
-	}
+	};
 
 	handleNext = (ev) => {
 		this.props.searchNext();
 		this.focus();
 		ev.preventDefault();
-	}
+	};
 
 	handleCancel = (ev) => {
 		this.props.updateSearchString(null);
-	}
+	};
 
 	handleKeyDown = (ev) => {
 		if (ev.key === 'Escape') {
 			this.handleCancel();
 			ev.preventDefault();
 		}
-	}
+	};
 
 	focus() {
 		this.ref.current.focus();

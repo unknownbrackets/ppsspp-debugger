@@ -98,7 +98,7 @@ class Field extends Component {
 			const value = target.type === 'checkbox' ? target.checked : target.value;
 			this.props.component.setState({ [prop]: value });
 		}
-	}
+	};
 }
 
 Field.propTypes = {

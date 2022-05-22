@@ -129,7 +129,7 @@ class DisasmButtons extends PureComponent {
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
-	}
+	};
 
 	handleStepInto = () => {
 		this.props.updateCurrentThread(undefined);
@@ -139,7 +139,7 @@ class DisasmButtons extends PureComponent {
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
-	}
+	};
 
 	handleStepOver = () => {
 		this.props.updateCurrentThread(undefined);
@@ -149,7 +149,7 @@ class DisasmButtons extends PureComponent {
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
-	}
+	};
 
 	handleStepOut = () => {
 		const threadID = this.context.gameStatus.currentThread;
@@ -161,7 +161,7 @@ class DisasmButtons extends PureComponent {
 			// This might fail if they aren't inside a function call on this thread, so restore the thread.
 			this.props.updateCurrentThread(threadID);
 		});
-	}
+	};
 
 	handleNextHLE = () => {
 		this.props.updateCurrentThread(undefined);
@@ -170,22 +170,22 @@ class DisasmButtons extends PureComponent {
 		}).catch(() => {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
-	}
+	};
 
 	handleThreadSelect = (ev) => {
 		const currentThread = this.state.threads.find(th => th.id === Number(ev.target.value));
 		if (currentThread) {
 			this.props.updateCurrentThread(currentThread.id, currentThread.pc);
 		}
-	}
+	};
 
 	handleBreakpointOpen = () => {
 		this.setState({ breakpointModalOpen: true });
-	}
+	};
 
 	handleBreakpointClose = () => {
 		this.setState({ breakpointModalOpen: false });
-	}
+	};
 
 	static getDerivedStateFromProps(nextProps, prevState) {
 		let update = null;

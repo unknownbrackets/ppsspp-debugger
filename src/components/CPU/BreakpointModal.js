@@ -139,7 +139,7 @@ class BreakpointModal extends PureComponent {
 		});
 
 		e.preventDefault();
-	}
+	};
 
 	saveNew = ({ uintValue }) => {
 		return this.context.ppsspp.send({
@@ -147,7 +147,7 @@ class BreakpointModal extends PureComponent {
 			...this.state,
 			address: uintValue,
 		});
-	}
+	};
 
 	deleteOld = ({ uintValue }) => {
 		// This is used when changing the breakpoint type.
@@ -159,7 +159,7 @@ class BreakpointModal extends PureComponent {
 			// Return the original new address for easy sequencing.
 			return { uintValue };
 		});
-	}
+	};
 
 	updateExisting = ({ uintValue }) => {
 		return this.context.ppsspp.send({
@@ -167,7 +167,7 @@ class BreakpointModal extends PureComponent {
 			...this.state,
 			address: uintValue,
 		});
-	}
+	};
 
 	getEvent(type, event) {
 		if (type === 'execute') {
@@ -182,7 +182,7 @@ class BreakpointModal extends PureComponent {
 	onClose = () => {
 		this.cleanTimeout.start();
 		this.props.onClose();
-	}
+	};
 
 	static getDerivedStateFromProps(nextProps, prevState) {
 		if (nextProps.isOpen && !prevState.isOpen) {
