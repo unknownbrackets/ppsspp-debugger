@@ -92,7 +92,7 @@ class App extends Component {
 
 	handleAutoConnect = () => {
 		this.connect(null);
-	}
+	};
 
 	connect = (uri) => {
 		this.setState({ connecting: true });
@@ -119,17 +119,17 @@ class App extends Component {
 			listeners.change(false);
 			this.setState({ connected: false, connecting: false });
 		});
-	}
+	};
 
 	handleDisconnect = () => {
 		// Should trigger the appropriate events automatically.
 		this.ppsspp.disconnect();
-	}
+	};
 
 	log = (message) => {
 		// Would rather keep Logger managing its state, and pass this callback around.
 		logger.addLogItem({ message: message + '\n' });
-	}
+	};
 
 	updateTitle = (data) => {
 		if (!document) {
@@ -141,7 +141,7 @@ class App extends Component {
 		} else {
 			document.title = this.originalTitle;
 		}
-	}
+	};
 
 	onConnectionChange = (status) => {
 		if (status) {
@@ -152,7 +152,7 @@ class App extends Component {
 		} else {
 			this.updateTitle({});
 		}
-	}
+	};
 }
 
 export default App;

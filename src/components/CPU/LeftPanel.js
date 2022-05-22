@@ -48,15 +48,15 @@ class LeftPanel extends PureComponent {
 		if (index === 1 && !this.state.everShownFuncs) {
 			this.setState({ everShownFuncs: true });
 		}
-	}
+	};
 
 	handleVFPUOpen = () => {
 		this.setState({ vfpuModalOpen: true });
-	}
+	};
 
 	handleVFPUClose = () => {
 		this.setState({ vfpuModalOpen: false });
-	}
+	};
 }
 
 LeftPanel.propTypes = {

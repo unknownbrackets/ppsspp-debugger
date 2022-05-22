@@ -152,13 +152,13 @@ class Disasm extends PureComponent {
 				return null;
 			});
 		}
-	}
+	};
 
 	getSelectedLines = () => {
 		const { selectionTop, selectionBottom } = this.props;
 		const isSelected = line => line.address + line.addressSize > selectionTop && line.address <= selectionBottom;
 		return this.state.lines.filter(isSelected);
-	}
+	};
 
 	getSelectedDisasm = () => {
 		const lines = this.getSelectedLines();
@@ -194,11 +194,11 @@ class Disasm extends PureComponent {
 		}
 
 		return result;
-	}
+	};
 
 	updateDisplaySymbols = (flag) => {
 		this.setState({ wantDisplaySymbols: flag });
-	}
+	};
 
 	followBranch = (direction, line) => {
 		if (direction) {
@@ -217,7 +217,7 @@ class Disasm extends PureComponent {
 				this.gotoAddress(this.props.pc);
 			}
 		}
-	}
+	};
 
 	assembleInstruction = (line, startCode) => {
 		const { address } = line;
@@ -266,7 +266,7 @@ class Disasm extends PureComponent {
 		} else {
 			return writeInstruction();
 		}
-	}
+	};
 
 	toggleBreakpoint = (line, keep) => {
 		if (line.breakpoint === null) {
@@ -299,7 +299,7 @@ class Disasm extends PureComponent {
 				address: line.breakpoint.address || line.address,
 			});
 		}
-	}
+	};
 
 	editBreakpoint = (line) => {
 		// In case it's actually in the middle of a macro.
@@ -318,11 +318,11 @@ class Disasm extends PureComponent {
 				this.setState({ creatingBreakpoint });
 			}
 		});
-	}
+	};
 
 	closeEditBreakpoint = () => {
 		this.setState({ editingBreakpoint: null, creatingBreakpoint: null });
-	}
+	};
 
 	gotoAddress = (addr, snap = 'center') => {
 		this.needsScroll = snap;
@@ -330,7 +330,7 @@ class Disasm extends PureComponent {
 			selectionTop: addr,
 			selectionBottom: addr,
 		});
-	}
+	};
 
 	searchDisasm = (cont) => {
 		const continueLast = cont && this.lastSearch !== null;
@@ -393,7 +393,7 @@ class Disasm extends PureComponent {
 				}
 			}
 		});
-	}
+	};
 
 	updateSearchString = (match) => {
 		const highlightText = match ? match.toLowerCase() : null;
@@ -410,16 +410,16 @@ class Disasm extends PureComponent {
 				this.listRef.current.ensureCursorInView(false);
 			}
 		}
-	}
+	};
 
 	searchPrompt = () => {
 		this.updateSearchString(this.state.searchString || (this.lastSearch ? this.lastSearch.match : ''));
 		this.searchRef.current.focus();
-	}
+	};
 
 	searchNext = () => {
 		this.searchDisasm(true);
-	}
+	};
 
 	searchCancel = () => {
 		if (this.lastSearch && this.lastSearch.cancelState) {
@@ -427,7 +427,7 @@ class Disasm extends PureComponent {
 			this.setState({ searchInProgress: false });
 			this.lastSearch.cancelState = null;
 		}
-	}
+	};
 
 	getSnapshotBeforeUpdate(prevProps, prevState) {
 		if (this.needsOffsetFix && this.listRef.current && this.state.lines.length !== 0) {
@@ -612,11 +612,11 @@ class Disasm extends PureComponent {
 
 	onDoubleClick = (ev, data) => {
 		this.toggleBreakpoint(data.line);
-	}
+	};
 
 	applyScroll = (dist) => {
 		this.ref.current.scrollTop += dist * this.state.lineHeight;
-	}
+	};
 
 	onScroll(ev) {
 		this.updatesSequence = this.updatesSequence.then(() => {
@@ -650,8 +650,9 @@ class Disasm extends PureComponent {
 
 	bufferRange() {
 		const { scrollHeight, scrollTop, clientHeight } = this.ref.current;
-		const bufferTop = scrollTop / this.state.lineHeight;
-		const bufferBottom = (scrollHeight - scrollTop - clientHeight) / this.state.lineHeight;
+		const { lineHeight } = this.state;
+		const bufferTop = lineHeight === 0 ? 0 : scrollTop / lineHeight;
+		const bufferBottom = lineHeight === 0 ? 0 : (scrollHeight - scrollTop - clientHeight) / lineHeight;
 		const visibleEachDirection = Math.floor((this.state.visibleLines - 1) / 2);
 
 		return {

@@ -70,7 +70,7 @@ class DisasmContextMenu extends PureComponent {
 	handleCopyAddress = (ev, data) => {
 		copyText(toString08X(data.line.address));
 		data.node.focus();
-	}
+	};
 
 	handleCopyHex = (ev, data) => {
 		const hexLines = this.props.getSelectedLines().map(line => {
@@ -79,13 +79,13 @@ class DisasmContextMenu extends PureComponent {
 		});
 		copyText(hexLines.join('\n'));
 		data.node.focus();
-	}
+	};
 
 	handleCopyDisasm = (ev, data) => {
 		const lines = this.props.getSelectedDisasm();
 		copyText(lines);
 		data.node.focus();
-	}
+	};
 
 	handleAssemble = (ev, data) => {
 		// Delay so the context menu can close before the prompt.
@@ -94,7 +94,7 @@ class DisasmContextMenu extends PureComponent {
 				// Exception logged.
 			});
 		}, 0);
-	}
+	};
 
 	handleRunUntil = (ev, data) => {
 		this.context.ppsspp.send({
@@ -104,7 +104,7 @@ class DisasmContextMenu extends PureComponent {
 			// Already logged, let's assume the parent will have marked it disconnected/not started by now.
 		});
 		data.node.focus();
-	}
+	};
 
 	handleJumpPC = (ev, data) => {
 		this.context.ppsspp.send({
@@ -115,21 +115,21 @@ class DisasmContextMenu extends PureComponent {
 		}).catch((err) => {
 			this.context.log('Failed to update PC: ' + err);
 		});
-	}
+	};
 
 	handleToggleBreakpoint = (ev, data) => {
 		this.props.toggleBreakpoint(data.line);
-	}
+	};
 
 	handleFollowBranch = (ev, data) => {
 		this.props.followBranch(true, data.line);
-	}
+	};
 
 	handleTodo = (ev, data) => {
 		// TODO
 		console.log(data);
 		data.node.focus();
-	}
+	};
 }
 
 DisasmContextMenu.propTypes = {

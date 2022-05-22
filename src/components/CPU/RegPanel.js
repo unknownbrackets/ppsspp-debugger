@@ -91,16 +91,16 @@ class RegPanel extends PureComponent {
 	handleViewMemory = (ev, data) => {
 		// TODO
 		console.log(data);
-	}
+	};
 
 	handleViewDisassembly = (ev, data) => {
 		const uintValue = this.state.categories[data.cat].uintValues[data.reg];
 		this.props.gotoDisasm(uintValue);
-	}
+	};
 
 	handleCopyReg = (ev, data, regNode) => {
 		copyText(data.value);
-	}
+	};
 
 	handleChangeReg = (ev, data, regNode) => {
 		const prevValue = (data.cat === 0 ? '0x' : '') + data.value;
@@ -123,7 +123,7 @@ class RegPanel extends PureComponent {
 		this.context.ppsspp.send(packet).catch((err) => {
 			window.alert(err);
 		});
-	}
+	};
 
 	updateRegs(keepLast) {
 		this.context.ppsspp.send({

@@ -94,7 +94,7 @@ class GPU extends PureComponent {
 			this.setState({ recording: false });
 		});
 		ev.preventDefault();
-	}
+	};
 }
 
 GPU.contextType = DebuggerContext;

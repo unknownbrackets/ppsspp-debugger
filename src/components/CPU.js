@@ -139,7 +139,7 @@ class CPU extends PureComponent {
 
 	updateSelection = (data) => {
 		this.setState(data);
-	}
+	};
 
 	gotoDisasm = (pc) => {
 		this.setState({
@@ -148,13 +148,13 @@ class CPU extends PureComponent {
 			// It just matters that this is a new object.
 			jumpMarker: {},
 		});
-	}
+	};
 
 	promptGoto = () => {
 		this.setState({
 			promptGotoMarker: {},
 		});
-	}
+	};
 
 	updateCurrentThread = (currentThread, pc) => {
 		this.setState({ setInitialPC: pc !== 0 && pc !== undefined });
@@ -163,15 +163,15 @@ class CPU extends PureComponent {
 			this.context.gameStatus.setState({ pc });
 			this.gotoDisasm(pc);
 		}
-	}
+	};
 
 	showNavTray = () => {
 		this.setState({ navTray: true });
-	}
+	};
 
 	hideNavTray = () => {
 		this.setState({ navTray: false });
-	}
+	};
 
 	updateInitialPC = () => {
 		this.context.ppsspp.send({ event: 'cpu.getReg', name: 'pc' }).then(result => {
@@ -182,7 +182,7 @@ class CPU extends PureComponent {
 			this.setState({ setInitialPC: pc !== 0 });
 			this.context.gameStatus.setState({ pc });
 		});
-	}
+	};
 }
 
 CPU.contextType = DebuggerContext;

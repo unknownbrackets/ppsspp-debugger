@@ -24,7 +24,7 @@ class FitModal extends PureComponent {
 		}
 
 		this.props.onClose();
-	}
+	};
 }
 
 FitModal.propTypes = {

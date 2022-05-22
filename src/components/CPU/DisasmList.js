@@ -191,7 +191,7 @@ class DisasmList extends PureComponent {
 
 	onCopy = (ev) => {
 		return this.props.getSelectedDisasm();
-	}
+	};
 
 	onFocusChange(ev, focused) {
 		const update = () => {

@@ -97,7 +97,7 @@ class VisualizeVFPU extends PureComponent {
 	handleFormat = (ev) => {
 		const format = ev.target.value;
 		this.setState({ format });
-	}
+	};
 }
 
 VisualizeVFPU.propTypes = {
