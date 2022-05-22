@@ -650,8 +650,9 @@ class Disasm extends PureComponent {
 
 	bufferRange() {
 		const { scrollHeight, scrollTop, clientHeight } = this.ref.current;
-		const bufferTop = scrollTop / this.state.lineHeight;
-		const bufferBottom = (scrollHeight - scrollTop - clientHeight) / this.state.lineHeight;
+		const { lineHeight } = this.state;
+		const bufferTop = lineHeight === 0 ? 0 : scrollTop / lineHeight;
+		const bufferBottom = lineHeight === 0 ? 0 : (scrollHeight - scrollTop - clientHeight) / lineHeight;
 		const visibleEachDirection = Math.floor((this.state.visibleLines - 1) / 2);
 
 		return {
