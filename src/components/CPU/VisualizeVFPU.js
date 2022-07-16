@@ -12,11 +12,12 @@ class VisualizeVFPU extends PureComponent {
 	state = {
 		categories: [],
 		format: 'float',
+		transposed: true,
 	};
 	listeners_;
 
 	render() {
-		const { categories, format } = this.state;
+		const { categories, format, transposed } = this.state;
 		if (categories.length < 3) {
 			return null;
 		}
@@ -32,10 +33,15 @@ class VisualizeVFPU extends PureComponent {
 				<div className="VisualizeVFPU__list">
 					{matrices}
 				</div>
-				<div className="VisualizeVFPU__format">
-					Display as:
-					<label><input type="radio" checked={format === 'float'} value="float" onChange={this.handleFormat} /> Float</label>
-					<label><input type="radio" checked={format === 'uint'} value="uint" onChange={this.handleFormat} /> Hex</label>
+				<div className="VisualizeVFPU__options">
+					<div className="VisualizeVFPU__format">
+						Display as:
+						<label><input type="radio" checked={format === 'float'} value="float" onChange={this.handleFormat} /> Float</label>
+						<label><input type="radio" checked={format === 'uint'} value="uint" onChange={this.handleFormat} /> Hex</label>
+					</div>
+					<div className="VisualizeVFPU__orientation">
+						<label><input type="checkbox" checked={transposed} onChange={this.handleOrientation} /> Transposed</label>
+					</div>
 				</div>
 			</FitModal>
 		);
@@ -45,25 +51,57 @@ class VisualizeVFPU extends PureComponent {
 		return (
 			<table className="VisualizeVFPU__matrix" key={m}>
 				<thead>
-					<tr>
-						<th className="VisualizeVFPU__name">M{m}00</th>
-						<th className="VisualizeVFPU__row-header">R{m}00</th>
-						<th className="VisualizeVFPU__row-header">R{m}01</th>
-						<th className="VisualizeVFPU__row-header">R{m}02</th>
-						<th className="VisualizeVFPU__row-header">R{m}03</th>
-					</tr>
+					{this.renderTopHeaders(m)}
 				</thead>
 				<tbody>
-					{this.renderColumn(m, 0)}
-					{this.renderColumn(m, 1)}
-					{this.renderColumn(m, 2)}
-					{this.renderColumn(m, 3)}
+					{this.renderTableRow(m, 0)}
+					{this.renderTableRow(m, 1)}
+					{this.renderTableRow(m, 2)}
+					{this.renderTableRow(m, 3)}
 				</tbody>
 			</table>
 		);
 	}
 
-	renderColumn(m, c) {
+	renderTopHeaders(m) {
+		const { transposed } = this.state;
+		if (!transposed) {
+			return (
+				<tr>
+					<th className="VisualizeVFPU__name">M{m}00</th>
+					<th className="VisualizeVFPU__row-header">C{m}00</th>
+					<th className="VisualizeVFPU__row-header">C{m}10</th>
+					<th className="VisualizeVFPU__row-header">C{m}20</th>
+					<th className="VisualizeVFPU__row-header">C{m}30</th>
+				</tr>
+			);
+		}
+
+		return (
+			<tr>
+				<th className="VisualizeVFPU__name">M{m}00</th>
+				<th className="VisualizeVFPU__row-header">R{m}00</th>
+				<th className="VisualizeVFPU__row-header">R{m}01</th>
+				<th className="VisualizeVFPU__row-header">R{m}02</th>
+				<th className="VisualizeVFPU__row-header">R{m}03</th>
+			</tr>
+		);
+	}
+
+	renderTableRow(m, c) {
+		const { transposed } = this.state;
+		if (!transposed) {
+			return (
+				<tr key={c}>
+					<th className="VisualizeVFPU__col-header">R{m}0{c}</th>
+					<td>{this.renderValue(m, 0, c)}</td>
+					<td>{this.renderValue(m, 1, c)}</td>
+					<td>{this.renderValue(m, 2, c)}</td>
+					<td>{this.renderValue(m, 3, c)}</td>
+				</tr>
+			);
+		}
+
 		return (
 			<tr key={c}>
 				<th className="VisualizeVFPU__col-header">C{m}{c}0</th>
@@ -113,6 +151,11 @@ class VisualizeVFPU extends PureComponent {
 	handleFormat = (ev) => {
 		const format = ev.target.value;
 		this.setState({ format });
+	};
+
+	handleOrientation = (ev) => {
+		const transposed = ev.target.checked;
+		this.setState({ transposed });
 	};
 }
 

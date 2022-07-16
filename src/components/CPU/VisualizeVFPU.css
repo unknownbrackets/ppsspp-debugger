@@ -34,7 +34,10 @@ th.VisualizeVFPU__col-header {
 	width: 4ex;
 }
 
-.VisualizeVFPU__format {
+.VisualizeVFPU__options {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	margin-top: 1ex;
 }
 
