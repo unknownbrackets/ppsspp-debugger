@@ -8,6 +8,56 @@ import BreakpointPanelContextMenu from './BreakpointPanelContextMenu';
 import BreakpointPanelItem from './BreakpointPanelItem';
 import './BreakpointPanelList.css';
 
+function handleToggleBreakpoint(context, breakpoint) {
+	if (breakpoint.type === 'execute') {
+		context.ppsspp.send({
+			event: 'cpu.breakpoint.update',
+			address: breakpoint.address,
+			enabled: !breakpoint.enabled,
+		});
+	} else if (breakpoint.type === 'memory') {
+		context.ppsspp.send({
+			event: 'memory.breakpoint.update',
+			address: breakpoint.address,
+			size: breakpoint.size,
+			enabled: !breakpoint.enabled,
+		});
+	}
+}
+
+function handleRemoveBreakpoint(context, breakpoint) {
+	if (breakpoint.type === 'execute') {
+		context.ppsspp.send({
+			event: 'cpu.breakpoint.remove',
+			address: breakpoint.address,
+		});
+	} else if (breakpoint.type === 'memory') {
+		context.ppsspp.send({
+			event: 'memory.breakpoint.remove',
+			address: breakpoint.address,
+			size: breakpoint.size,
+		});
+	}
+}
+
+function handleClearBreakpoints(context, breakpoints) {
+	if (!window.confirm('Remove all breakpoints?')) {
+		return;
+	}
+
+	for (let breakpoint of breakpoints) {
+		handleRemoveBreakpoint(context, breakpoint);
+	}
+}
+
+function handleDisableBreakpoints(context, breakpoints) {
+	for (let breakpoint of breakpoints) {
+		if (breakpoint.enabled) {
+			handleToggleBreakpoint(context, breakpoint);
+		}
+	}
+}
+
 export default function BreakpointPanelList(props) {
 	const context = useDebuggerContext();
 
@@ -15,38 +65,6 @@ export default function BreakpointPanelList(props) {
 
 	const [editingBreakpoint, setEditingBreakpoint] = useState(null);
 	const [creatingBreakpoint, setCreatingBreakpoint] = useState(false);
-
-	const handleToggleBreakpoint = (breakpoint) => {
-		if (breakpoint.type === 'execute') {
-			context.ppsspp.send({
-				event: 'cpu.breakpoint.update',
-				address: breakpoint.address,
-				enabled: !breakpoint.enabled,
-			});
-		} else if (breakpoint.type === 'memory') {
-			context.ppsspp.send({
-				event: 'memory.breakpoint.update',
-				address: breakpoint.address,
-				size: breakpoint.size,
-				enabled: !breakpoint.enabled,
-			});
-		}
-	};
-
-	const handleRemoveBreakpoint = (breakpoint) => {
-		if (breakpoint.type === 'execute') {
-			context.ppsspp.send({
-				event: 'cpu.breakpoint.remove',
-				address: breakpoint.address,
-			});
-		} else if (breakpoint.type === 'memory') {
-			context.ppsspp.send({
-				event: 'memory.breakpoint.remove',
-				address: breakpoint.address,
-				size: breakpoint.size,
-			});
-		}
-	};
 
 	const handleGotoBreakpoint = (breakpoint) => {
 		if (breakpoint.type === 'execute') {
@@ -84,7 +102,7 @@ export default function BreakpointPanelList(props) {
 			ev.preventDefault();
 		}
 		if (ev.key === ' ') {
-			handleToggleBreakpoint(selectedBreakpoint);
+			handleToggleBreakpoint(context, selectedBreakpoint);
 			ev.preventDefault();
 		}
 		if (ev.key === 'Enter') {
@@ -92,7 +110,7 @@ export default function BreakpointPanelList(props) {
 			ev.preventDefault();
 		}
 		if (ev.key === 'Delete') {
-			handleRemoveBreakpoint(selectedBreakpoint);
+			handleRemoveBreakpoint(context, selectedBreakpoint);
 			ev.preventDefault();
 		}
 	};
@@ -128,7 +146,7 @@ export default function BreakpointPanelList(props) {
 								breakpoint={breakpoint}
 								selected={index === selectedRow}
 								gotoBreakpoint={handleGotoBreakpoint}
-								toggleBreakpoint={handleToggleBreakpoint}
+								toggleBreakpoint={(breakpoint) => handleToggleBreakpoint(context, breakpoint)}
 								onSelect={() => setSelectedRow(index)} />
 						)}
 					</tbody>
@@ -143,10 +161,14 @@ export default function BreakpointPanelList(props) {
 				breakpoint={editingBreakpoint}
 			/>
 			<BreakpointPanelContextMenu
-				toggleBreakpoint={handleToggleBreakpoint}
+				toggleBreakpoint={(breakpoint) => handleToggleBreakpoint(context, breakpoint)}
 				editBreakpoint={(breakpoint) => setEditingBreakpoint(breakpoint)}
-				removeBreakpoint={handleRemoveBreakpoint}
-				createBreakpoint={() => setCreatingBreakpoint(true)} />
+				removeBreakpoint={(breakpoint) => handleRemoveBreakpoint(context, breakpoint)}
+				createBreakpoint={() => setCreatingBreakpoint(true)}
+				hasBreakpoints={breakpoints.length > 0}
+				hasEnabledBreakpoints={breakpoints.filter(bp => bp.enabled).length > 0}
+				clearBreakpoints={() => handleClearBreakpoints(context, breakpoints)}
+				disableBreakpoints={() => handleDisableBreakpoints(context, breakpoints)} />
 		</>
 	);
 }
