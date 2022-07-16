@@ -27,13 +27,21 @@
 }
 
 .BreakpointPanelList__table-column {
-	width: 18%;
+	width: auto;
+}
+
+.BreakpointPanelList__table-column-type {
+	width: 18ex;
+}
+
+.BreakpointPanelList__table-column-offset {
+	width: 14ex;
 }
 
 .BreakpointPanelList__table-column-break {
-	width: 1%;
+	width: 6ex;
 }
 
 .BreakpointPanelList__table-column-hits {
-	width: 9%;
+	width: 14ex;
 }

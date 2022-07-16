@@ -114,8 +114,8 @@ export default function BreakpointPanelList(props) {
 					</thead>
 					<colgroup>
 						<col className="BreakpointPanelList__table-column-break" />
-						<col className="BreakpointPanelList__table-column" />
-						<col className="BreakpointPanelList__table-column" />
+						<col className="BreakpointPanelList__table-column-type" />
+						<col className="BreakpointPanelList__table-column-offset" />
 						<col className="BreakpointPanelList__table-column" />
 						<col className="BreakpointPanelList__table-column" />
 						<col className="BreakpointPanelList__table-column" />
