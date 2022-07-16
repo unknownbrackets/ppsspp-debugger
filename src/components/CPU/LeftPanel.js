@@ -5,12 +5,14 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import FuncList from './FuncList';
 import RegPanel from './RegPanel';
 import VisualizeVFPU from './VisualizeVFPU';
+import SaveBreakpoints from './SaveBreakpoints';
 import './LeftPanel.css';
 import '../ext/react-tabs.css';
 
 class LeftPanel extends PureComponent {
 	state = {
 		vfpuModalOpen: false,
+		breakpointModalOpen: false,
 		// These can be slow, so we want to prevent render until it's selected.
 		everShownFuncs: false,
 	};
@@ -36,10 +38,12 @@ class LeftPanel extends PureComponent {
 					</TabPanel>
 					<TabPanel className="react-tabs__tab-panel LeftPanel__tools">
 						<button type="button" onClick={this.handleVFPUOpen}>Visualize VFPU</button>
+						<button type="button" onClick={this.handleBreakpointOpen}>Save Breakpoints</button>
 					</TabPanel>
 				</Tabs>
 
 				<VisualizeVFPU isOpen={this.state.vfpuModalOpen} onClose={this.handleVFPUClose} />
+				<SaveBreakpoints isOpen={this.state.breakpointModalOpen} onClose={this.handleBreakpointClose} />
 			</div>
 		);
 	}
@@ -56,6 +60,14 @@ class LeftPanel extends PureComponent {
 
 	handleVFPUClose = () => {
 		this.setState({ vfpuModalOpen: false });
+	};
+
+	handleBreakpointOpen = () => {
+		this.setState({ breakpointModalOpen: true });
+	};
+
+	handleBreakpointClose = () => {
+		this.setState({ breakpointModalOpen: false });
 	};
 }
 
