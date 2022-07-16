@@ -1,0 +1,8 @@
+*.html text diff=html
+*.js text diff=javascript
+*.css text
+*.md text
+*.json text
+*.yml text
+*.svg text
+*.sh text eol=lf
