@@ -52,7 +52,7 @@ jobs:
       env:
         PUBLIC_URL: '.'
 
-    - name: Deploy to gh-pages
+    - name: Deploy to bundled
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
