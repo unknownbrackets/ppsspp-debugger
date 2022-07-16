@@ -83,8 +83,10 @@ class GPU extends PureComponent {
 	beginRecord = (ev) => {
 		this.setState({ recording: true });
 		this.context.ppsspp.send({ event: 'gpu.record.dump' }).then(result => {
-			var a = document.createElement('a');
-			a.setAttribute('download', 'recording.ppdmp');
+			const { id } = this.context.gameStatus;
+
+			let a = document.createElement('a');
+			a.setAttribute('download', id ? id + '.ppdmp' : 'recording.ppdmp');
 			a.href = result.uri;
 			a.hidden = true;
 			document.body.appendChild(a);

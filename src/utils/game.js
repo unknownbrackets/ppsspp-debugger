@@ -16,6 +16,7 @@ class GameStatus {
 	 * @type {GameStatusValues}
 	 */
 	state = {
+		id: null,
 		connected: false,
 		stepping: false,
 		paused: true,
@@ -39,8 +40,11 @@ class GameStatus {
 			'connection.change': (connected) => this.onConnectionChange(connected),
 			'cpu.stepping': (data) => this.onStepping(data),
 			'cpu.resume': () => this.setState({ stepping: false }),
-			'game.start': () => {
-				this.setState({ started: true, paused: false });
+			'game.start': ({ game }) => {
+				this.setState({ id: game && game.id, started: true, paused: false });
+			},
+			'game.status': ({ game }) => {
+				this.setState({ id: game && game.id });
 			},
 			'game.quit': () => {
 				this.setState({
