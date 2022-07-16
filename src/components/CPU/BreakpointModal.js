@@ -33,6 +33,7 @@ class BreakpointModal extends PureComponent {
 	context;
 	cleanState = {
 		isOpen: false,
+		editing: false,
 		derivedBreakpoint: null,
 	};
 	cleanBreakpoint = {
@@ -59,7 +60,7 @@ class BreakpointModal extends PureComponent {
 	}
 
 	render() {
-		const editing = !!this.props.breakpoint;
+		const editing = this.state.editing;
 
 		return (
 			<FitModal
@@ -203,7 +204,13 @@ class BreakpointModal extends PureComponent {
 					initialOverrides.size = '0x' + toString08X(initialOverrides.size);
 				}
 			}
-			return { isOpen: true, ...derivedBreakpoint, derivedBreakpoint, ...initialOverrides };
+			return {
+				isOpen: true,
+				editing: !!derivedBreakpoint,
+				...derivedBreakpoint,
+				derivedBreakpoint,
+				...initialOverrides,
+			};
 		}
 		if (!nextProps.isOpen && prevState.derivedBreakpoint) {
 			return { derivedBreakpoint: null };
