@@ -16,6 +16,19 @@ export function isAutoPersistingBreakpoints() {
 	}
 }
 
+export function cleanBreakpointForPersist(data) {
+	return {
+		...data,
+		// These are informational.
+		code: undefined,
+		symbol: undefined,
+		hits: undefined,
+		// Can't send nulls, so remove here.
+		condition: data.condition === null ? undefined : data.condition,
+		logFormat: data.logFormat === null ? undefined : data.logFormat,
+	};
+}
+
 class BreakpointPersister {
 	ppsspp_;
 	updateTimeouts_ = {};
@@ -103,16 +116,7 @@ class BreakpointPersister {
 		const key = 'ppdbg_breakpoints_' + type + '_' + this.gameID_;
 		try {
 			// Store, but remove some properties it's not useful to persist.
-			localStorage[key] = JSON.stringify(breakpoints.map(v => ({
-				...v,
-				// These are informational.
-				code: undefined,
-				symbol: undefined,
-				hits: undefined,
-				// Can't send nulls, so remove here.
-				condition: v.condition === null ? undefined : v.condition,
-				logFormat: v.logFormat === null ? undefined : v.logFormat,
-			})));
+			localStorage[key] = JSON.stringify(breakpoints.map(cleanBreakpointForPersist));
 		} catch (err) {
 			console.error('Unable to save breakpoints', err);
 		}
