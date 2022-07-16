@@ -87,6 +87,22 @@ class VisualizeVFPU extends PureComponent {
 	componentDidMount() {
 		this.listeners_ = listeners.listen({
 			'cpu.getAllRegs': ({ categories }) => this.setState({ categories }),
+			'cpu.setReg': ({ category, register, uintValue, floatValue }) => {
+				const spliceCopy = (arr, index, value) => [...arr.slice(0, index), value, ...arr.slice(index + 1)];
+
+				if (category !== 2) {
+					return;
+				}
+				this.setState(prevState => {
+					const newCategory = {
+						...prevState.categories[2],
+						uintValues: spliceCopy(prevState.categories[2].uintValues, register, uintValue),
+						floatValues: spliceCopy(prevState.categories[2].floatValues, register, floatValue),
+					};
+					const categories = spliceCopy(prevState.categories, 2, newCategory);
+					return { categories };
+				});
+			},
 		});
 	}
 
