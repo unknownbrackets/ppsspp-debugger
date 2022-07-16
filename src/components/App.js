@@ -8,6 +8,7 @@ import PPSSPP from '../sdk/ppsspp.js';
 import listeners from '../utils/listeners.js';
 import logger from '../utils/logger.js';
 import GameStatus from '../utils/game.js';
+import { breakpointPersister } from '../utils/persist.js';
 import logo from '../assets/logo.svg';
 import './App.css';
 
@@ -44,6 +45,7 @@ class App extends Component {
 		this.gameStatus.listenState(gameStatus => {
 			this.setState({ gameStatus });
 		});
+		breakpointPersister.init(this.ppsspp);
 	}
 
 	render() {
