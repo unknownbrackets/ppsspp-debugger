@@ -114,7 +114,7 @@ class VisualizeVFPU extends PureComponent {
 	}
 
 	renderValue(m, c, r) {
-		const reg = m * 4 + c * 32 + r;
+		const reg = m * 4 + r * 32 + c;
 		const cat = this.state.categories[2];
 		if (this.state.format === 'uint') {
 			return toString08X(cat.uintValues[reg]);
