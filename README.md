@@ -47,6 +47,13 @@ yarn build
 
 This will create a `build` directory with files ready for everyday use.
 
+To build for serving from within PPSSPP using the built-in webserver, build
+like this:
+
+```sh
+PUBLIC_URL=/debugger yarn build
+```
+
 ### What's this crazy syntax?
 
 This app uses modern JavaScript syntax + JSX extensions.

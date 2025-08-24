@@ -4,19 +4,23 @@
 	"homepage": "http://ppsspp-debugger.unknownbrackets.org",
 	"license": "GPL-3.0-or-later",
 	"dependencies": {
-		"clsx": "^1.1.1",
-		"react": "^18.1.0",
+		"@babel/plugin-syntax-flow": "^7.27.1",
+		"@babel/plugin-transform-react-jsx": "^7.27.1",
+		"clsx": "2.1.1",
+		"prop-types": "^15.8.1",
+		"react": "18.3.1",
 		"react-app-polyfill": "^3.0.0",
 		"react-contextmenu": "^2.14.0",
-		"react-dom": "^18.1.0",
-		"react-modal": "^3.15.1",
-		"react-router-dom": "^5.3.3",
+		"react-dom": "18.3.1",
+		"react-modal": "3.16.3",
+		"react-router-dom": "5.3.4",
 		"react-scripts": "5.0.1",
-		"react-tabs": "^5.1.0",
-		"react-virtualized": "^9.22.3"
+		"react-tabs": "5.2.0",
+		"react-virtualized": "9.22.6",
+		"typescript": "^5.9.2"
 	},
 	"devDependencies": {
-		"eslint-plugin-jsdoc": "^39.3.0"
+		"eslint-plugin-jsdoc": "^54.1.1"
 	},
 	"scripts": {
 		"start": "react-scripts start",
